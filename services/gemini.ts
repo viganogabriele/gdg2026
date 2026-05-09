@@ -5,23 +5,23 @@
  * as the primary provider, OpenRouter as a secondary fallback.
  * All functions return structured JSON via responseSchema / json_object mode.
  */
-import {
-  GoogleGenerativeAI,
-  SchemaType,
-} from '@google/generative-ai';
 import type {
-  Source,
-  SourceSection,
-  QuizQuestion,
-  StudyLevel,
-  DailyObjective,
-  LevelTopic,
-  Subject,
+    DailyObjective,
+    LevelTopic,
+    QuizQuestion,
+    Source,
+    SourceSection,
+    StudyLevel,
+    Subject,
 } from '@/types';
+import {
+    GoogleGenerativeAI,
+    SchemaType,
+} from '@google/generative-ai';
 
 // ─── Configuration ──────────────────────────────────────────────────
 
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-3.1-flash-lite';
 
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const OPENROUTER_MODEL = 'google/gemini-2.0-flash-001';
@@ -420,24 +420,24 @@ Return JSON:
   };
 
   const raw = await callAI<{
-    levels: Array<{
+    levels: {
       levelNumber: number;
       title: string;
-      topics: Array<{
+      topics: {
         title: string;
         arguments: string[];
         completed: boolean;
-      }>;
+      }[];
       status: string;
       requiredStudyMinutes: number;
       completedStudyMinutes?: number;
-    }>;
-    dailyObjectives: Array<{
+    }[];
+    dailyObjectives: {
       title: string;
       description: string;
       type: string;
       estimatedMinutes: number;
-    }>;
+    }[];
   }>({ prompt, responseSchema, temperature: 0.6 }, provider);
 
   // Hydrate with IDs, deadlines, and full type compliance
