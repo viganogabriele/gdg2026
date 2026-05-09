@@ -1,98 +1,112 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+/**
+ * Home Dashboard — Daily objectives, level, streak, quick actions
+ */
+import React from 'react';
+import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LevelIndicator } from '@/components/home/LevelIndicator';
+import { StreakCounter } from '@/components/home/StreakCounter';
+import { QuickActions } from '@/components/home/QuickActions';
+import { DailyObjectives } from '@/components/home/DailyObjectives';
+import { useStudyStore } from '@/hooks/useStudyStore';
+import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const subjects = useStudyStore((s) => s.subjects);
+  const levels = useStudyStore((s) => s.levels);
+  const stats = useStudyStore((s) => s.stats);
+  const dailyObjectives = useStudyStore((s) => s.dailyObjectives);
+  const completeObjective = useStudyStore((s) => s.completeObjective);
+  const { hasDueCards, dueCount } = useSpacedRepetition();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const activeSubject = subjects[0];
+  const activeLevel = levels.find((l) => l.status === 'active');
+  const currentLevelNum = activeLevel?.levelNumber || 1;
+
+  const handleChallenge = () => {
+    if (activeLevel) {
+      router.push(`/quiz/${activeLevel.id}`);
+    }
+  };
+
+  const handleQuickReview = () => {
+    router.push('/spaced-review');
+  };
+
+  const handleObjectivePress = () => {
+    if (activeLevel) {
+      router.push('/focus');
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Welcome back 👋</Text>
+            <Text style={styles.subject} numberOfLines={1}>
+              {activeSubject?.title || 'StudyQuest'}
+            </Text>
+          </View>
+          <View style={styles.xpBadge}>
+            <Text style={styles.xpText}>⭐ {stats.totalPoints}</Text>
+          </View>
+        </View>
+
+        {/* Level Indicator */}
+        <LevelIndicator
+          currentLevel={currentLevelNum}
+          totalLevels={levels.length}
+          levelTitle={activeLevel?.title || 'No active level'}
+          completedMinutes={activeLevel?.completedStudyMinutes || 0}
+          requiredMinutes={activeLevel?.requiredStudyMinutes || 100}
+          totalPoints={stats.totalPoints}
+        />
+
+        {/* Streak */}
+        <StreakCounter
+          currentStreak={stats.currentStreak}
+          longestStreak={stats.longestStreak}
+        />
+
+        {/* Quick Actions */}
+        <View style={styles.section}>
+          <QuickActions
+            onTakeChallenge={handleChallenge}
+            onQuickReview={handleQuickReview}
+            hasDueReviews={hasDueCards}
+            dueReviewCount={dueCount}
+            challengeAvailable={!!activeLevel}
+          />
+        </View>
+
+        {/* Daily Objectives */}
+        <View style={styles.section}>
+          <DailyObjectives
+            objectives={dailyObjectives}
+            onComplete={completeObjective}
+            onPress={handleObjectivePress}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  container: { flex: 1, backgroundColor: Colors.bg.primary },
+  content: { padding: Spacing.lg, paddingBottom: Spacing.huge },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: Spacing.lg },
+  greeting: { color: Colors.text.secondary, fontSize: FontSize.md },
+  subject: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold, marginTop: 4, maxWidth: 250 },
+  xpBadge: { backgroundColor: 'rgba(255, 215, 0, 0.1)', borderRadius: 20, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderWidth: 1, borderColor: 'rgba(255, 215, 0, 0.2)' },
+  xpText: { color: Colors.accent.xp, fontSize: FontSize.md, fontWeight: FontWeight.bold },
+  section: { marginTop: Spacing.xxl },
 });
