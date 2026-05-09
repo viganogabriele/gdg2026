@@ -68,6 +68,7 @@ export default function AssessmentScreen() {
           totalQuestions={questions.length}
           onAnswer={handleAnswer}
           showFeedback={false}
+          allowChange={true}
         />
       </ScrollView>
 
