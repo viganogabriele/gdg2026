@@ -1,5 +1,5 @@
 /**
- * Circular Progress Indicator — SVG-based with animated fill
+ * Circular Progress Indicator — SVG-based with animated fill, supports gradient stroke
  */
 import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
+import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Colors } from '@/constants/theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -19,10 +19,13 @@ interface ProgressCircleProps {
   size?: number;
   strokeWidth?: number;
   color?: string;
+  gradientColors?: [string, string, string];
+  gradientId?: string;
   backgroundColor?: string;
   label?: string;
   sublabel?: string;
   showPercentage?: boolean;
+  children?: React.ReactNode;
 }
 
 export function ProgressCircle({
@@ -30,10 +33,13 @@ export function ProgressCircle({
   size = 120,
   strokeWidth = 8,
   color = Colors.accent.primary,
+  gradientColors,
+  gradientId = 'pcgrad',
   backgroundColor = Colors.bg.tertiary,
   label,
   sublabel,
   showPercentage = true,
+  children,
 }: ProgressCircleProps) {
   const animatedProgress = useSharedValue(0);
 
@@ -51,10 +57,20 @@ export function ProgressCircle({
     strokeDashoffset: circumference * (1 - animatedProgress.value),
   }));
 
+  const strokeColor = gradientColors ? `url(#${gradientId})` : color;
+
   return (
     <View className="items-center justify-center" style={{ width: size, height: size }}>
       <Svg width={size} height={size} className="absolute">
-        {/* Background circle */}
+        {gradientColors && (
+          <Defs>
+            <LinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0" stopColor={gradientColors[0]} />
+              <Stop offset="0.5" stopColor={gradientColors[1]} />
+              <Stop offset="1" stopColor={gradientColors[2]} />
+            </LinearGradient>
+          </Defs>
+        )}
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -63,12 +79,11 @@ export function ProgressCircle({
           strokeWidth={strokeWidth}
           fill="none"
         />
-        {/* Progress circle */}
         <AnimatedCircle
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={color}
+          stroke={strokeColor}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}
@@ -94,6 +109,7 @@ export function ProgressCircle({
             {sublabel}
           </Text>
         )}
+        {children}
       </View>
     </View>
   );
