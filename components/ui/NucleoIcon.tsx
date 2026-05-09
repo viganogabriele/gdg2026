@@ -25,18 +25,19 @@ export type NucleoIconName = keyof typeof NUCLEO_ICONS;
 interface NucleoIconProps {
   name: NucleoIconName;
   size?: number;
+  color?: string;
   className?: string;
   style?: StyleProp<ImageStyle>;
 }
 
-export function NucleoIcon({ name, size = 24, className, style }: NucleoIconProps) {
+export function NucleoIcon({ name, size = 24, color, className, style }: NucleoIconProps) {
   const iconSource = NUCLEO_ICONS[name];
 
   return (
     <Image
       source={iconSource}
       className={className}
-      style={[{ width: size, height: size }, style]}
+      style={[{ width: size, height: size }, color ? { tintColor: color } : undefined, style]}
       contentFit="contain"
     />
   );
