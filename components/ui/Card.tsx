@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
-import { Colors, BorderRadius, Spacing, Shadow } from '@/constants/theme';
+import { Colors, Spacing, Shadow } from '@/constants/theme';
 
 interface CardProps {
   children: React.ReactNode;

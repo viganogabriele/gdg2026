@@ -1,42 +1,44 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-  ],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
       colors: {
-        bg: {
-          primary: '#0A0E1A',
-          secondary: '#141929',
-          tertiary: '#1E2640',
-          overlay: 'rgba(10, 14, 26, 0.85)',
+        background: '#0b151e',
+        foreground: '#d1d5ea',
+        border: {
+          DEFAULT: '#2c3b4e',
+          subtle: '#2c3b4e',
+          medium: '#2c3b4e',
+          bright: '#1156ae',
         },
-        accent: {
-          primary: '#6C5CE7',
-          'primary-light': '#8B7CF6',
-          secondary: '#00D2FF',
-          'secondary-light': '#33DDFF',
-          success: '#00E676',
-          'success-light': '#33EB91',
-          warning: '#FFD740',
-          'warning-light': '#FFE066',
-          danger: '#FF5252',
-          'danger-light': '#FF7B7B',
-          xp: '#FFD700',
+        ring: '#1156ae',
+        bg: {
+          primary: '#0b151e',
+          secondary: '#17202e',
+          tertiary: '#1a2433',
+          overlay: '#1a2737',
         },
         text: {
-          primary: '#FFFFFF',
-          secondary: '#8892B0',
-          muted: '#4A5568',
-          inverse: '#0A0E1A',
+          primary: '#d1d5ea',
+          secondary: '#c7cce1',
+          muted: '#b8bbd6',
+          inverse: '#0b151e',
         },
-        border: {
-          subtle: 'rgba(108, 92, 231, 0.15)',
-          medium: 'rgba(108, 92, 231, 0.3)',
-          bright: 'rgba(108, 92, 231, 0.5)',
+        accent: {
+          DEFAULT: '#2c3b4e',
+          primary: '#1156ae',
+          'primary-light': '#d8e9fd',
+          secondary: '#1c395e',
+          'secondary-light': '#2c3b4e',
+          success: '#36c6e2',
+          'success-light': '#e88930',
+          warning: '#e88930',
+          'warning-light': '#db57c3',
+          danger: '#ba1c1e',
+          'danger-light': '#ffffff',
+          xp: '#db57c3',
         },
       },
       spacing: {
@@ -51,12 +53,17 @@ module.exports = {
         massive: '64px',
       },
       borderRadius: {
-        sm: '8px',
-        md: '12px',
-        lg: '16px',
-        xl: '20px',
+        sm: '5.6px',
+        md: '7.6px',
+        lg: '9.6px',
+        xl: '13.6px',
         xxl: '24px',
         full: '9999px',
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+        serif: ['Libre Baskerville', 'serif'],
+        mono: ['Space Mono', 'monospace'],
       },
       fontSize: {
         xs: ['11px', { lineHeight: '16px' }],
