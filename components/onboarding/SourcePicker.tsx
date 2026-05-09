@@ -39,16 +39,18 @@ export function SourcePicker({
       const result = await DocumentPicker.getDocumentAsync({
         type: 'application/pdf',
         copyToCacheDirectory: true,
+        multiple: true,
       });
 
-      if (!result.canceled && result.assets[0]) {
-        const asset = result.assets[0];
-        onAddSource({
-          id: uid(),
-          type: 'pdf',
-          title: asset.name || 'PDF Document',
-          uri: asset.uri,
-          sections: [],
+      if (!result.canceled) {
+        result.assets.forEach((asset) => {
+          onAddSource({
+            id: uid(),
+            type: 'pdf',
+            title: asset.name || 'PDF Document',
+            uri: asset.uri,
+            sections: [],
+          });
         });
       }
     } catch (error) {
