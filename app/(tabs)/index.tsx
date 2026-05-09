@@ -61,7 +61,7 @@ export default function HomeScreen() {
           </View>
           <View className="bg-[rgba(255,215,0,0.1)] rounded-[20px] px-md py-sm border border-[rgba(255,215,0,0.2)]">
             <View className="flex-row items-center gap-[4px]">
-              <NucleoIcon name="star" size={16} />
+              <NucleoIcon name="star-xp" size={16} />
               <Text className="text-accent-xp text-md font-bold">{stats.totalPoints}</Text>
             </View>
           </View>
