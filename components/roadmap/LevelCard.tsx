@@ -1,25 +1,26 @@
 /**
  * Level Card — expandable card for roadmap timeline
  */
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  withTiming,
-  useSharedValue,
-} from 'react-native-reanimated';
-import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Colors, Shadow } from '@/constants/theme';
 import type { StudyLevel } from '@/types';
+import React, { useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 interface LevelCardProps {
   level: StudyLevel;
+  levelColor: string;
   onPress: () => void;
   onTakeQuiz: () => void;
 }
 
-export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
+export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardProps) {
   const [expanded, setExpanded] = useState(false);
   const expandHeight = useSharedValue(0);
 
@@ -35,8 +36,8 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
 
   const statusConfig = {
     locked: { color: Colors.text.muted, icon: 'lock' as const, label: 'Locked' },
-    active: { color: Colors.accent.primary, icon: 'book-open' as const, label: 'In Progress' },
-    completed: { color: Colors.accent.success, icon: 'circle-check' as const, label: 'Completed' },
+    active: { color: levelColor, icon: 'book-open' as const, label: 'In Progress' },
+    completed: { color: levelColor, icon: 'circle-check' as const, label: 'Completed' },
     failed: { color: Colors.accent.danger, icon: 'flame' as const, label: 'Needs Review' },
   }[level.status];
 
@@ -52,18 +53,19 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
 
   return (
     <TouchableOpacity
-      className={`bg-bg-secondary rounded-lg p-lg border mb-md ${
-        level.status === 'active' ? 'border-accent-primary' : 'border-border-subtle'
-      } ${level.status === 'completed' ? 'opacity-80' : ''}`}
-      style={level.status === 'active' ? Shadow.sm : undefined}
+      className={`bg-bg-secondary rounded-lg p-lg border mb-md ${level.status === 'completed' ? 'opacity-80' : ''}`}
+      style={[
+        { borderColor: level.status !== 'locked' ? levelColor : Colors.border.subtle },
+        level.status === 'active' ? Shadow.sm : undefined,
+      ]}
       onPress={toggleExpand}
       activeOpacity={0.8}
     >
       {/* Header */}
       <View className="flex-row items-center gap-md">
-        <View className="w-[40px] h-[40px] rounded-[20px] bg-bg-tertiary items-center justify-center border-[1.5px] border-border-medium">
+        <View className="w-[40px] h-[40px] rounded-[20px] bg-bg-tertiary items-center justify-center border-[1.5px]" style={{ borderColor: statusConfig.color }}>
           <Text className="text-lg font-bold" style={{ color: statusConfig.color }}>
-            {level.levelNumber}
+            {level.status === 'completed' ? '✓' : level.levelNumber}
           </Text>
         </View>
         <View className="flex-1">
@@ -71,7 +73,6 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
             {level.title}
           </Text>
           <View className="flex-row items-center gap-sm mt-[4px]">
-            <NucleoIcon name={statusConfig.icon as NucleoIconName} size={12} />
             <Text className="text-xs font-medium" style={{ color: statusConfig.color }}>
               {statusConfig.label}
             </Text>
