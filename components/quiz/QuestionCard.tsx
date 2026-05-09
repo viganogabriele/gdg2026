@@ -20,10 +20,11 @@ interface QuestionCardProps {
   totalQuestions: number;
   onAnswer: (answerIndex: number) => void;
   showFeedback: boolean;
+  allowChange?: boolean;
 }
 
 export function QuestionCard({
-  question, questionNumber, totalQuestions, onAnswer, showFeedback,
+  question, questionNumber, totalQuestions, onAnswer, showFeedback, allowChange = false,
 }: QuestionCardProps) {
   const shakeX = useSharedValue(0);
   const containerStyle = useAnimatedStyle(() => ({
@@ -85,7 +86,7 @@ export function QuestionCard({
               key={index}
               className={`flex-row items-center bg-bg-secondary rounded-md p-lg border-[1.5px] gap-md ${getOptionBorderClass(index)}`}
               onPress={() => handleAnswer(index)}
-              disabled={answered}
+              disabled={answered && !allowChange}
               activeOpacity={0.7}
             >
               <View className="w-[32px] h-[32px] rounded-[16px] bg-bg-tertiary items-center justify-center">
