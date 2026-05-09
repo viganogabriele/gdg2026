@@ -1,14 +1,14 @@
 /**
  * Root Layout — Dark theme, onboarding routing, font loading
  */
-import { useEffect } from 'react';
-import { Stack, router, useSegments } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { Colors } from '@/constants/theme';
+import { useStudyStore } from '@/hooks/useStudyStore';
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
-import { useStudyStore } from '@/hooks/useStudyStore';
-import { Colors } from '@/constants/theme';
 
 const CustomDarkTheme = {
   ...DarkTheme,
@@ -29,17 +29,24 @@ export const unstable_settings = {
 export default function RootLayout() {
   const onboardingComplete = useStudyStore((s) => s.onboardingComplete);
   const segments = useSegments();
+  const router = useRouter();
+
+  
 
   useEffect(() => {
-    const inOnboarding = segments[0] === '(onboarding)';
-    const inTabs = segments[0] === '(tabs)';
+    // avoid navigating before the router/segments are ready
+    setTimeout(() => {
+      if (!segments) return;
 
-    if (!onboardingComplete && !inOnboarding) {
-      router.replace('/(onboarding)/subject');
-    } else if (onboardingComplete && inOnboarding) {
-      router.replace('/(tabs)');
-    }
-  }, [onboardingComplete, segments]);
+      const inOnboarding = segments[0] === '(onboarding)';
+
+      if (!onboardingComplete && !inOnboarding) {
+        router.replace('/(onboarding)/subject');
+      } else if (onboardingComplete && inOnboarding) {
+        router.replace('/(tabs)');
+      }
+    }, 10);
+  }, [onboardingComplete, segments, router]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
