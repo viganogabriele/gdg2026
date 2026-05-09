@@ -1,18 +1,18 @@
 /**
  * Home Dashboard — Daily objectives, level, streak, quick actions
  */
-import React from 'react';
-import { ScrollView, View, Text } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { LevelIndicator } from '@/components/home/LevelIndicator';
-import { StreakCounter } from '@/components/home/StreakCounter';
-import { QuickActions } from '@/components/home/QuickActions';
 import { DailyObjectives } from '@/components/home/DailyObjectives';
-import { useStudyStore } from '@/hooks/useStudyStore';
-import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { LevelIndicator } from '@/components/home/LevelIndicator';
+import { QuickActions } from '@/components/home/QuickActions';
+import { StreakCounter } from '@/components/home/StreakCounter';
 import { Colors } from '@/constants/theme';
+import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { useStudyStore } from '@/hooks/useStudyStore';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const subjects = useStudyStore((s) => s.subjects);
@@ -34,6 +34,10 @@ export default function HomeScreen() {
 
   const handleQuickReview = () => {
     router.push('/spaced-review');
+  };
+
+  const handleFocusMode = () => {
+    router.push('/focus');
   };
 
   const handleObjectivePress = () => {
@@ -88,6 +92,7 @@ export default function HomeScreen() {
           <QuickActions
             onTakeChallenge={handleChallenge}
             onQuickReview={handleQuickReview}
+            onFocusMode={handleFocusMode}
             hasDueReviews={hasDueCards}
             dueReviewCount={dueCount}
             challengeAvailable={!!activeLevel}

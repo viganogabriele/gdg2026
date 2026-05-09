@@ -1,22 +1,23 @@
 /**
  * Quick Actions — Challenge and Review action buttons
  */
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from 'react-native-reanimated';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface QuickActionsProps {
   onTakeChallenge: () => void;
   onQuickReview: () => void;
+  onFocusMode?: () => void;
   hasDueReviews: boolean;
   dueReviewCount: number;
   challengeAvailable: boolean;
@@ -25,6 +26,7 @@ interface QuickActionsProps {
 export function QuickActions({
   onTakeChallenge,
   onQuickReview,
+  onFocusMode,
   hasDueReviews,
   dueReviewCount,
   challengeAvailable,
@@ -47,6 +49,14 @@ export function QuickActions({
         disabled={!hasDueReviews}
         color={Colors.accent.secondary}
         badge={hasDueReviews ? dueReviewCount : undefined}
+      />
+      <ActionButton
+        iconName="time-outline"
+        title="Focus Mode"
+        subtitle={'Start a focused session'}
+        onPress={() => onFocusMode && onFocusMode()}
+        disabled={false}
+        color={Colors.accent.success}
       />
     </View>
   );

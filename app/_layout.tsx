@@ -2,6 +2,7 @@
  * Root Layout — Dark theme, onboarding routing, font loading
  */
 import { Colors } from '@/constants/theme';
+import useAutoFocusOnChargeAndLandscape from '@/hooks/useAutoFocusOnChargeAndLandscape';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
@@ -31,6 +32,9 @@ export default function RootLayout() {
   const onboardingComplete = useStudyStore((s) => s.onboardingComplete);
   const segments = useSegments();
   const router = useRouter();
+
+  // auto-focus: navigate to `/focus` when device is charging and landscape
+  useAutoFocusOnChargeAndLandscape(true);
 
   useEffect(() => {
     // avoid navigating before the router/segments are ready
