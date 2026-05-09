@@ -3,7 +3,7 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Button } from '@/components/ui/Button';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
 import { Colors } from '@/constants/theme';
@@ -62,10 +62,9 @@ export function PomodoroTimer({ onSessionComplete }: PomodoroTimerProps) {
   return (
     <View className="flex-1 items-center justify-center p-xxl">
       <View className="flex-row items-center gap-xs mb-xxl">
-        <Ionicons
-          name={isBreak ? 'cafe-outline' : 'book-outline'}
+        <NucleoIcon
+          name={isBreak ? 'star' : 'book-open'}
           size={20}
-          color={Colors.text.secondary}
         />
         <Text className="text-xl text-text-primary font-semibold">
           {isBreak ? 'Break Time' : 'Focus Time'}

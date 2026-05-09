@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { PomodoroTimer } from '@/components/focus/PomodoroTimer';
 import { SessionComplete } from '@/components/focus/SessionComplete';
 import { Button } from '@/components/ui/Button';
@@ -58,7 +58,7 @@ export default function FocusScreen() {
               <Text className="text-text-primary text-md font-medium">{currentTopic.title}</Text>
               {currentTopic.sourceRefs.map((ref, i) => (
                 <View key={i} className="flex-row items-center gap-[4px] mt-xs">
-                  <Ionicons name="attach-outline" size={12} color={Colors.accent.secondary} />
+                  <NucleoIcon name="link" size={12} />
                   <Text className="text-accent-secondary text-xs">{ref.label}</Text>
                 </View>
               ))}

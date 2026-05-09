@@ -6,7 +6,7 @@ import { View, Text, ScrollView } from 'react-native';
 import Animated, {
   FadeInDown,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
@@ -65,7 +65,7 @@ export default function RoadmapRevealScreen() {
       <ScrollView contentContainerStyle={{ padding: 24, paddingTop: 48 }} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.delay(200)} className="items-center">
           <View className="mb-lg">
-            <Ionicons name="school-outline" size={64} color={Colors.accent.xp} />
+            <NucleoIcon name="book-open" size={64} />
           </View>
           <Text className="text-text-primary text-xxl font-bold text-center">Your Study Plan is Ready!</Text>
           <Text className="text-text-secondary text-md text-center mt-sm mb-xxxl">
@@ -95,14 +95,13 @@ export default function RoadmapRevealScreen() {
               <View className="flex-1">
                 <Text className="text-text-primary text-md font-semibold">{level.title}</Text>
                 <View className="flex-row items-center gap-xs mt-[2px]">
-                  <Ionicons
+                  <NucleoIcon
                     name={
-                      level.status === 'completed' ? 'checkmark-circle'
-                      : level.status === 'active' ? 'book-outline'
-                      : 'lock-closed'
+                      level.status === 'completed' ? 'circle-check'
+                      : level.status === 'active' ? 'book-open'
+                      : 'lock'
                     }
                     size={12}
-                    color={Colors.text.muted}
                   />
                   <Text className="text-text-muted text-xs">
                     {level.status === 'completed' ? 'Already known' :
@@ -117,7 +116,7 @@ export default function RoadmapRevealScreen() {
         <Animated.View entering={FadeInDown.delay(400 + levels.length * 150)} className="mt-xxxl pb-xxl">
           <Button
             title="Start Studying!"
-            icon={<Ionicons name="rocket-outline" size={18} color={Colors.text.primary} />}
+            icon={<NucleoIcon name="rocket" size={18} />}
             onPress={handleStart}
             fullWidth
             size="lg"

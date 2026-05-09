@@ -7,18 +7,18 @@ import Animated, {
   useSharedValue, useAnimatedStyle, withRepeat,
   withSequence, withTiming, Easing,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
 import { Colors } from '@/constants/theme';
 
-const STEPS = [
-  { label: 'Analyzing your sources...', icon: 'document-outline' as const },
-  { label: 'Mapping topic dependencies...', icon: 'map-outline' as const },
-  { label: 'Generating assessment questions...', icon: 'help-circle-outline' as const },
-  { label: 'Almost ready!', icon: 'sparkles-outline' as const },
+const STEPS: { label: string; icon: NucleoIconName }[] = [
+  { label: 'Analyzing your sources...', icon: 'book-open' },
+  { label: 'Mapping topic dependencies...', icon: 'folder' },
+  { label: 'Generating assessment questions...', icon: 'award' },
+  { label: 'Almost ready!', icon: 'sparkle' },
 ];
 
 export default function ProcessingScreen() {
@@ -98,7 +98,7 @@ export default function ProcessingScreen() {
           className="w-[120px] h-[120px] rounded-[60px] bg-bg-secondary items-center justify-center border-2 border-accent-primary mb-xxxl"
           style={pulseStyle}
         >
-          <Ionicons name={step.icon} size={48} color={Colors.accent.primary} />
+          <NucleoIcon name={step.icon} size={48} />
         </Animated.View>
 
         <Text className="text-text-primary text-xl font-semibold text-center mb-xxl">{step.label}</Text>

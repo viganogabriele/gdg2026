@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
 import { Colors } from '@/constants/theme';
 
@@ -54,7 +54,7 @@ export function LevelIndicator({
           {completedMinutes} / {requiredMinutes} min studied
         </Text>
         <View className="flex-row items-center mt-sm gap-xs">
-          <Ionicons name="star" size={16} color={Colors.accent.xp} />
+          <NucleoIcon name="star" size={16} />
           <Text className="text-accent-xp text-lg font-bold">{totalPoints} XP</Text>
         </View>
       </View>

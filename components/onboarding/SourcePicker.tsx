@@ -10,7 +10,7 @@ import {
   TextInput,
   Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
 import type { Source } from '@/types';
 
@@ -80,10 +80,10 @@ export function SourcePicker({
     setNotesInput('');
   };
 
-  const tabConfig: Record<string, { icon: string; label: string }> = {
-    pdf: { icon: 'document-outline', label: 'PDF' },
-    url: { icon: 'link-outline', label: 'URL' },
-    notes: { icon: 'create-outline', label: 'Notes' },
+  const tabConfig: Record<string, { icon: NucleoIconName; label: string }> = {
+    pdf: { icon: 'book-open', label: 'PDF' },
+    url: { icon: 'link', label: 'URL' },
+    notes: { icon: 'dial', label: 'Notes' },
   };
 
   return (
@@ -101,10 +101,9 @@ export function SourcePicker({
             onPress={() => setActiveTab(tab)}
           >
             <View className="flex-row items-center gap-[6px]">
-              <Ionicons
-                name={tabConfig[tab].icon as any}
+              <NucleoIcon
+                name={tabConfig[tab].icon}
                 size={16}
-                color={activeTab === tab ? Colors.accent.primary : Colors.text.muted}
               />
               <Text className={`text-sm font-medium ${activeTab === tab ? 'text-accent-primary' : 'text-text-muted'}`}>
                 {tabConfig[tab].label}
@@ -122,7 +121,7 @@ export function SourcePicker({
             onPress={handlePickPDF}
           >
             <View className="mb-md">
-              <Ionicons name="folder-outline" size={40} color={Colors.text.primary} />
+              <NucleoIcon name="folder" size={40} />
             </View>
             <Text className="text-text-primary text-md font-medium">
               Tap to select a PDF file
@@ -191,10 +190,9 @@ export function SourcePicker({
           {sources.map((source) => (
             <View key={source.id} className="flex-row items-center bg-bg-secondary rounded-md p-md border border-border-subtle">
               <View className="mr-md">
-                <Ionicons
-                  name={tabConfig[source.type]?.icon as any || 'document-outline'}
+                <NucleoIcon
+                  name={tabConfig[source.type]?.icon || 'book-open'}
                   size={20}
-                  color={Colors.text.primary}
                 />
               </View>
               <View className="flex-1">

@@ -4,22 +4,22 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { View, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
 
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
-    home: 'home',
-    roadmap: 'map-outline',
-    profile: 'person',
+  const icons: Record<string, NucleoIconName> = {
+    home: 'house',
+    roadmap: 'folder',
+    profile: 'face-grin',
   };
   return (
     <View className={`items-center justify-center w-[40px] h-[32px] rounded-[16px] ${focused ? 'bg-[rgba(108,92,231,0.15)]' : ''}`}>
-      <Ionicons
-        name={icons[name] || 'apps'}
+      <NucleoIcon
+        name={icons[name] || 'folder'}
         size={focused ? 22 : 20}
-        color={focused ? Colors.accent.primary : Colors.text.muted}
+        className={focused ? 'opacity-100' : 'opacity-50'}
       />
     </View>
   );

@@ -1,16 +1,16 @@
 /**
  * Profile / Settings Screen — stats, badges, preferences
  */
-import React from 'react';
-import { ScrollView, View, Text, Switch, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { Card } from '@/components/ui/Card';
 import { BadgeDisplay } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { useStudyStore } from '@/hooks/useStudyStore';
+import { Card } from '@/components/ui/Card';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { BadgeDefinitions } from '@/constants/gamification';
 import { Colors } from '@/constants/theme';
+import { useStudyStore } from '@/hooks/useStudyStore';
+import React from 'react';
+import { Alert, ScrollView, Switch, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
   const stats = useStudyStore((s) => s.stats);
@@ -45,9 +45,9 @@ export default function ProfileScreen() {
 
         {/* Stats Cards */}
         <View className="flex-row flex-wrap gap-md mb-xxl">
-          <StatCard iconName="time-outline" label="Study Time" value={formatHours(stats.totalStudyMinutes)} />
+          <StatCard iconName="calendar" label="Study Time" value={formatHours(stats.totalStudyMinutes)} />
           <StatCard iconName="star" label="Total XP" value={String(stats.totalPoints)} />
-          <StatCard iconName="library-outline" label="Levels Done" value={String(stats.levelsCompleted)} />
+          <StatCard iconName="folder" label="Levels Done" value={String(stats.levelsCompleted)} />
           <StatCard iconName="flame" label="Best Streak" value={`${stats.longestStreak}d`} />
         </View>
 
@@ -55,7 +55,7 @@ export default function ProfileScreen() {
         {subjects[0] && (
           <Card style={{ marginBottom: 24 }}>
             <View className="flex-row items-center gap-sm mb-sm">
-              <Ionicons name="book-outline" size={18} color={Colors.text.primary} />
+              <NucleoIcon name="book-open" size={18} />
               <Text className="text-text-primary text-lg font-bold">Current Subject</Text>
             </View>
             <Text className="text-text-primary text-lg font-semibold mt-sm">{subjects[0].title}</Text>
@@ -67,7 +67,7 @@ export default function ProfileScreen() {
 
         {/* Badges */}
         <View className="flex-row items-center gap-sm mb-md mt-lg">
-          <Ionicons name="trophy-outline" size={18} color={Colors.text.primary} />
+          <NucleoIcon name="award" size={18} />
           <Text className="text-text-primary text-lg font-bold">Badges</Text>
         </View>
         <View className="flex-row flex-wrap gap-md mb-lg">
@@ -85,7 +85,7 @@ export default function ProfileScreen() {
 
         {/* Notification Settings */}
         <View className="flex-row items-center gap-sm mb-md mt-lg">
-          <Ionicons name="notifications-outline" size={18} color={Colors.text.primary} />
+          <NucleoIcon name="bell" size={18} />
           <Text className="text-text-primary text-lg font-bold">Notifications</Text>
         </View>
         <Card style={{ marginBottom: 24 }}>
@@ -108,10 +108,10 @@ export default function ProfileScreen() {
   );
 }
 
-function StatCard({ iconName, label, value }: { iconName: string; label: string; value: string }) {
+function StatCard({ iconName, label, value }: { iconName: NucleoIconName; label: string; value: string }) {
   return (
     <View className="flex-1 min-w-[45%] bg-bg-secondary rounded-lg p-lg items-center border border-border-subtle">
-      <Ionicons name={iconName as any} size={24} color={Colors.text.primary} />
+      <NucleoIcon name={iconName} size={24} />
       <Text className="text-text-primary text-xxl font-bold mt-sm">{value}</Text>
       <Text className="text-text-muted text-xs mt-xs">{label}</Text>
     </View>

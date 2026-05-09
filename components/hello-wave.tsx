@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import Animated from 'react-native-reanimated';
 
 export function HelloWave() {
@@ -12,7 +12,7 @@ export function HelloWave() {
         animationIterationCount: 4,
         animationDuration: '300ms',
       }}>
-      <Ionicons name="hand-left-outline" size={28} color="#FFFFFF" />
+      <NucleoIcon name="face-grin" size={28} />
     </Animated.View>
   );
 }

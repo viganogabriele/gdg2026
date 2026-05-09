@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
   useSharedValue,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Colors, Shadow } from '@/constants/theme';
 import type { StudyLevel } from '@/types';
@@ -34,10 +34,10 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
   }));
 
   const statusConfig = {
-    locked: { color: Colors.text.muted, icon: 'lock-closed' as const, label: 'Locked' },
-    active: { color: Colors.accent.primary, icon: 'book-outline' as const, label: 'In Progress' },
-    completed: { color: Colors.accent.success, icon: 'checkmark-circle' as const, label: 'Completed' },
-    failed: { color: Colors.accent.danger, icon: 'close-circle' as const, label: 'Needs Review' },
+    locked: { color: Colors.text.muted, icon: 'lock' as const, label: 'Locked' },
+    active: { color: Colors.accent.primary, icon: 'book-open' as const, label: 'In Progress' },
+    completed: { color: Colors.accent.success, icon: 'circle-check' as const, label: 'Completed' },
+    failed: { color: Colors.accent.danger, icon: 'flame' as const, label: 'Needs Review' },
   }[level.status];
 
   const progress =
@@ -71,7 +71,7 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
             {level.title}
           </Text>
           <View className="flex-row items-center gap-sm mt-[4px]">
-            <Ionicons name={statusConfig.icon} size={12} color={statusConfig.color} />
+            <NucleoIcon name={statusConfig.icon as NucleoIconName} size={12} />
             <Text className="text-xs font-medium" style={{ color: statusConfig.color }}>
               {statusConfig.label}
             </Text>
@@ -117,7 +117,7 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
               ))}
               {topic.sourceRefs.map((ref, i) => (
                 <View key={i} className="flex-row items-center gap-[4px] mt-[4px]">
-                  <Ionicons name="attach-outline" size={12} color={Colors.accent.secondary} />
+                  <NucleoIcon name="link" size={12} />
                   <Text className="text-accent-secondary text-xs">
                     {ref.label}
                   </Text>

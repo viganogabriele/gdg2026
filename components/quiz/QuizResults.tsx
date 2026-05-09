@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/theme';
@@ -28,10 +28,9 @@ export function QuizResults({
   return (
     <ScrollView contentContainerStyle={{ alignItems: 'center', padding: 24, paddingTop: 48 }}>
       <View className="mb-lg">
-        <Ionicons
-          name={passed ? 'ribbon-outline' : 'book-outline'}
+        <NucleoIcon
+          name={passed ? 'award' : 'book-open'}
           size={64}
-          color={passed ? Colors.accent.xp : Colors.text.primary}
         />
       </View>
       <Text className="text-text-primary text-xxxl font-bold mb-xxl">

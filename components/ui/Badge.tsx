@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors, Shadow } from '@/constants/theme';
 
 interface BadgeDisplayProps {
@@ -40,11 +40,10 @@ export function BadgeDisplay({
           earned && { ...Shadow.glow, shadowColor: Colors.accent.xp },
         ]}
       >
-        <Ionicons
-          name={(earned ? icon : 'lock-closed') as any}
+        <NucleoIcon
+          name={(earned ? icon : 'lock') as NucleoIconName}
           size={sizeConfig.icon}
-          color={earned ? Colors.text.primary : Colors.text.muted}
-          style={!earned ? { opacity: 0.4 } : undefined}
+          className={!earned ? 'opacity-40' : undefined}
         />
       </View>
       <Text

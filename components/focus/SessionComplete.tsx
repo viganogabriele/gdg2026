@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/theme';
 
@@ -21,12 +21,12 @@ export function SessionComplete({
     <View className="absolute inset-0 bg-bg-overlay justify-center items-center p-xxl" style={StyleSheet.absoluteFillObject}>
       <View className="bg-bg-secondary rounded-xl p-xxxl w-full items-center border border-border-medium">
         <View className="mb-lg">
-          <Ionicons name="trophy" size={64} color={Colors.accent.xp} />
+          <NucleoIcon name="award" size={64} />
         </View>
         <Text className="text-text-primary text-xxl font-bold mb-xxl">Session Complete!</Text>
 
         <View className="w-full gap-md mb-xxl">
-          <StatItem iconName="time-outline" label="Time Studied" value={`${durationMinutes} min`} />
+          <StatItem iconName="calendar" label="Time Studied" value={`${durationMinutes} min`} />
           <StatItem iconName="star" label="XP Earned" value={`+${pointsEarned}`} />
           <StatItem iconName="flame" label="Streak" value={`${streakDay} days`} />
         </View>
@@ -37,11 +37,11 @@ export function SessionComplete({
   );
 }
 
-function StatItem({ iconName, label, value }: { iconName: string; label: string; value: string }) {
+function StatItem({ iconName, label, value }: { iconName: NucleoIconName; label: string; value: string }) {
   return (
     <View className="flex-row items-center bg-bg-tertiary rounded-md p-lg">
       <View className="mr-md">
-        <Ionicons name={iconName as any} size={20} color={Colors.text.primary} />
+        <NucleoIcon name={iconName} size={20} />
       </View>
       <Text className="text-text-secondary text-md flex-1">{label}</Text>
       <Text className="text-text-primary text-lg font-bold">{value}</Text>

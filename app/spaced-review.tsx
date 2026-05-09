@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
@@ -77,10 +77,9 @@ export default function SpacedReviewScreen() {
       <SafeAreaView className="flex-1 bg-bg-primary">
         <View className="flex-1 justify-center items-center p-xxl">
           <View className="mb-lg">
-            <Ionicons
-              name={questions.length === 0 ? 'checkmark-circle' : 'bulb-outline'}
+            <NucleoIcon
+              name={questions.length === 0 ? 'circle-check' : 'sparkle'}
               size={64}
-              color={questions.length === 0 ? Colors.accent.success : Colors.accent.primary}
             />
           </View>
           <Text className="text-text-primary text-xxl font-bold">
@@ -109,7 +108,7 @@ export default function SpacedReviewScreen() {
     <SafeAreaView className="flex-1 bg-bg-primary">
       <View className="flex-row justify-between items-center px-lg py-md">
         <View className="flex-row items-center gap-sm">
-          <Ionicons name="bulb-outline" size={20} color={Colors.text.primary} />
+          <NucleoIcon name="sparkle" size={20} />
           <Text className="text-text-primary text-lg font-bold">Quick Review</Text>
         </View>
         <Button title="Skip" variant="ghost" onPress={() => router.back()} />

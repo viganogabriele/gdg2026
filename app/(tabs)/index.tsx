@@ -5,7 +5,7 @@ import React from 'react';
 import { ScrollView, View, Text } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { LevelIndicator } from '@/components/home/LevelIndicator';
 import { StreakCounter } from '@/components/home/StreakCounter';
 import { QuickActions } from '@/components/home/QuickActions';
@@ -53,7 +53,7 @@ export default function HomeScreen() {
           <View>
             <View className="flex-row items-center gap-xs">
               <Text className="text-text-secondary text-md">Welcome back</Text>
-              <Ionicons name="hand-left-outline" size={18} color={Colors.text.secondary} />
+              <NucleoIcon name="face-grin" size={18} />
             </View>
             <Text className="text-text-primary text-xxl font-bold mt-[4px] max-w-[250px]" numberOfLines={1}>
               {activeSubject?.title || 'StudyQuest'}
@@ -61,7 +61,7 @@ export default function HomeScreen() {
           </View>
           <View className="bg-[rgba(255,215,0,0.1)] rounded-[20px] px-md py-sm border border-[rgba(255,215,0,0.2)]">
             <View className="flex-row items-center gap-[4px]">
-              <Ionicons name="star" size={16} color={Colors.accent.xp} />
+              <NucleoIcon name="star" size={16} />
               <Text className="text-accent-xp text-md font-bold">{stats.totalPoints}</Text>
             </View>
           </View>

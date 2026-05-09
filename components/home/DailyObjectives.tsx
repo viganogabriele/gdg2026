@@ -4,7 +4,7 @@
 import { Card } from '@/components/ui/Card';
 import { Colors } from '@/constants/theme';
 import type { DailyObjective } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -19,10 +19,10 @@ export function DailyObjectives({
   onComplete,
   onPress,
 }: DailyObjectivesProps) {
-  const typeIcons: Record<string, keyof typeof Ionicons.glyphMap> = {
-    study: 'book-outline',
-    review: 'swap-horizontal',
-    quiz: 'help-circle-outline',
+  const typeIcons: Record<string, NucleoIconName> = {
+    study: 'book-open',
+    review: 'dial',
+    quiz: 'award',
   };
 
   return (
@@ -40,7 +40,7 @@ export function DailyObjectives({
               </TouchableOpacity>
               <View className="flex-1">
                 <View className="flex-row items-center gap-sm">
-                  <Ionicons name={typeIcons[obj.type] || 'book-outline'} size={16} color={Colors.text.primary} />
+                  <NucleoIcon name={typeIcons[obj.type] || 'book-open'} size={16} />
                   <Text
                     className={`text-text-primary text-md font-semibold flex-1 ${obj.completed ? 'line-through text-text-muted' : ''}`}
                     numberOfLines={1}
@@ -53,12 +53,12 @@ export function DailyObjectives({
                 </Text>
                 <View className="flex-row gap-md mt-sm">
                   <View className="flex-row items-center gap-[4px]">
-                    <Ionicons name="time-outline" size={12} color={Colors.text.muted} />
+                    <NucleoIcon name="calendar" size={12} />
                     <Text className="text-text-muted text-xs font-medium">{obj.estimatedMinutes} min</Text>
                   </View>
                   {obj.sourceRefs.length > 0 && (
                     <View className="flex-row items-center gap-[4px] flex-1">
-                      <Ionicons name="attach-outline" size={12} color={Colors.accent.secondary} />
+                      <NucleoIcon name="link" size={12} />
                       <Text className="text-accent-secondary text-xs font-medium flex-1" numberOfLines={1}>
                         {obj.sourceRefs[0].label}
                       </Text>
@@ -73,7 +73,7 @@ export function DailyObjectives({
       {objectives.length === 0 && (
         <Card className="items-center py-xxl">
           <View className="flex-row items-center gap-sm">
-            <Ionicons name="checkmark-circle" size={20} color={Colors.text.secondary} />
+            <NucleoIcon name="circle-check" size={20} />
             <Text className="text-text-secondary text-md">All done for today!</Text>
           </View>
         </Card>

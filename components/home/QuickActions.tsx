@@ -9,7 +9,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -32,7 +32,7 @@ export function QuickActions({
   return (
     <View className="flex-row gap-md">
       <ActionButton
-        iconName="game-controller-outline"
+        iconName="rocket"
         title="Take Challenge"
         subtitle={challengeAvailable ? 'Test your knowledge' : 'No challenge available'}
         onPress={onTakeChallenge}
@@ -40,7 +40,7 @@ export function QuickActions({
         color={Colors.accent.primary}
       />
       <ActionButton
-        iconName="bulb-outline"
+        iconName="sparkle"
         title="Quick Review"
         subtitle={hasDueReviews ? `${dueReviewCount} cards due` : 'No reviews due'}
         onPress={onQuickReview}
@@ -61,7 +61,7 @@ function ActionButton({
   color,
   badge,
 }: {
-  iconName: string;
+  iconName: NucleoIconName;
   title: string;
   subtitle: string;
   onPress: () => void;
@@ -96,7 +96,7 @@ function ActionButton({
       activeOpacity={0.7}
     >
       <View className="mb-sm">
-        <Ionicons name={iconName as any} size={28} color={Colors.text.primary} />
+        <NucleoIcon name={iconName} size={28} />
       </View>
       <Text className={`text-md font-semibold ${disabled ? 'text-text-muted' : 'text-text-primary'}`}>
         {title}

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Colors } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -146,7 +146,7 @@ export default function DeadlineScreen() {
 
           <View className="bg-bg-secondary rounded-md p-lg border border-border-subtle mt-md">
             <View className="flex-row items-center justify-center gap-sm">
-              <Ionicons name="calendar-outline" size={16} color={Colors.text.secondary} />
+              <NucleoIcon name="calendar" size={16} />
               <Text className="text-text-secondary text-sm text-center">
                 Studying ~{hoursPerWeek}h/week until {formatDate(date)}
               </Text>

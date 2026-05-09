@@ -1,0 +1,43 @@
+import { Image, ImageStyle } from 'expo-image';
+import React from 'react';
+import { StyleProp } from 'react-native';
+
+export const NUCLEO_ICONS = {
+  award: require('@/assets/svg/nucleo-glass/icon-award.svg'),
+  bell: require('@/assets/svg/nucleo-glass/icon-bell.svg'),
+  'book-open': require('@/assets/svg/nucleo-glass/icon-book-open.svg'),
+  calendar: require('@/assets/svg/nucleo-glass/icon-calendar.svg'),
+  'circle-check': require('@/assets/svg/nucleo-glass/icon-circle-check.svg'),
+  dial: require('@/assets/svg/nucleo-glass/icon-dial.svg'),
+  'face-grin': require('@/assets/svg/nucleo-glass/icon-face-grin.svg'),
+  flame: require('@/assets/svg/nucleo-glass/icon-flame.svg'),
+  folder: require('@/assets/svg/nucleo-glass/icon-folder.svg'),
+  house: require('@/assets/svg/nucleo-glass/icon-house.svg'),
+  link: require('@/assets/svg/nucleo-glass/icon-link.svg'),
+  lock: require('@/assets/svg/nucleo-glass/icon-lock.svg'),
+  rocket: require('@/assets/svg/nucleo-glass/icon-rocket.svg'),
+  sparkle: require('@/assets/svg/nucleo-glass/icon-sparkle.svg'),
+  star: require('@/assets/svg/nucleo-glass/icon-star.svg'),
+} as const;
+
+export type NucleoIconName = keyof typeof NUCLEO_ICONS;
+
+interface NucleoIconProps {
+  name: NucleoIconName;
+  size?: number;
+  className?: string;
+  style?: StyleProp<ImageStyle>;
+}
+
+export function NucleoIcon({ name, size = 24, className, style }: NucleoIconProps) {
+  const iconSource = NUCLEO_ICONS[name];
+
+  return (
+    <Image
+      source={iconSource}
+      className={className}
+      style={[{ width: size, height: size }, style]}
+      contentFit="contain"
+    />
+  );
+}

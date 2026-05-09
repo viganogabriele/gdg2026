@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
 
 interface DatePickerProps {
@@ -34,7 +34,7 @@ export function DatePicker({ label, value, minimumDate, onChange }: DatePickerPr
         className="flex-row items-center justify-between bg-bg-secondary border border-border-subtle rounded-md px-lg py-md"
       >
         <Text className="text-text-primary text-md">{formatDate(value)}</Text>
-        <Ionicons name="calendar-outline" size={20} color={Colors.text.secondary} />
+        <NucleoIcon name="calendar" size={20} />
       </TouchableOpacity>
 
       {Platform.OS === 'ios' ? (

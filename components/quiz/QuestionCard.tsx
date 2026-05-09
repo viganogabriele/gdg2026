@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
 import type { QuizQuestion } from '@/types';
 
@@ -100,10 +100,9 @@ export function QuestionCard({
       {answered && showFeedback && (
         <View className="bg-bg-tertiary rounded-md p-lg mt-xxl border border-border-subtle">
           <View className="flex-row items-center gap-sm mb-sm">
-            <Ionicons
-              name={question.userAnswer === question.correctIndex ? 'checkmark-circle' : 'close-circle'}
+            <NucleoIcon
+              name={question.userAnswer === question.correctIndex ? 'circle-check' : 'flame'}
               size={18}
-              color={question.userAnswer === question.correctIndex ? Colors.accent.success : Colors.accent.danger}
             />
             <Text className="text-text-primary text-md font-semibold">
               {question.userAnswer === question.correctIndex ? 'Correct!' : 'Incorrect'}

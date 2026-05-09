@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Colors, Shadow } from '@/constants/theme';
 
 interface StreakCounterProps {
@@ -61,10 +61,10 @@ export function StreakCounter({ currentStreak, longestStreak }: StreakCounterPro
     >
       <View className="flex-row items-center gap-md">
         <Animated.View style={flameStyle}>
-          <Ionicons
-            name={isActive ? 'flame' : 'snow-outline'}
+          <NucleoIcon
+            name="flame"
             size={36}
-            color={isActive ? Colors.accent.warning : Colors.text.muted}
+            className={isActive ? 'opacity-100' : 'opacity-40'}
           />
         </Animated.View>
         <View className="flex-1">
