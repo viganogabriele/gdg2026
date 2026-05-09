@@ -1,18 +1,18 @@
 /**
  * Home Dashboard — Daily objectives, level, streak, quick actions
  */
-import React from 'react';
-import { ScrollView, View, Text } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { LevelIndicator } from '@/components/home/LevelIndicator';
-import { StreakCounter } from '@/components/home/StreakCounter';
-import { QuickActions } from '@/components/home/QuickActions';
 import { DailyObjectives } from '@/components/home/DailyObjectives';
-import { useStudyStore } from '@/hooks/useStudyStore';
-import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { LevelIndicator } from '@/components/home/LevelIndicator';
+import { QuickActions } from '@/components/home/QuickActions';
+import { StreakCounter } from '@/components/home/StreakCounter';
 import { Colors } from '@/constants/theme';
+import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { useStudyStore } from '@/hooks/useStudyStore';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const subjects = useStudyStore((s) => s.subjects);
@@ -51,10 +51,6 @@ export default function HomeScreen() {
         {/* Header */}
         <View className="flex-row justify-between items-start mb-lg">
           <View>
-            <View className="flex-row items-center gap-xs">
-              <Text className="text-text-secondary text-md">Welcome back</Text>
-              <Ionicons name="hand-left-outline" size={18} color={Colors.text.secondary} />
-            </View>
             <Text className="text-text-primary text-xxl font-bold mt-[4px] max-w-[250px]" numberOfLines={1}>
               {activeSubject?.title || 'StudyQuest'}
             </Text>
