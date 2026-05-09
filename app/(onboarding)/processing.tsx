@@ -58,7 +58,7 @@ export default function ProcessingScreen() {
         const { questions } = await api.generateAssessment(
           store.onboardingData.subjectTitle,
           sections,
-          12
+          6
         );
 
         if (cancelled) return;

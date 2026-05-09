@@ -92,7 +92,7 @@ export async function analyzeSources(
 export async function generateAssessment(
   subjectTitle: string,
   sections: SourceSection[],
-  count: number = 12
+  count: number = 6
 ): Promise<{ questions: QuizQuestion[] }> {
   return apiCall(
     '/api/assessment/generate',

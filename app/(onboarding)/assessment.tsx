@@ -27,7 +27,6 @@ export default function AssessmentScreen() {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      // Calculate score and proceed
       const correct = questions.filter(
         (q) => q.userAnswer === q.correctIndex
       ).length;
@@ -38,6 +37,14 @@ export default function AssessmentScreen() {
       store.completeQuiz();
 
       router.replace('/(onboarding)/roadmap-reveal');
+    }
+  };
+
+  const handleBack = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    } else {
+      router.back();
     }
   };
 
@@ -64,16 +71,22 @@ export default function AssessmentScreen() {
         />
       </ScrollView>
 
-      {answered && (
-        <View className="px-xxl pb-xxl">
+      <View className="px-xxl pb-xxl gap-sm">
+        {answered && (
           <Button
             title={currentIndex < questions.length - 1 ? 'Next Question' : 'See Results'}
             onPress={handleNext}
             fullWidth
             size="lg"
           />
-        </View>
-      )}
+        )}
+        <Button
+          title="Back"
+          variant="ghost"
+          onPress={handleBack}
+          fullWidth
+        />
+      </View>
     </SafeAreaView>
   );
 }
