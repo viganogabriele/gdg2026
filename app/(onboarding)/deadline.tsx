@@ -6,10 +6,10 @@ import { useStudyStore } from '@/hooks/useStudyStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const HOURS_OPTIONS = [5, 10, 15, 20, 30];
+const HOURS_OPTIONS = [5, 10, 20, 30];
 
 const minDate = new Date();
 minDate.setDate(minDate.getDate() + 1);
@@ -30,6 +30,18 @@ export default function DeadlineScreen() {
 
   const [date, setDate] = useState(initial);
   const [hoursPerWeek, setHoursPerWeek] = useState(store.onboardingData.hoursPerWeek || 10);
+  const [customMode, setCustomMode] = useState(false);
+  const [customInput, setCustomInput] = useState('');
+
+  const isCustomSelected = !HOURS_OPTIONS.includes(hoursPerWeek);
+
+  const handleCustomSubmit = () => {
+    const val = parseInt(customInput, 10);
+    if (!isNaN(val) && val >= 1 && val <= 168) {
+      setHoursPerWeek(val);
+    }
+    setCustomMode(false);
+  };
 
   const handleContinue = () => {
     store.setOnboardingDeadline(date.toISOString(), hoursPerWeek);
@@ -43,8 +55,13 @@ export default function DeadlineScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg-primary">
-      <View className="flex-1 px-xxl">
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <SafeAreaView style={{ flex: 1 }} className="bg-bg-primary">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
         <StepIndicator totalSteps={6} currentStep={2} />
 
         <View className="flex-1 pt-xxl">
@@ -73,24 +90,61 @@ export default function DeadlineScreen() {
           </View>
 
           <Text className="text-text-primary text-md font-semibold mb-md">Hours per week available</Text>
-          <View className="flex-row gap-sm mb-xxl">
+          <View className="flex-row gap-sm mb-sm">
             {HOURS_OPTIONS.map((h) => (
               <TouchableOpacity
                 key={h}
-                className={`flex-1 rounded-md py-md items-center border ${hoursPerWeek === h
-                  ? 'bg-accent-primary border-accent-primary'
-                  : 'bg-bg-secondary border-border-subtle'
-                  }`}
-                onPress={() => setHoursPerWeek(h)}
+                className={`flex-1 rounded-md py-md items-center border ${
+                  hoursPerWeek === h && !isCustomSelected
+                    ? 'bg-accent-primary border-accent-primary'
+                    : 'bg-bg-secondary border-border-subtle'
+                }`}
+                onPress={() => { setHoursPerWeek(h); setCustomMode(false); }}
               >
-                <Text className={`text-md font-semibold ${hoursPerWeek === h ? 'text-text-primary' : 'text-text-secondary'}`}>
+                <Text className={`text-md font-semibold ${hoursPerWeek === h && !isCustomSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
                   {h}h
                 </Text>
               </TouchableOpacity>
             ))}
+
+            <TouchableOpacity
+              className={`flex-1 rounded-md py-md items-center border ${
+                isCustomSelected
+                  ? 'bg-accent-primary border-accent-primary'
+                  : 'bg-bg-secondary border-border-subtle'
+              }`}
+              onPress={() => { setCustomMode(true); setCustomInput(isCustomSelected ? String(hoursPerWeek) : ''); }}
+            >
+              <Text className={`text-md font-semibold ${isCustomSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
+                {isCustomSelected ? `${hoursPerWeek}h` : '...'}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          <View className="bg-bg-secondary rounded-md p-lg border border-border-subtle">
+          {customMode && (
+            <View className="flex-row gap-sm mb-md mt-sm">
+              <TextInput
+                className="flex-1 bg-bg-secondary rounded-md border border-accent-primary px-lg py-md text-text-primary text-md"
+                placeholder="1 – 168"
+                placeholderTextColor={Colors.text.muted}
+                value={customInput}
+                onChangeText={(t) => setCustomInput(t.replace(/[^0-9]/g, ''))}
+                keyboardType="number-pad"
+                maxLength={3}
+                autoFocus
+                selectionColor={Colors.accent.primary}
+                onSubmitEditing={handleCustomSubmit}
+              />
+              <TouchableOpacity
+                className="bg-accent-primary rounded-md px-lg py-md justify-center"
+                onPress={handleCustomSubmit}
+              >
+                <Text className="text-text-primary text-md font-semibold">OK</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <View className="bg-bg-secondary rounded-md p-lg border border-border-subtle mt-md">
             <View className="flex-row items-center justify-center gap-sm">
               <Ionicons name="calendar-outline" size={16} color={Colors.text.secondary} />
               <Text className="text-text-secondary text-sm text-center">
@@ -104,7 +158,8 @@ export default function DeadlineScreen() {
           <Button title="Generate Study Plan" onPress={handleContinue} fullWidth size="lg" />
           <Button title="Back" variant="ghost" onPress={() => router.back()} fullWidth />
         </View>
-      </View>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
