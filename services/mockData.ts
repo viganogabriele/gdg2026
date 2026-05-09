@@ -118,7 +118,7 @@ export function mockAnalyzeSources(subjectTitle: string): {
 export function mockGenerateAssessment(
   subjectTitle: string,
   sections: SourceSection[],
-  count: number = 12
+  count: number = 6
 ): QuizQuestion[] {
   const questions: QuizQuestion[] = [];
 

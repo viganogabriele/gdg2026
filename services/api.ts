@@ -1,103 +1,98 @@
 /**
- * API Service — fetch wrapper with mock fallback
+ * API Service — Gemini → OpenRouter → Mock fallback chain
  *
- * All endpoints call the external AI proxy. If the proxy is unavailable
- * or not configured, we fall back to local mock data.
+ * Every endpoint tries Gemini first, then OpenRouter, and finally
+ * falls back to local mock data. The demo always works regardless
+ * of which API keys are available or working.
  */
 import type {
-  Source,
-  SourceSection,
-  QuizQuestion,
-  StudyLevel,
-  DailyObjective,
-  LevelTopic,
-  Subject,
+    DailyObjective,
+    LevelTopic,
+    QuizQuestion,
+    Source,
+    SourceSection,
+    StudyLevel,
+    Subject,
 } from '@/types';
 import {
-  mockAnalyzeSources,
-  mockGenerateAssessment,
-  mockGenerateRoadmap,
-  mockGenerateLevelQuiz,
-  mockGenerateSpacedRepQuestions,
+    geminiAnalyzeSources,
+    geminiGenerateAssessment,
+    geminiGenerateLevelQuiz,
+    geminiGenerateRoadmap,
+    geminiGenerateSpacedRepQuestions,
+    MOCK_MODE
+} from './gemini';
+import {
+    mockAnalyzeSources,
+    mockGenerateAssessment,
+    mockGenerateLevelQuiz,
+    mockGenerateRoadmap,
+    mockGenerateSpacedRepQuestions,
 } from './mockData';
 
-// Configure this to point to your AI proxy when available
-const API_BASE_URL = ''; // e.g. 'https://your-api.com'
-const TIMEOUT_MS = 15000;
-const USE_MOCKS = true; // Set to false when backend is ready
+// ─── 3-tier fallback: Gemini → OpenRouter → Mock ────────────────────
 
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    return response;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-async function apiCall<T>(
-  endpoint: string,
-  body: unknown,
-  mockFn: () => T
+async function withFallback<T>(
+  aiCall: (provider: 'gemini' | 'openrouter') => Promise<T>,
+  mockCall: () => T,
+  label: string
 ): Promise<T> {
-  if (USE_MOCKS || !API_BASE_URL) {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 800 + Math.random() * 1200));
-    return mockFn();
+  // If no API keys are set, immediately use mock responses without attempting network calls.
+  if (MOCK_MODE) {
+    console.warn(`📦 ${label}: MOCK_MODE active — using mock data without network calls`);
+    // small delay to keep behavior consistent with non-mock path
+    await new Promise((r) => setTimeout(r, 200 + Math.random() * 200));
+    return mockCall();
   }
-
+  // Tier 1: Gemini
   try {
-    const response = await fetchWithTimeout(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-    console.warn(`API call to ${endpoint} failed, using mock:`, error);
-    return mockFn();
+    const result = await aiCall('gemini');
+    console.log(`✅ ${label}: Gemini API succeeded`);
+    return result;
+  } catch (geminiError) {
+    console.warn(`⚠️ ${label}: Gemini failed —`, geminiError);
   }
+
+  // Tier 2: OpenRouter
+  try {
+    const result = await aiCall('openrouter');
+    console.log(`✅ ${label}: OpenRouter API succeeded`);
+    return result;
+  } catch (openRouterError) {
+    console.warn(`⚠️ ${label}: OpenRouter failed —`, openRouterError);
+  }
+
+  // Tier 3: Mock data
+  console.warn(`📦 ${label}: Using mock data`);
+  await new Promise((r) => setTimeout(r, 600 + Math.random() * 800));
+  return mockCall();
 }
 
 // ─── Public API Methods ─────────────────────────────────────────────
 
 export async function analyzeSources(
   subjectTitle: string,
-  _sources: Source[]
+  sources: Source[]
 ): Promise<{
   sections: SourceSection[];
   topicGraph: { topics: string[]; dependencies: string[][] };
 }> {
-  return apiCall(
-    '/api/sources/analyze',
-    { subjectTitle, sources: _sources },
-    () => mockAnalyzeSources(subjectTitle)
+  return withFallback(
+    (provider) => geminiAnalyzeSources(subjectTitle, sources, provider),
+    () => mockAnalyzeSources(subjectTitle),
+    'analyzeSources'
   );
 }
 
 export async function generateAssessment(
   subjectTitle: string,
   sections: SourceSection[],
-  count: number = 12
+  count: number
 ): Promise<{ questions: QuizQuestion[] }> {
-  return apiCall(
-    '/api/assessment/generate',
-    { subjectTitle, sections, count },
-    () => ({ questions: mockGenerateAssessment(subjectTitle, sections, count) })
+  return withFallback(
+    (provider) => geminiGenerateAssessment(subjectTitle, sections, count, provider),
+    () => ({ questions: mockGenerateAssessment(subjectTitle, sections, count) }),
+    'generateAssessment'
   );
 }
 
@@ -106,16 +101,16 @@ export async function generateRoadmap(
   sections: SourceSection[],
   assessmentScore: number
 ): Promise<{ levels: StudyLevel[]; dailyObjectives: DailyObjective[] }> {
-  return apiCall(
-    '/api/roadmap/generate',
-    { subject, assessmentScore },
+  return withFallback(
+    (provider) => geminiGenerateRoadmap(subject, sections, assessmentScore, provider),
     () =>
       mockGenerateRoadmap(
         subject.title,
         sections,
         subject.deadline,
         assessmentScore
-      )
+      ),
+    'generateRoadmap'
   );
 }
 
@@ -125,10 +120,10 @@ export async function generateLevelQuiz(
   topics: LevelTopic[],
   count: number = 8
 ): Promise<{ questions: QuizQuestion[] }> {
-  return apiCall(
-    '/api/quiz/generate',
-    { levelId, topics, count },
-    () => ({ questions: mockGenerateLevelQuiz(levelTitle, topics, count) })
+  return withFallback(
+    (provider) => geminiGenerateLevelQuiz(levelId, levelTitle, topics, count, provider),
+    () => ({ questions: mockGenerateLevelQuiz(levelTitle, topics, count) }),
+    'generateLevelQuiz'
   );
 }
 
@@ -174,10 +169,10 @@ export async function generateSpacedRepQuestions(
   topics: LevelTopic[],
   count: number = 5
 ): Promise<{ questions: QuizQuestion[] }> {
-  return apiCall(
-    '/api/spaced-repetition/generate',
-    { topics, count },
-    () => ({ questions: mockGenerateSpacedRepQuestions(topics, count) })
+  return withFallback(
+    (provider) => geminiGenerateSpacedRepQuestions(topics, count, provider),
+    () => ({ questions: mockGenerateSpacedRepQuestions(topics, count) }),
+    'generateSpacedRepQuestions'
   );
 }
 
@@ -186,35 +181,27 @@ export async function adjustRoadmap(
   levels: StudyLevel[],
   event: 'level_failed' | 'early_completion'
 ): Promise<{ updatedLevels: StudyLevel[]; message: string }> {
-  return apiCall(
-    '/api/roadmap/adjust',
-    { subject: _subject, levels, event },
-    () => {
-      // Simple local adjustment
-      const updated = levels.map((level) => {
-        if (level.status === 'locked') {
-          // Push deadlines back by 2 days on failure
-          if (event === 'level_failed') {
-            const dl = new Date(level.deadline);
-            dl.setDate(dl.getDate() + 2);
-            return { ...level, deadline: dl.toISOString() };
-          }
-          // Pull deadlines forward by 1 day on early completion
-          if (event === 'early_completion') {
-            const dl = new Date(level.deadline);
-            dl.setDate(dl.getDate() - 1);
-            return { ...level, deadline: dl.toISOString() };
-          }
-        }
-        return level;
-      });
-
-      const message =
-        event === 'level_failed'
-          ? 'Your schedule has been adjusted to give you more time. Keep going!'
-          : 'Great job finishing early! Your schedule has been optimized.';
-
-      return { updatedLevels: updated, message };
+  // Keep local adjustment logic — lightweight, no AI needed
+  const updated = levels.map((level) => {
+    if (level.status === 'locked') {
+      if (event === 'level_failed') {
+        const dl = new Date(level.deadline);
+        dl.setDate(dl.getDate() + 2);
+        return { ...level, deadline: dl.toISOString() };
+      }
+      if (event === 'early_completion') {
+        const dl = new Date(level.deadline);
+        dl.setDate(dl.getDate() - 1);
+        return { ...level, deadline: dl.toISOString() };
+      }
     }
-  );
+    return level;
+  });
+
+  const message =
+    event === 'level_failed'
+      ? 'Your schedule has been adjusted to give you more time. Keep going!'
+      : 'Great job finishing early! Your schedule has been optimized.';
+
+  return { updatedLevels: updated, message };
 }
