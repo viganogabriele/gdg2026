@@ -1,49 +1,63 @@
-/**
- * StudyQuest Design System — Dark Mode Only, Game-Inspired
- */
-
 export const Colors = {
+  light: {
+    text: '#1a304d',
+    background: '#fbfcfe',
+    tint: '#1156ae',
+    icon: '#0c2b50',
+    tabIconDefault: '#0c2b50',
+    tabIconSelected: '#1156ae',
+  },
+  dark: {
+    text: '#d1d5ea',
+    background: '#0b151e',
+    tint: '#1156ae',
+    icon: '#b8bbd6',
+    tabIconDefault: '#b8bbd6',
+    tabIconSelected: '#1156ae',
+  },
   bg: {
-    primary: '#0A0E1A',
-    secondary: '#141929',
-    tertiary: '#1E2640',
-    overlay: 'rgba(10, 14, 26, 0.85)',
+    primary: '#0b151e',
+    secondary: '#17202e',
+    tertiary: '#1a2433',
+    overlay: '#1a2737',
   },
   accent: {
-    primary: '#6C5CE7',
-    primaryLight: '#8B7CF6',
-    secondary: '#00D2FF',
-    secondaryLight: '#33DDFF',
-    success: '#00E676',
-    successLight: '#33EB91',
-    warning: '#FFD740',
-    warningLight: '#FFE066',
-    danger: '#FF5252',
-    dangerLight: '#FF7B7B',
-    xp: '#FFD700',
+    primary: '#1156ae',
+    primaryLight: '#d8e9fd',
+    secondary: '#1c395e',
+    secondaryLight: '#2c3b4e',
+    success: '#36c6e2',
+    successLight: '#e88930',
+    warning: '#e88930',
+    warningLight: '#db57c3',
+    danger: '#ba1c1e',
+    dangerLight: '#ffffff',
+    xp: '#db57c3',
   },
   text: {
-    primary: '#FFFFFF',
-    secondary: '#8892B0',
-    muted: '#4A5568',
-    inverse: '#0A0E1A',
+    primary: '#d1d5ea',
+    secondary: '#c7cce1',
+    muted: '#b8bbd6',
+    inverse: '#0b151e',
+    accentDarkBg: '#f2f1f8',
+    accentLightBg: '#2c3b4e',
   },
   border: {
-    subtle: 'rgba(108, 92, 231, 0.15)',
-    medium: 'rgba(108, 92, 231, 0.3)',
-    bright: 'rgba(108, 92, 231, 0.5)',
+    subtle: '#2c3b4e',
+    medium: '#2c3b4e',
+    bright: '#1156ae',
   },
   gradient: {
-    primary: ['#6C5CE7', '#8B7CF6'] as const,
-    secondary: ['#00D2FF', '#0098B3'] as const,
-    success: ['#00E676', '#00C853'] as const,
-    warning: ['#FFD740', '#FFC107'] as const,
-    danger: ['#FF5252', '#D32F2F'] as const,
-    xp: ['#FFD700', '#FF8F00'] as const,
-    dark: ['#141929', '#0A0E1A'] as const,
-    card: ['rgba(30, 38, 64, 0.8)', 'rgba(20, 25, 41, 0.9)'] as const,
+    primary: ['#1156ae', '#d8e9fd'] as const,
+    secondary: ['#1c395e', '#2c3b4e'] as const,
+    success: ['#36c6e2', '#e88930'] as const,
+    warning: ['#e88930', '#db57c3'] as const,
+    danger: ['#ba1c1e', '#ffffff'] as const,
+    xp: ['#db57c3', '#36c6e2'] as const,
+    dark: ['#17202e', '#0b151e'] as const,
+    card: ['#17202e', '#1a2433'] as const,
   },
-};
+} as const;
 
 export const Spacing = {
   xs: 4,
@@ -58,12 +72,16 @@ export const Spacing = {
 } as const;
 
 export const BorderRadius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
+  sm: 5.6,
+  md: 7.6,
+  lg: 9.6,
+  xl: 13.6,
   xxl: 24,
   full: 9999,
+  images: 7.6,
+  rectangles: 9.6,
+  buttonsM: 60,
+  buttonsL: 100,
 } as const;
 
 export const FontSize = {
@@ -79,48 +97,47 @@ export const FontSize = {
 } as const;
 
 export const FontWeight = {
-  regular: '400' as const,
-  medium: '500' as const,
-  semibold: '600' as const,
-  bold: '700' as const,
-  heavy: '800' as const,
-};
+  regular: '400',
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  heavy: '800',
+} as const;
 
 export const Shadow = {
   sm: {
-    shadowColor: '#6C5CE7',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
     elevation: 2,
   },
   md: {
-    shadowColor: '#6C5CE7',
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1.5 },
     shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#6C5CE7',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 6,
   },
   glow: {
-    shadowColor: '#6C5CE7',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.38,
+    shadowRadius: 10,
     elevation: 10,
   },
-};
+} as const;
 
-// Re-export for backward compatibility with existing template components
 export const Fonts = {
-  sans: 'System',
-  serif: 'serif',
-  rounded: 'System',
-  mono: 'monospace',
-};
+  sans: 'Poppins',
+  serif: 'Libre Baskerville',
+  rounded: 'Poppins',
+  mono: 'Space Mono',
+} as const;

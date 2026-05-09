@@ -2,15 +2,16 @@
  * Focus Mode — Pomodoro timer with current topic and source refs
  */
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { PomodoroTimer } from '@/components/focus/PomodoroTimer';
 import { SessionComplete } from '@/components/focus/SessionComplete';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { useGamePoints } from '@/hooks/useGamePoints';
-import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import type { StudySession } from '@/types';
 
 export default function FocusScreen() {
@@ -41,22 +42,25 @@ export default function FocusScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row justify-end p-md">
         <Button title="✕ Close" variant="ghost" onPress={() => router.back()} />
       </View>
 
       {/* Current Topic Info */}
       {activeLevel && (
-        <View style={styles.topicInfo}>
-          <Text style={styles.levelLabel}>Level {activeLevel.levelNumber}</Text>
-          <Text style={styles.levelTitle}>{activeLevel.title}</Text>
+        <View className="items-center px-xxl mb-lg">
+          <Text className="text-accent-primary text-sm font-bold tracking-[1px]">Level {activeLevel.levelNumber}</Text>
+          <Text className="text-text-primary text-xl font-bold mt-xs">{activeLevel.title}</Text>
           {currentTopic && (
-            <View style={styles.topicCard}>
-              <Text style={styles.topicName}>{currentTopic.title}</Text>
+            <View className="bg-bg-secondary rounded-md p-md mt-md border border-border-subtle w-full">
+              <Text className="text-text-primary text-md font-medium">{currentTopic.title}</Text>
               {currentTopic.sourceRefs.map((ref, i) => (
-                <Text key={i} style={styles.sourceRef}>📎 {ref.label}</Text>
+                <View key={i} className="flex-row items-center gap-[4px] mt-xs">
+                  <Ionicons name="attach-outline" size={12} color={Colors.accent.secondary} />
+                  <Text className="text-accent-secondary text-xs">{ref.label}</Text>
+                </View>
               ))}
             </View>
           )}
@@ -78,14 +82,3 @@ export default function FocusScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  header: { flexDirection: 'row', justifyContent: 'flex-end', padding: Spacing.md },
-  topicInfo: { alignItems: 'center', paddingHorizontal: Spacing.xxl, marginBottom: Spacing.lg },
-  levelLabel: { color: Colors.accent.primary, fontSize: FontSize.sm, fontWeight: FontWeight.bold, letterSpacing: 1 },
-  levelTitle: { color: Colors.text.primary, fontSize: FontSize.xl, fontWeight: FontWeight.bold, marginTop: Spacing.xs },
-  topicCard: { backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, padding: Spacing.md, marginTop: Spacing.md, borderWidth: 1, borderColor: Colors.border.subtle, width: '100%' },
-  topicName: { color: Colors.text.primary, fontSize: FontSize.md, fontWeight: FontWeight.medium },
-  sourceRef: { color: Colors.accent.secondary, fontSize: FontSize.xs, marginTop: Spacing.xs },
-});

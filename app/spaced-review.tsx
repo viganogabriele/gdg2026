@@ -2,15 +2,16 @@
  * Spaced Review — quick 3-5 question review from due SR cards
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import * as api from '@/services/api';
-import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import type { QuizQuestion } from '@/types';
 
 export default function SpacedReviewScreen() {
@@ -68,23 +69,29 @@ export default function SpacedReviewScreen() {
   };
 
   if (loading) {
-    return <SafeAreaView style={styles.container}><View style={styles.loading} /></SafeAreaView>;
+    return <SafeAreaView className="flex-1 bg-bg-primary"><View className="flex-1" /></SafeAreaView>;
   }
 
   if (done || questions.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.doneContent}>
-          <Text style={styles.doneEmoji}>{questions.length === 0 ? '✅' : '🧠'}</Text>
-          <Text style={styles.doneTitle}>
+      <SafeAreaView className="flex-1 bg-bg-primary">
+        <View className="flex-1 justify-center items-center p-xxl">
+          <View className="mb-lg">
+            <Ionicons
+              name={questions.length === 0 ? 'checkmark-circle' : 'bulb-outline'}
+              size={64}
+              color={questions.length === 0 ? Colors.accent.success : Colors.accent.primary}
+            />
+          </View>
+          <Text className="text-text-primary text-xxl font-bold">
             {questions.length === 0 ? 'No reviews due!' : 'Review Complete!'}
           </Text>
           {questions.length > 0 && (
-            <Text style={styles.doneScore}>
+            <Text className="text-accent-primary text-lg mt-sm">
               {correctCount} / {questions.length} correct
             </Text>
           )}
-          <Text style={styles.doneHint}>
+          <Text className="text-text-secondary text-md text-center mt-lg mb-xxxl leading-[22px]">
             {questions.length === 0
               ? 'Keep studying, reviews will appear as you progress.'
               : 'Spaced repetition helps lock in long-term memory. Keep it up!'}
@@ -99,12 +106,15 @@ export default function SpacedReviewScreen() {
   if (!currentQ) return null;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>🧠 Quick Review</Text>
+    <SafeAreaView className="flex-1 bg-bg-primary">
+      <View className="flex-row justify-between items-center px-lg py-md">
+        <View className="flex-row items-center gap-sm">
+          <Ionicons name="bulb-outline" size={20} color={Colors.text.primary} />
+          <Text className="text-text-primary text-lg font-bold">Quick Review</Text>
+        </View>
         <Button title="Skip" variant="ghost" onPress={() => router.back()} />
       </View>
-      <ScrollView style={styles.scroll}>
+      <ScrollView className="flex-1">
         <QuestionCard
           question={currentQ}
           questionNumber={currentIndex + 1}
@@ -114,7 +124,7 @@ export default function SpacedReviewScreen() {
         />
       </ScrollView>
       {currentQ.userAnswer !== undefined && (
-        <View style={styles.footer}>
+        <View className="px-xxl pb-xxl">
           <Button
             title={currentIndex < questions.length - 1 ? 'Next' : 'Finish'}
             onPress={handleNext}
@@ -125,17 +135,3 @@ export default function SpacedReviewScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  loading: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
-  headerTitle: { color: Colors.text.primary, fontSize: FontSize.lg, fontWeight: FontWeight.bold },
-  scroll: { flex: 1 },
-  footer: { paddingHorizontal: Spacing.xxl, paddingBottom: Spacing.xxl },
-  doneContent: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing.xxl },
-  doneEmoji: { fontSize: 64, marginBottom: Spacing.lg },
-  doneTitle: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold },
-  doneScore: { color: Colors.accent.primary, fontSize: FontSize.lg, marginTop: Spacing.sm },
-  doneHint: { color: Colors.text.secondary, fontSize: FontSize.md, textAlign: 'center', marginTop: Spacing.lg, marginBottom: Spacing.xxxl, lineHeight: 22 },
-});

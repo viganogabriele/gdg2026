@@ -1,138 +1,165 @@
-/**
- * Onboarding Step 3 — "When is your deadline?"
- */
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { DatePicker } from '@/components/ui/DatePicker';
+import { Colors } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const HOURS_OPTIONS = [5, 10, 15, 20, 30];
+const HOURS_OPTIONS = [5, 10, 20, 30];
+
+const minDate = new Date();
+minDate.setDate(minDate.getDate() + 1);
+
+const defaultDate = new Date();
+defaultDate.setDate(defaultDate.getDate() + 30);
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+}
 
 export default function DeadlineScreen() {
   const store = useStudyStore();
-  const [dateText, setDateText] = useState(
-    store.onboardingData.deadline
-      ? new Date(store.onboardingData.deadline).toLocaleDateString()
-      : ''
-  );
-  const [hoursPerWeek, setHoursPerWeek] = useState(store.onboardingData.hoursPerWeek || 10);
 
-  // Simple date parsing from text input
-  const parseDate = (text: string): Date | null => {
-    const d = new Date(text);
-    if (isNaN(d.getTime())) return null;
-    return d;
+  const initial = store.onboardingData.deadline
+    ? new Date(store.onboardingData.deadline)
+    : defaultDate;
+
+  const [date, setDate] = useState(initial);
+  const [hoursPerWeek, setHoursPerWeek] = useState(store.onboardingData.hoursPerWeek || 10);
+  const [customMode, setCustomMode] = useState(false);
+  const [customInput, setCustomInput] = useState('');
+
+  const isCustomSelected = !HOURS_OPTIONS.includes(hoursPerWeek);
+
+  const handleCustomSubmit = () => {
+    const val = parseInt(customInput, 10);
+    if (!isNaN(val) && val >= 1 && val <= 168) {
+      setHoursPerWeek(val);
+    }
+    setCustomMode(false);
   };
 
   const handleContinue = () => {
-    let deadline: string;
-    const parsed = parseDate(dateText);
-    if (parsed && parsed > new Date()) {
-      deadline = parsed.toISOString();
-    } else {
-      // Default: 30 days from now
-      const d = new Date();
-      d.setDate(d.getDate() + 30);
-      deadline = d.toISOString();
-    }
-    store.setOnboardingDeadline(deadline, hoursPerWeek);
+    store.setOnboardingDeadline(date.toISOString(), hoursPerWeek);
     router.push('/(onboarding)/processing');
   };
 
   const setQuickDeadline = (days: number) => {
     const d = new Date();
     d.setDate(d.getDate() + days);
-    setDateText(d.toISOString().split('T')[0]);
+    setDate(d);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <SafeAreaView style={{ flex: 1 }} className="bg-bg-primary">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
         <StepIndicator totalSteps={6} currentStep={2} />
 
-        <View style={styles.body}>
-          <Text style={styles.title}>When is your deadline?</Text>
-          <Text style={styles.subtitle}>
+        <View className="flex-1 pt-xxl">
+          <Text className="text-text-primary text-xxl font-bold">When is your deadline?</Text>
+          <Text className="text-text-secondary text-md mt-sm mb-xxl">
             We'll plan your study schedule around this date
           </Text>
 
-          <Input
+          <DatePicker
             label="Exam / Deadline Date"
-            placeholder="YYYY-MM-DD (e.g. 2025-06-15)"
-            value={dateText}
-            onChangeText={setDateText}
-            containerStyle={styles.dateInput}
+            value={date}
+            minimumDate={minDate}
+            onChange={setDate}
           />
 
-          {/* Quick date options */}
-          <View style={styles.quickDates}>
+          <View className="flex-row gap-sm mt-md mb-xxl">
             {[7, 14, 30, 60, 90].map((days) => (
               <TouchableOpacity
                 key={days}
-                style={styles.quickDateBtn}
+                className="flex-1 bg-bg-secondary rounded-md py-sm items-center border border-border-subtle"
                 onPress={() => setQuickDeadline(days)}
               >
-                <Text style={styles.quickDateText}>{days}d</Text>
+                <Text className="text-text-secondary text-sm font-medium">{days}d</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          {/* Hours per week */}
-          <Text style={styles.hoursLabel}>Hours per week available</Text>
-          <View style={styles.hoursOptions}>
+          <Text className="text-text-primary text-md font-semibold mb-md">Hours per week available</Text>
+          <View className="flex-row gap-sm mb-sm">
             {HOURS_OPTIONS.map((h) => (
               <TouchableOpacity
                 key={h}
-                style={[styles.hoursBtn, hoursPerWeek === h && styles.hoursBtnActive]}
-                onPress={() => setHoursPerWeek(h)}
+                className={`flex-1 rounded-md py-md items-center border ${
+                  hoursPerWeek === h && !isCustomSelected
+                    ? 'bg-accent-primary border-accent-primary'
+                    : 'bg-bg-secondary border-border-subtle'
+                }`}
+                onPress={() => { setHoursPerWeek(h); setCustomMode(false); }}
               >
-                <Text style={[styles.hoursText, hoursPerWeek === h && styles.hoursTextActive]}>
+                <Text className={`text-md font-semibold ${hoursPerWeek === h && !isCustomSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
                   {h}h
                 </Text>
               </TouchableOpacity>
             ))}
+
+            <TouchableOpacity
+              className={`flex-1 rounded-md py-md items-center border ${
+                isCustomSelected
+                  ? 'bg-accent-primary border-accent-primary'
+                  : 'bg-bg-secondary border-border-subtle'
+              }`}
+              onPress={() => { setCustomMode(true); setCustomInput(isCustomSelected ? String(hoursPerWeek) : ''); }}
+            >
+              <Text className={`text-md font-semibold ${isCustomSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
+                {isCustomSelected ? `${hoursPerWeek}h` : '...'}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {dateText && (
-            <View style={styles.summary}>
-              <Text style={styles.summaryText}>
-                📅 Studying ~{hoursPerWeek}h/week until your deadline
-              </Text>
+          {customMode && (
+            <View className="flex-row gap-sm mb-md mt-sm">
+              <TextInput
+                className="flex-1 bg-bg-secondary rounded-md border border-accent-primary px-lg py-md text-text-primary text-md"
+                placeholder="1 – 168"
+                placeholderTextColor={Colors.text.muted}
+                value={customInput}
+                onChangeText={(t) => setCustomInput(t.replace(/[^0-9]/g, ''))}
+                keyboardType="number-pad"
+                maxLength={3}
+                autoFocus
+                selectionColor={Colors.accent.primary}
+                onSubmitEditing={handleCustomSubmit}
+              />
+              <TouchableOpacity
+                className="bg-accent-primary rounded-md px-lg py-md justify-center"
+                onPress={handleCustomSubmit}
+              >
+                <Text className="text-text-primary text-md font-semibold">OK</Text>
+              </TouchableOpacity>
             </View>
           )}
+
+          <View className="bg-bg-secondary rounded-md p-lg border border-border-subtle mt-md">
+            <View className="flex-row items-center justify-center gap-sm">
+              <Ionicons name="calendar-outline" size={16} color={Colors.text.secondary} />
+              <Text className="text-text-secondary text-sm text-center">
+                Studying ~{hoursPerWeek}h/week until {formatDate(date)}
+              </Text>
+            </View>
+          </View>
         </View>
 
-        <View style={styles.footer}>
+        <View className="gap-sm pb-xxl">
           <Button title="Generate Study Plan" onPress={handleContinue} fullWidth size="lg" />
           <Button title="Back" variant="ghost" onPress={() => router.back()} fullWidth />
         </View>
-      </View>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { flex: 1, paddingHorizontal: Spacing.xxl },
-  body: { flex: 1, paddingTop: Spacing.xxl },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold },
-  subtitle: { color: Colors.text.secondary, fontSize: FontSize.md, marginTop: Spacing.sm, marginBottom: Spacing.xxl },
-  dateInput: { marginBottom: Spacing.lg },
-  quickDates: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xxxl },
-  quickDateBtn: { backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderWidth: 1, borderColor: Colors.border.subtle },
-  quickDateText: { color: Colors.text.secondary, fontSize: FontSize.sm, fontWeight: FontWeight.medium },
-  hoursLabel: { color: Colors.text.primary, fontSize: FontSize.md, fontWeight: FontWeight.semibold, marginBottom: Spacing.md },
-  hoursOptions: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xxl },
-  hoursBtn: { flex: 1, backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border.subtle },
-  hoursBtnActive: { backgroundColor: Colors.accent.primary, borderColor: Colors.accent.primary },
-  hoursText: { color: Colors.text.secondary, fontSize: FontSize.md, fontWeight: FontWeight.semibold },
-  hoursTextActive: { color: Colors.text.primary },
-  summary: { backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, padding: Spacing.lg, borderWidth: 1, borderColor: Colors.border.subtle },
-  summaryText: { color: Colors.text.secondary, fontSize: FontSize.sm, textAlign: 'center' },
-  footer: { gap: Spacing.sm, paddingBottom: Spacing.xxl },
-});

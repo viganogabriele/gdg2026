@@ -1,16 +1,15 @@
 /**
  * Onboarding Step 2 — "What are your sources?"
  */
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { SourcePicker } from '@/components/onboarding/SourcePicker';
+import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import type { Source } from '@/types';
+import { router } from 'expo-router';
+import React from 'react';
+import { Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SourcesScreen() {
   const sources = useStudyStore((s) => s.onboardingData.sources);
@@ -25,16 +24,16 @@ export default function SourcesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
+      <View className="flex-1 px-xxl">
         <StepIndicator totalSteps={6} currentStep={1} />
 
-        <Text style={styles.title}>What are your sources?</Text>
-        <Text style={styles.subtitle}>
+        <Text className="text-text-primary text-xxl font-bold mt-lg">What are your sources?</Text>
+        <Text className="text-text-secondary text-md mt-sm mb-xxl leading-[22px]">
           Add PDFs, URLs, or paste notes. We'll analyze them to build your study plan.
         </Text>
 
-        <View style={styles.pickerWrapper}>
+        <View className="flex-1">
           <SourcePicker
             sources={sources}
             onAddSource={handleAddSource}
@@ -42,10 +41,10 @@ export default function SourcesScreen() {
           />
         </View>
 
-        <View style={styles.footer}>
+        <View className="gap-sm pb-xxl">
           <Button
             title={sources.length > 0 ? 'Continue' : 'Skip for now'}
-            variant={sources.length > 0 ? 'primary' : 'ghost'}
+            variant='primary'
             onPress={() => router.push('/(onboarding)/deadline')}
             fullWidth
             size="lg"
@@ -61,12 +60,3 @@ export default function SourcesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { flex: 1, paddingHorizontal: Spacing.xxl },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold, marginTop: Spacing.lg },
-  subtitle: { color: Colors.text.secondary, fontSize: FontSize.md, marginTop: Spacing.sm, marginBottom: Spacing.xxl, lineHeight: 22 },
-  pickerWrapper: { flex: 1 },
-  footer: { gap: Spacing.sm, paddingBottom: Spacing.xxl },
-});

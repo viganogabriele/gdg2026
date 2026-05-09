@@ -38,7 +38,7 @@ export async function requestPermissions(): Promise<boolean> {
 
 export async function scheduleDailyReminder(
   time: string, // "HH:mm"
-  title: string = 'Time to study! 📚',
+  title: string = 'Time to study!',
   body: string = 'Your study plan is waiting. Keep that streak going!'
 ): Promise<string | null> {
   const mod = await getNotificationsModule();
@@ -72,7 +72,7 @@ export async function scheduleDeadlineWarning(
 
   const id = await mod.scheduleNotificationAsync({
     content: {
-      title: '⏰ Deadline Tomorrow!',
+      title: 'Deadline Tomorrow!',
       body: `"${levelTitle}" is due tomorrow. Time to review!`,
       sound: true,
     },
@@ -99,7 +99,7 @@ export async function scheduleStreakWarning(): Promise<string | null> {
 
   const id = await mod.scheduleNotificationAsync({
     content: {
-      title: "🔥 Don't break your streak!",
+      title: "Don't break your streak!",
       body: "You haven't studied today. A quick session is all it takes!",
       sound: true,
     },

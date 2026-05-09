@@ -1,11 +1,12 @@
 /**
  * Daily Objectives — scrollable card list with source refs and completion
  */
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Card } from '@/components/ui/Card';
-import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import type { DailyObjective } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 interface DailyObjectivesProps {
   objectives: DailyObjective[];
@@ -18,44 +19,50 @@ export function DailyObjectives({
   onComplete,
   onPress,
 }: DailyObjectivesProps) {
-  const typeIcons: Record<string, string> = {
-    study: '📖',
-    review: '🔄',
-    quiz: '❓',
+  const typeIcons: Record<string, keyof typeof Ionicons.glyphMap> = {
+    study: 'book-outline',
+    review: 'swap-horizontal',
+    quiz: 'help-circle-outline',
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Today's Objectives</Text>
+    <View className="gap-sm">
+      <Text className="text-text-primary text-lg font-bold mb-xs">Today's Objectives</Text>
       {objectives.map((obj) => (
-        <TouchableOpacity key={obj.id} onPress={() => onPress(obj)} activeOpacity={0.7}>
-          <Card style={[styles.card, obj.completed && styles.completedCard]}>
-            <View style={styles.row}>
+        <TouchableOpacity key={obj.id} onPress={() => onPress(obj)} activeOpacity={0.7} className="mb-xs">
+          <Card className={obj.completed ? 'opacity-60' : ''}>
+            <View className="flex-row items-start gap-md">
               <TouchableOpacity
-                style={[styles.checkbox, obj.completed && styles.checkedBox]}
+                className={`w-[24px] h-[24px] rounded-md border-2 border-accent-primary items-center justify-center mt-[2px] ${obj.completed ? 'bg-accent-primary' : ''}`}
                 onPress={() => onComplete(obj.id)}
               >
-                {obj.completed && <Text style={styles.checkmark}>✓</Text>}
+                {obj.completed && <Text className="text-text-primary text-[14px] font-bold">✓</Text>}
               </TouchableOpacity>
-              <View style={styles.content}>
-                <View style={styles.titleRow}>
-                  <Text style={styles.icon}>{typeIcons[obj.type]}</Text>
+              <View className="flex-1">
+                <View className="flex-row items-center gap-sm">
+                  <Ionicons name={typeIcons[obj.type] || 'book-outline'} size={16} color={Colors.text.primary} />
                   <Text
-                    style={[styles.title, obj.completed && styles.completedText]}
+                    className={`text-text-primary text-md font-semibold flex-1 ${obj.completed ? 'line-through text-text-muted' : ''}`}
                     numberOfLines={1}
                   >
                     {obj.title}
                   </Text>
                 </View>
-                <Text style={styles.description} numberOfLines={2}>
+                <Text className="text-text-secondary text-sm mt-xs leading-[18px]" numberOfLines={2}>
                   {obj.description}
                 </Text>
-                <View style={styles.meta}>
-                  <Text style={styles.time}>⏱ {obj.estimatedMinutes} min</Text>
+                <View className="flex-row gap-md mt-sm">
+                  <View className="flex-row items-center gap-[4px]">
+                    <Ionicons name="time-outline" size={12} color={Colors.text.muted} />
+                    <Text className="text-text-muted text-xs font-medium">{obj.estimatedMinutes} min</Text>
+                  </View>
                   {obj.sourceRefs.length > 0 && (
-                    <Text style={styles.source} numberOfLines={1}>
-                      📎 {obj.sourceRefs[0].label}
-                    </Text>
+                    <View className="flex-row items-center gap-[4px] flex-1">
+                      <Ionicons name="attach-outline" size={12} color={Colors.accent.secondary} />
+                      <Text className="text-accent-secondary text-xs font-medium flex-1" numberOfLines={1}>
+                        {obj.sourceRefs[0].label}
+                      </Text>
+                    </View>
                   )}
                 </View>
               </View>
@@ -64,102 +71,13 @@ export function DailyObjectives({
         </TouchableOpacity>
       ))}
       {objectives.length === 0 && (
-        <Card style={styles.emptyCard}>
-          <Text style={styles.emptyText}>🎉 All done for today!</Text>
+        <Card className="items-center py-xxl">
+          <View className="flex-row items-center gap-sm">
+            <Ionicons name="checkmark-circle" size={20} color={Colors.text.secondary} />
+            <Text className="text-text-secondary text-md">All done for today!</Text>
+          </View>
         </Card>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: Spacing.sm,
-  },
-  sectionTitle: {
-    color: Colors.text.primary,
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.bold,
-    marginBottom: Spacing.xs,
-  },
-  card: {
-    marginBottom: Spacing.xs,
-  },
-  completedCard: {
-    opacity: 0.6,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.md,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: Colors.accent.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-  },
-  checkedBox: {
-    backgroundColor: Colors.accent.primary,
-  },
-  checkmark: {
-    color: Colors.text.primary,
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-  },
-  content: {
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-  },
-  icon: {
-    fontSize: 16,
-  },
-  title: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-    flex: 1,
-  },
-  completedText: {
-    textDecorationLine: 'line-through',
-    color: Colors.text.muted,
-  },
-  description: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.sm,
-    marginTop: Spacing.xs,
-    lineHeight: 18,
-  },
-  meta: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-    marginTop: Spacing.sm,
-  },
-  time: {
-    color: Colors.text.muted,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-  },
-  source: {
-    color: Colors.accent.secondary,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    flex: 1,
-  },
-  emptyCard: {
-    alignItems: 'center',
-    paddingVertical: Spacing.xxl,
-  },
-  emptyText: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.md,
-  },
-});

@@ -2,9 +2,9 @@
  * Timeline View — vertical timeline connector for roadmap levels
  */
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { LevelCard } from './LevelCard';
-import { Colors, Spacing, FontSize, FontWeight } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import type { StudyLevel } from '@/types';
 
 interface TimelineViewProps {
@@ -20,80 +20,72 @@ export function TimelineView({ levels, onLevelPress, onTakeQuiz }: TimelineViewP
 
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
+      className="flex-1"
+      contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 48 }}
       showsVerticalScrollIndicator={false}
     >
       {/* Overall Progress Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Study Roadmap</Text>
-        <Text style={styles.headerProgress}>
+      <View className="mb-xxl pt-lg">
+        <Text className="text-text-primary text-xxl font-bold">Study Roadmap</Text>
+        <Text className="text-text-secondary text-sm mt-xs">
           {completedCount} / {totalCount} levels completed
         </Text>
-        <View style={styles.progressTrack}>
+        <View className="h-[4px] bg-bg-tertiary rounded-[2px] mt-md overflow-hidden">
           <View
-            style={[
-              styles.progressFill,
-              { width: `${overallProgress * 100}%` },
-            ]}
+            className="h-full bg-accent-success rounded-[2px]"
+            style={{ width: `${overallProgress * 100}%` }}
           />
         </View>
       </View>
 
       {/* Timeline */}
       {levels.map((level, index) => (
-        <View key={level.id} style={styles.timelineItem}>
+        <View key={level.id} className="flex-row">
           {/* Timeline connector line */}
-          <View style={styles.connector}>
+          <View className="w-[24px] items-center mr-md">
             {index > 0 && (
               <View
-                style={[
-                  styles.lineTop,
-                  {
-                    backgroundColor:
-                      level.status === 'completed' || levels[index - 1]?.status === 'completed'
-                        ? Colors.accent.success
-                        : Colors.border.subtle,
-                  },
-                ]}
+                className="w-[2px] flex-1 min-h-[12px]"
+                style={{
+                  backgroundColor:
+                    level.status === 'completed' || levels[index - 1]?.status === 'completed'
+                      ? Colors.accent.success
+                      : Colors.border.subtle,
+                }}
               />
             )}
             <View
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    level.status === 'completed'
-                      ? Colors.accent.success
-                      : level.status === 'active'
-                      ? Colors.accent.primary
-                      : Colors.bg.tertiary,
-                  borderColor:
-                    level.status === 'completed'
-                      ? Colors.accent.success
-                      : level.status === 'active'
-                      ? Colors.accent.primary
-                      : Colors.border.medium,
-                },
-              ]}
+              className="w-[14px] h-[14px] rounded-[7px] border-2"
+              style={{
+                backgroundColor:
+                  level.status === 'completed'
+                    ? Colors.accent.success
+                    : level.status === 'active'
+                    ? Colors.accent.primary
+                    : Colors.bg.tertiary,
+                borderColor:
+                  level.status === 'completed'
+                    ? Colors.accent.success
+                    : level.status === 'active'
+                    ? Colors.accent.primary
+                    : Colors.border.medium,
+              }}
             />
             {index < levels.length - 1 && (
               <View
-                style={[
-                  styles.lineBottom,
-                  {
-                    backgroundColor:
-                      level.status === 'completed'
-                        ? Colors.accent.success
-                        : Colors.border.subtle,
-                  },
-                ]}
+                className="w-[2px] flex-1 min-h-[12px]"
+                style={{
+                  backgroundColor:
+                    level.status === 'completed'
+                      ? Colors.accent.success
+                      : Colors.border.subtle,
+                }}
               />
             )}
           </View>
 
           {/* Level Card */}
-          <View style={styles.cardWrapper}>
+          <View className="flex-1">
             <LevelCard
               level={level}
               onPress={() => onLevelPress(level)}
@@ -105,66 +97,3 @@ export function TimelineView({ levels, onLevelPress, onTakeQuiz }: TimelineViewP
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.huge,
-  },
-  header: {
-    marginBottom: Spacing.xxl,
-    paddingTop: Spacing.lg,
-  },
-  headerTitle: {
-    color: Colors.text.primary,
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-  },
-  headerProgress: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.sm,
-    marginTop: Spacing.xs,
-  },
-  progressTrack: {
-    height: 4,
-    backgroundColor: Colors.bg.tertiary,
-    borderRadius: 2,
-    marginTop: Spacing.md,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: Colors.accent.success,
-    borderRadius: 2,
-  },
-  timelineItem: {
-    flexDirection: 'row',
-  },
-  connector: {
-    width: 24,
-    alignItems: 'center',
-    marginRight: Spacing.md,
-  },
-  lineTop: {
-    width: 2,
-    flex: 1,
-    minHeight: 12,
-  },
-  dot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 2,
-  },
-  lineBottom: {
-    width: 2,
-    flex: 1,
-    minHeight: 12,
-  },
-  cardWrapper: {
-    flex: 1,
-  },
-});

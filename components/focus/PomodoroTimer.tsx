@@ -2,10 +2,11 @@
  * Pomodoro Timer — circular countdown with pause/resume
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { PomodoroDefaults } from '@/constants/gamification';
 
 interface PomodoroTimerProps {
@@ -59,10 +60,19 @@ export function PomodoroTimer({ onSessionComplete }: PomodoroTimerProps) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.mode}>{isBreak ? '☕ Break Time' : '📖 Focus Time'}</Text>
+    <View className="flex-1 items-center justify-center p-xxl">
+      <View className="flex-row items-center gap-xs mb-xxl">
+        <Ionicons
+          name={isBreak ? 'cafe-outline' : 'book-outline'}
+          size={20}
+          color={Colors.text.secondary}
+        />
+        <Text className="text-xl text-text-primary font-semibold">
+          {isBreak ? 'Break Time' : 'Focus Time'}
+        </Text>
+      </View>
 
-      <View style={styles.timerWrapper}>
+      <View className="items-center justify-center w-[220px] h-[220px] mb-xxxl">
         <ProgressCircle
           progress={progress}
           size={220}
@@ -70,15 +80,15 @@ export function PomodoroTimer({ onSessionComplete }: PomodoroTimerProps) {
           color={isBreak ? Colors.accent.success : Colors.accent.primary}
           showPercentage={false}
         />
-        <View style={styles.timerContent}>
-          <Text style={styles.time}>
+        <View className="absolute items-center">
+          <Text className="text-display text-text-primary font-extrabold" style={{ fontVariant: ['tabular-nums'] }}>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </Text>
-          <Text style={styles.sessions}>Session {sessionsCompleted + 1}</Text>
+          <Text className="text-text-muted text-sm mt-xs">Session {sessionsCompleted + 1}</Text>
         </View>
       </View>
 
-      <View style={styles.actions}>
+      <View className="w-full gap-md">
         <Button
           title={isRunning ? 'Pause' : 'Start'}
           onPress={() => setIsRunning(!isRunning)}
@@ -95,20 +105,9 @@ export function PomodoroTimer({ onSessionComplete }: PomodoroTimerProps) {
         <Button title="Complete Session" variant="success" onPress={handleComplete} fullWidth />
       </View>
 
-      <Text style={styles.totalTime}>
+      <Text className="text-text-muted text-sm mt-xxl">
         Total studied: {totalStudied.current} min
       </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.xxl },
-  mode: { fontSize: FontSize.xl, color: Colors.text.primary, fontWeight: FontWeight.semibold, marginBottom: Spacing.xxl },
-  timerWrapper: { alignItems: 'center', justifyContent: 'center', width: 220, height: 220, marginBottom: Spacing.xxxl },
-  timerContent: { position: 'absolute', alignItems: 'center' },
-  time: { fontSize: FontSize.display, color: Colors.text.primary, fontWeight: FontWeight.heavy, fontVariant: ['tabular-nums'] },
-  sessions: { color: Colors.text.muted, fontSize: FontSize.sm, marginTop: Spacing.xs },
-  actions: { width: '100%', gap: Spacing.md },
-  totalTime: { color: Colors.text.muted, fontSize: FontSize.sm, marginTop: Spacing.xxl },
-});

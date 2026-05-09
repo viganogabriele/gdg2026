@@ -2,12 +2,12 @@
  * Step Indicator — horizontal dots for onboarding progress
  */
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
-import { Colors, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface StepIndicatorProps {
   totalSteps: number;
@@ -21,29 +21,15 @@ function Dot({ active }: { active: boolean }) {
     backgroundColor: active ? Colors.accent.primary : Colors.text.muted,
   }));
 
-  return <Animated.View style={[styles.dot, style]} />;
+  return <Animated.View className="h-[8px] rounded-[4px]" style={style} />;
 }
 
 export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
   return (
-    <View style={styles.container}>
+    <View className="flex-row items-center justify-center gap-sm py-lg">
       {Array.from({ length: totalSteps }, (_, i) => (
         <Dot key={i} active={i === currentStep} />
       ))}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.sm,
-    paddingVertical: Spacing.lg,
-  },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-  },
-});
