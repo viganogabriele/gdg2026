@@ -87,7 +87,7 @@ export async function analyzeSources(
 export async function generateAssessment(
   subjectTitle: string,
   sections: SourceSection[],
-  count: number = 12
+  count: number
 ): Promise<{ questions: QuizQuestion[] }> {
   return withFallback(
     (provider) => geminiGenerateAssessment(subjectTitle, sections, count, provider),
