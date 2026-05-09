@@ -249,7 +249,7 @@ export const useStudyStore = create<StudyState>()(
       // ─── Objective Actions ──────────────────────────────────────
       setDailyObjectives: (objectives) => set({ dailyObjectives: objectives }),
 
-      completeObjective: (objectiveId) =>
+      completeObjective: (objectiveId) => {
         set((state) => ({
           dailyObjectives: state.dailyObjectives.map((o) =>
             o.id === objectiveId ? { ...o, completed: true } : o
@@ -258,7 +258,9 @@ export const useStudyStore = create<StudyState>()(
             ...state.stats,
             totalPoints: state.stats.totalPoints + Points.STUDY_SESSION_COMPLETE,
           },
-        })),
+        }));
+        get().updateStreak();
+      },
 
       // ─── Quiz Actions ──────────────────────────────────────────
       startQuiz: (quiz) => set({ activeQuiz: quiz }),
@@ -362,16 +364,18 @@ export const useStudyStore = create<StudyState>()(
 
       updateStreak: () => {
         const state = get();
-        const today = new Date().toDateString();
-        const lastStudy = state.stats.lastStudyDate
-          ? new Date(state.stats.lastStudyDate).toDateString()
+
+        const toDay = (d: Date) => d.toISOString().slice(0, 10); // "YYYY-MM-DD"
+        const today = toDay(new Date());
+        const lastDay = state.stats.lastStudyDate
+          ? toDay(new Date(state.stats.lastStudyDate))
           : '';
 
-        if (lastStudy === today) return; // Already studied today
+        if (lastDay === today) return; // already updated today, nothing to do
 
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
-        const isConsecutive = lastStudy === yesterday.toDateString();
+        const isConsecutive = lastDay === toDay(yesterday);
 
         const newStreak = isConsecutive ? state.stats.currentStreak + 1 : 1;
 

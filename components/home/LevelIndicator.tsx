@@ -54,7 +54,7 @@ export function LevelIndicator({
           {completedMinutes} / {requiredMinutes} min studied
         </Text>
         <View className="flex-row items-center mt-sm gap-xs">
-          <NucleoIcon name="star" size={16} />
+          <NucleoIcon name="star-xp" size={16} />
           <Text className="text-accent-xp text-lg font-bold">{totalPoints} XP</Text>
         </View>
       </View>

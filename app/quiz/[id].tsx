@@ -1,18 +1,18 @@
 /**
  * Quiz Screen — level quiz or challenge, accessed via /quiz/[id]
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { QuizResults } from '@/components/quiz/QuizResults';
 import { Button } from '@/components/ui/Button';
-import { useStudyStore } from '@/hooks/useStudyStore';
+import { LevelThresholds, Points } from '@/constants/gamification';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
-import { Points, LevelThresholds } from '@/constants/gamification';
 import type { QuizQuestion } from '@/types';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function QuizScreen() {
   const { id: levelId } = useLocalSearchParams<{ id: string }>();
@@ -28,11 +28,25 @@ export default function QuizScreen() {
   const level = store.levels.find((l) => l.id === levelId);
 
   useEffect(() => {
-    async function loadQuiz() {
-      if (!level) { router.back(); return; }
+    // Wait up to 1s for store hydration before giving up
+    let attempts = 0;
+    const tryLoad = () => {
+      const found = useStudyStore.getState().levels.find((l) => l.id === levelId);
+      if (found) {
+        loadQuiz(found);
+      } else if (attempts < 5) {
+        attempts++;
+        setTimeout(tryLoad, 200);
+      } else {
+        router.back();
+      }
+    };
+
+    async function loadQuiz(lvl: typeof level) {
+      if (!lvl) return;
       try {
         const { questions: q } = await api.generateLevelQuiz(
-          level.id, level.title, level.topics, 8
+          lvl.id, lvl.title, lvl.topics, 8
         );
         setQuestions(q);
       } catch (e) {
@@ -41,7 +55,8 @@ export default function QuizScreen() {
         setLoading(false);
       }
     }
-    loadQuiz();
+
+    tryLoad();
   }, [levelId]);
 
   const handleAnswer = useCallback((answerIndex: number) => {
@@ -68,6 +83,8 @@ export default function QuizScreen() {
 
     // Add questions to spaced repetition
     addCardsFromQuiz(questions);
+
+    store.updateStreak();
 
     if (s >= LevelThresholds.PASS_PERCENTAGE && level) {
       store.completeLevel(level.id);
