@@ -96,7 +96,7 @@ function ActionButton({
       activeOpacity={0.7}
     >
       <View className="mb-sm">
-        <NucleoIcon name={iconName} size={28} />
+        <NucleoIcon name={disabled ? iconName : iconName === 'rocket' ? 'rocket-blue' : iconName} size={28} />
       </View>
       <Text className={`text-md font-semibold ${disabled ? 'text-text-muted' : 'text-text-primary'}`}>
         {title}
