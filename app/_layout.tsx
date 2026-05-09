@@ -31,8 +31,6 @@ export default function RootLayout() {
   const segments = useSegments();
   const router = useRouter();
 
-  
-
   useEffect(() => {
     // avoid navigating before the router/segments are ready
     setTimeout(() => {
