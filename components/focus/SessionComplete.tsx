@@ -3,8 +3,9 @@
  */
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface SessionCompleteProps {
   durationMinutes: number;
@@ -17,15 +18,17 @@ export function SessionComplete({
   durationMinutes, pointsEarned, streakDay, onDismiss,
 }: SessionCompleteProps) {
   return (
-    <View style={styles.overlay}>
-      <View style={styles.card}>
-        <Text style={styles.emoji}>🎯</Text>
-        <Text style={styles.title}>Session Complete!</Text>
+    <View className="absolute inset-0 bg-bg-overlay justify-center items-center p-xxl" style={StyleSheet.absoluteFillObject}>
+      <View className="bg-bg-secondary rounded-xl p-xxxl w-full items-center border border-border-medium">
+        <View className="mb-lg">
+          <Ionicons name="trophy" size={64} color={Colors.accent.xp} />
+        </View>
+        <Text className="text-text-primary text-xxl font-bold mb-xxl">Session Complete!</Text>
 
-        <View style={styles.stats}>
-          <StatItem icon="⏱" label="Time Studied" value={`${durationMinutes} min`} />
-          <StatItem icon="⭐" label="XP Earned" value={`+${pointsEarned}`} />
-          <StatItem icon="🔥" label="Streak" value={`${streakDay} days`} />
+        <View className="w-full gap-md mb-xxl">
+          <StatItem iconName="time-outline" label="Time Studied" value={`${durationMinutes} min`} />
+          <StatItem iconName="star" label="XP Earned" value={`+${pointsEarned}`} />
+          <StatItem iconName="flame" label="Streak" value={`${streakDay} days`} />
         </View>
 
         <Button title="Done" onPress={onDismiss} fullWidth size="lg" />
@@ -34,24 +37,14 @@ export function SessionComplete({
   );
 }
 
-function StatItem({ icon, label, value }: { icon: string; label: string; value: string }) {
+function StatItem({ iconName, label, value }: { iconName: string; label: string; value: string }) {
   return (
-    <View style={styles.statItem}>
-      <Text style={styles.statIcon}>{icon}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
+    <View className="flex-row items-center bg-bg-tertiary rounded-md p-lg">
+      <View className="mr-md">
+        <Ionicons name={iconName as any} size={20} color={Colors.text.primary} />
+      </View>
+      <Text className="text-text-secondary text-md flex-1">{label}</Text>
+      <Text className="text-text-primary text-lg font-bold">{value}</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.bg.overlay, justifyContent: 'center', alignItems: 'center', padding: Spacing.xxl },
-  card: { backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.xl, padding: Spacing.xxxl, width: '100%', alignItems: 'center', borderWidth: 1, borderColor: Colors.border.medium },
-  emoji: { fontSize: 64, marginBottom: Spacing.lg },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold, marginBottom: Spacing.xxl },
-  stats: { width: '100%', gap: Spacing.md, marginBottom: Spacing.xxl },
-  statItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.bg.tertiary, borderRadius: BorderRadius.md, padding: Spacing.lg },
-  statIcon: { fontSize: 20, marginRight: Spacing.md },
-  statLabel: { color: Colors.text.secondary, fontSize: FontSize.md, flex: 1 },
-  statValue: { color: Colors.text.primary, fontSize: FontSize.lg, fontWeight: FontWeight.bold },
-});

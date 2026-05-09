@@ -2,22 +2,23 @@
  * Onboarding Step 4 — Processing screen with animated progress
  */
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle, withRepeat,
-  withSequence, withTiming, Easing, withDelay,
+  withSequence, withTiming, Easing,
 } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 const STEPS = [
-  { label: 'Analyzing your sources...', icon: '📄' },
-  { label: 'Mapping topic dependencies...', icon: '🗺️' },
-  { label: 'Generating assessment questions...', icon: '❓' },
-  { label: 'Almost ready!', icon: '✨' },
+  { label: 'Analyzing your sources...', icon: 'document-outline' as const },
+  { label: 'Mapping topic dependencies...', icon: 'map-outline' as const },
+  { label: 'Generating assessment questions...', icon: 'help-circle-outline' as const },
+  { label: 'Almost ready!', icon: 'sparkles-outline' as const },
 ];
 
 export default function ProcessingScreen() {
@@ -25,7 +26,6 @@ export default function ProcessingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
 
   const pulse = useSharedValue(1);
-  const rotation = useSharedValue(0);
 
   useEffect(() => {
     pulse.value = withRepeat(
@@ -33,9 +33,6 @@ export default function ProcessingScreen() {
         withTiming(1.2, { duration: 800, easing: Easing.inOut(Easing.ease) }),
         withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) })
       ), -1, true
-    );
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 3000, easing: Easing.linear }), -1
     );
   }, []);
 
@@ -95,24 +92,27 @@ export default function ProcessingScreen() {
   const step = STEPS[currentStep];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Animated.View style={[styles.iconWrapper, pulseStyle]}>
-          <Text style={styles.icon}>{step.icon}</Text>
+    <SafeAreaView className="flex-1 bg-bg-primary">
+      <View className="flex-1 justify-center items-center px-xxl">
+        <Animated.View
+          className="w-[120px] h-[120px] rounded-[60px] bg-bg-secondary items-center justify-center border-2 border-accent-primary mb-xxxl"
+          style={pulseStyle}
+        >
+          <Ionicons name={step.icon} size={48} color={Colors.accent.primary} />
         </Animated.View>
 
-        <Text style={styles.label}>{step.label}</Text>
+        <Text className="text-text-primary text-xl font-semibold text-center mb-xxl">{step.label}</Text>
 
-        <View style={styles.dots}>
+        <View className="flex-row gap-sm">
           {STEPS.map((_, i) => (
             <View
               key={i}
-              style={[styles.dot, i <= currentStep && styles.dotActive]}
+              className={`h-[8px] rounded-[4px] ${i <= currentStep ? 'bg-accent-primary w-[24px]' : 'bg-bg-tertiary w-[8px]'}`}
             />
           ))}
         </View>
 
-        <Text style={styles.hint}>
+        <Text className="text-text-muted text-sm text-center mt-xxxl leading-[20px]">
           Preparing your personalized study plan for{'\n'}
           "{store.onboardingData.subjectTitle}"
         </Text>
@@ -120,15 +120,3 @@ export default function ProcessingScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing.xxl },
-  iconWrapper: { width: 120, height: 120, borderRadius: 60, backgroundColor: Colors.bg.secondary, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: Colors.accent.primary, marginBottom: Spacing.xxxl },
-  icon: { fontSize: 48 },
-  label: { color: Colors.text.primary, fontSize: FontSize.xl, fontWeight: FontWeight.semibold, textAlign: 'center', marginBottom: Spacing.xxl },
-  dots: { flexDirection: 'row', gap: Spacing.sm },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.bg.tertiary },
-  dotActive: { backgroundColor: Colors.accent.primary, width: 24 },
-  hint: { color: Colors.text.muted, fontSize: FontSize.sm, textAlign: 'center', marginTop: Spacing.xxxl, lineHeight: 20 },
-});

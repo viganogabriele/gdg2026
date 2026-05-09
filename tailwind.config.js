@@ -1,0 +1,75 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+  ],
+  presets: [require('nativewind/preset')],
+  theme: {
+    extend: {
+      colors: {
+        bg: {
+          primary: '#0A0E1A',
+          secondary: '#141929',
+          tertiary: '#1E2640',
+          overlay: 'rgba(10, 14, 26, 0.85)',
+        },
+        accent: {
+          primary: '#6C5CE7',
+          'primary-light': '#8B7CF6',
+          secondary: '#00D2FF',
+          'secondary-light': '#33DDFF',
+          success: '#00E676',
+          'success-light': '#33EB91',
+          warning: '#FFD740',
+          'warning-light': '#FFE066',
+          danger: '#FF5252',
+          'danger-light': '#FF7B7B',
+          xp: '#FFD700',
+        },
+        text: {
+          primary: '#FFFFFF',
+          secondary: '#8892B0',
+          muted: '#4A5568',
+          inverse: '#0A0E1A',
+        },
+        border: {
+          subtle: 'rgba(108, 92, 231, 0.15)',
+          medium: 'rgba(108, 92, 231, 0.3)',
+          bright: 'rgba(108, 92, 231, 0.5)',
+        },
+      },
+      spacing: {
+        xs: '4px',
+        sm: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '20px',
+        xxl: '24px',
+        xxxl: '32px',
+        huge: '48px',
+        massive: '64px',
+      },
+      borderRadius: {
+        sm: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '20px',
+        xxl: '24px',
+        full: '9999px',
+      },
+      fontSize: {
+        xs: ['11px', { lineHeight: '16px' }],
+        sm: ['13px', { lineHeight: '18px' }],
+        md: ['15px', { lineHeight: '20px' }],
+        lg: ['17px', { lineHeight: '24px' }],
+        xl: ['20px', { lineHeight: '28px' }],
+        xxl: ['24px', { lineHeight: '32px' }],
+        xxxl: ['32px', { lineHeight: '40px' }],
+        hero: ['40px', { lineHeight: '48px' }],
+        display: ['48px', { lineHeight: '56px' }],
+      },
+    },
+  },
+  plugins: [],
+};

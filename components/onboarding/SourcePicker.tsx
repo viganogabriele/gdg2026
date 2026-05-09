@@ -7,11 +7,11 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
   TextInput,
   Platform,
 } from 'react-native';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/theme';
 import type { Source } from '@/types';
 
 interface SourcePickerProps {
@@ -80,36 +80,54 @@ export function SourcePicker({
     setNotesInput('');
   };
 
-  const typeIcons: Record<string, string> = {
-    pdf: '📄',
-    url: '🔗',
-    notes: '📝',
+  const tabConfig: Record<string, { icon: string; label: string }> = {
+    pdf: { icon: 'document-outline', label: 'PDF' },
+    url: { icon: 'link-outline', label: 'URL' },
+    notes: { icon: 'create-outline', label: 'Notes' },
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 w-full">
       {/* Tab Selector */}
-      <View style={styles.tabs}>
+      <View className="flex-row gap-sm mb-lg">
         {(['pdf', 'url', 'notes'] as const).map((tab) => (
           <TouchableOpacity
             key={tab}
-            style={[styles.tab, activeTab === tab && styles.activeTab]}
+            className={`flex-1 py-md rounded-md items-center border ${
+              activeTab === tab
+                ? 'bg-bg-tertiary border-accent-primary'
+                : 'bg-bg-secondary border-border-subtle'
+            }`}
             onPress={() => setActiveTab(tab)}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {tab === 'pdf' ? '📄 PDF' : tab === 'url' ? '🔗 URL' : '📝 Notes'}
-            </Text>
+            <View className="flex-row items-center gap-[6px]">
+              <Ionicons
+                name={tabConfig[tab].icon as any}
+                size={16}
+                color={activeTab === tab ? Colors.accent.primary : Colors.text.muted}
+              />
+              <Text className={`text-sm font-medium ${activeTab === tab ? 'text-accent-primary' : 'text-text-muted'}`}>
+                {tabConfig[tab].label}
+              </Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
 
       {/* Input Area */}
-      <View style={styles.inputArea}>
+      <View className="mb-lg">
         {activeTab === 'pdf' && (
-          <TouchableOpacity style={styles.uploadBtn} onPress={handlePickPDF}>
-            <Text style={styles.uploadIcon}>📁</Text>
-            <Text style={styles.uploadText}>Tap to select a PDF file</Text>
-            <Text style={styles.uploadHint}>
+          <TouchableOpacity
+            className="border-2 border-dashed border-border-medium rounded-lg py-xxxl items-center justify-center bg-bg-secondary"
+            onPress={handlePickPDF}
+          >
+            <View className="mb-md">
+              <Ionicons name="folder-outline" size={40} color={Colors.text.primary} />
+            </View>
+            <Text className="text-text-primary text-md font-medium">
+              Tap to select a PDF file
+            </Text>
+            <Text className="text-text-muted text-sm mt-xs">
               {Platform.OS === 'web'
                 ? 'Browse your files'
                 : 'From Files, iCloud, or Downloads'}
@@ -118,9 +136,9 @@ export function SourcePicker({
         )}
 
         {activeTab === 'url' && (
-          <View style={styles.urlContainer}>
+          <View className="flex-row gap-sm">
             <TextInput
-              style={styles.textInput}
+              className="flex-1 bg-bg-secondary rounded-md border border-border-subtle px-lg py-md text-text-primary text-md"
               placeholder="https://example.com/study-material"
               placeholderTextColor={Colors.text.muted}
               value={urlInput}
@@ -131,19 +149,19 @@ export function SourcePicker({
               selectionColor={Colors.accent.primary}
             />
             <TouchableOpacity
-              style={[styles.addBtn, !urlInput.trim() && styles.addBtnDisabled]}
+              className={`bg-accent-primary rounded-md px-lg py-md justify-center items-center ${!urlInput.trim() ? 'opacity-40' : ''}`}
               onPress={handleAddUrl}
               disabled={!urlInput.trim()}
             >
-              <Text style={styles.addBtnText}>Add</Text>
+              <Text className="text-text-primary text-md font-semibold">Add</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {activeTab === 'notes' && (
-          <View style={styles.notesContainer}>
+          <View className="gap-sm">
             <TextInput
-              style={[styles.textInput, styles.notesInput]}
+              className="flex-1 bg-bg-secondary rounded-md border border-border-subtle px-lg py-md text-text-primary text-md min-h-[120px]"
               placeholder="Paste your notes or key topics here..."
               placeholderTextColor={Colors.text.muted}
               value={notesInput}
@@ -153,11 +171,11 @@ export function SourcePicker({
               selectionColor={Colors.accent.primary}
             />
             <TouchableOpacity
-              style={[styles.addBtn, !notesInput.trim() && styles.addBtnDisabled]}
+              className={`bg-accent-primary rounded-md px-lg py-md justify-center items-center ${!notesInput.trim() ? 'opacity-40' : ''}`}
               onPress={handleAddNotes}
               disabled={!notesInput.trim()}
             >
-              <Text style={styles.addBtnText}>Add Notes</Text>
+              <Text className="text-text-primary text-md font-semibold">Add Notes</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -165,26 +183,32 @@ export function SourcePicker({
 
       {/* Source List */}
       {sources.length > 0 && (
-        <ScrollView style={styles.sourceList} showsVerticalScrollIndicator={false}>
-          <Text style={styles.sourcesTitle}>
+        <ScrollView style={{ maxHeight: 200 }} showsVerticalScrollIndicator={false}>
+          <Text className="text-text-secondary text-sm font-medium mb-sm">
             Added Sources ({sources.length})
           </Text>
           {sources.map((source) => (
-            <View key={source.id} style={styles.sourceItem}>
-              <Text style={styles.sourceIcon}>{typeIcons[source.type]}</Text>
-              <View style={styles.sourceInfo}>
-                <Text style={styles.sourceName} numberOfLines={1}>
+            <View key={source.id} className="flex-row items-center bg-bg-secondary rounded-md p-md mb-sm border border-border-subtle">
+              <View className="mr-md">
+                <Ionicons
+                  name={tabConfig[source.type]?.icon as any || 'document-outline'}
+                  size={20}
+                  color={Colors.text.primary}
+                />
+              </View>
+              <View className="flex-1">
+                <Text className="text-text-primary text-md font-medium" numberOfLines={1}>
                   {source.title}
                 </Text>
-                <Text style={styles.sourceType}>
+                <Text className="text-text-muted text-xs font-medium mt-[2px]">
                   {source.type.toUpperCase()}
                 </Text>
               </View>
               <TouchableOpacity
-                style={styles.removeBtn}
+                className="w-[28px] h-[28px] rounded-[14px] bg-bg-tertiary items-center justify-center"
                 onPress={() => onRemoveSource(source.id)}
               >
-                <Text style={styles.removeBtnText}>✕</Text>
+                <Text className="text-text-muted text-sm">✕</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -193,151 +217,3 @@ export function SourcePicker({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-  },
-  tabs: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    marginBottom: Spacing.lg,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.bg.secondary,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border.subtle,
-  },
-  activeTab: {
-    backgroundColor: Colors.bg.tertiary,
-    borderColor: Colors.accent.primary,
-  },
-  tabText: {
-    color: Colors.text.muted,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-  },
-  activeTabText: {
-    color: Colors.accent.primary,
-  },
-  inputArea: {
-    marginBottom: Spacing.lg,
-  },
-  uploadBtn: {
-    borderWidth: 2,
-    borderColor: Colors.border.medium,
-    borderStyle: 'dashed',
-    borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.xxxl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.bg.secondary,
-  },
-  uploadIcon: {
-    fontSize: 40,
-    marginBottom: Spacing.md,
-  },
-  uploadText: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.medium,
-  },
-  uploadHint: {
-    color: Colors.text.muted,
-    fontSize: FontSize.sm,
-    marginTop: Spacing.xs,
-  },
-  urlContainer: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-  },
-  textInput: {
-    flex: 1,
-    backgroundColor: Colors.bg.secondary,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    borderColor: Colors.border.subtle,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-  },
-  notesContainer: {
-    gap: Spacing.sm,
-  },
-  notesInput: {
-    minHeight: 120,
-    textAlignVertical: 'top',
-    paddingTop: Spacing.md,
-  },
-  addBtn: {
-    backgroundColor: Colors.accent.primary,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addBtnDisabled: {
-    opacity: 0.4,
-  },
-  addBtnText: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-  },
-  sourceList: {
-    maxHeight: 200,
-  },
-  sourcesTitle: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-    marginBottom: Spacing.sm,
-  },
-  sourceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.bg.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border.subtle,
-  },
-  sourceIcon: {
-    fontSize: 20,
-    marginRight: Spacing.md,
-  },
-  sourceInfo: {
-    flex: 1,
-  },
-  sourceName: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.medium,
-  },
-  sourceType: {
-    color: Colors.text.muted,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    marginTop: 2,
-  },
-  removeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.bg.tertiary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeBtnText: {
-    color: Colors.text.muted,
-    fontSize: FontSize.sm,
-  },
-});

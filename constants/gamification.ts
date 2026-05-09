@@ -34,7 +34,7 @@ export interface BadgeDefinition {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  icon: string; // Ionicons name
   condition: string; // human-readable condition
 }
 
@@ -43,84 +43,84 @@ export const BadgeDefinitions: BadgeDefinition[] = [
     id: 'first_session',
     title: 'First Steps',
     description: 'Complete your first study session',
-    icon: '🎯',
+    icon: 'trophy',
     condition: 'complete_first_session',
   },
   {
     id: 'streak_3',
     title: 'Getting Started',
     description: 'Maintain a 3-day study streak',
-    icon: '🔥',
+    icon: 'flame',
     condition: 'streak_3',
   },
   {
     id: 'streak_7',
     title: 'On Fire',
     description: 'Maintain a 7-day study streak',
-    icon: '🔥',
+    icon: 'flame',
     condition: 'streak_7',
   },
   {
     id: 'streak_30',
     title: 'Unstoppable',
     description: 'Maintain a 30-day study streak',
-    icon: '💎',
+    icon: 'diamond-outline',
     condition: 'streak_30',
   },
   {
     id: 'perfect_score',
     title: 'Perfect Score',
     description: 'Get 100% on a level quiz',
-    icon: '⭐',
+    icon: 'star',
     condition: 'perfect_quiz',
   },
   {
     id: 'early_bird',
     title: 'Early Bird',
     description: 'Complete a level before its deadline',
-    icon: '🏃',
+    icon: 'flash',
     condition: 'early_completion',
   },
   {
     id: 'night_owl',
     title: 'Night Owl',
     description: 'Study after midnight',
-    icon: '🦉',
+    icon: 'moon-outline',
     condition: 'study_after_midnight',
   },
   {
     id: 'level_5',
     title: 'Scholar',
     description: 'Complete 5 levels',
-    icon: '📚',
+    icon: 'library-outline',
     condition: 'levels_completed_5',
   },
   {
     id: 'level_10',
     title: 'Master',
     description: 'Complete 10 levels',
-    icon: '🎓',
+    icon: 'school-outline',
     condition: 'levels_completed_10',
   },
   {
     id: 'points_500',
     title: 'Point Collector',
     description: 'Earn 500 total points',
-    icon: '💰',
+    icon: 'wallet-outline',
     condition: 'points_500',
   },
   {
     id: 'points_1000',
     title: 'XP Hunter',
     description: 'Earn 1000 total points',
-    icon: '🏆',
+    icon: 'trophy-outline',
     condition: 'points_1000',
   },
   {
     id: 'marathon',
     title: 'Marathon Runner',
     description: 'Study for 2+ hours in a single day',
-    icon: '🏅',
+    icon: 'medal-outline',
     condition: 'study_2_hours_day',
   },
 ];

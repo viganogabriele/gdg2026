@@ -2,7 +2,7 @@
  * Circular Progress Indicator — SVG-based with animated fill
  */
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedProps,
@@ -10,7 +10,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
-import { Colors, FontSize, FontWeight } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -52,8 +52,8 @@ export function ProgressCircle({
   }));
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
-      <Svg width={size} height={size} style={styles.svg}>
+    <View className="items-center justify-center" style={{ width: size, height: size }}>
+      <Svg width={size} height={size} className="absolute">
         {/* Background circle */}
         <Circle
           cx={size / 2}
@@ -78,19 +78,19 @@ export function ProgressCircle({
           origin={`${size / 2}, ${size / 2}`}
         />
       </Svg>
-      <View style={styles.content}>
+      <View className="items-center justify-center">
         {showPercentage && (
-          <Text style={[styles.percentage, { fontSize: size * 0.2 }]}>
+          <Text className="text-text-primary font-bold" style={{ fontSize: size * 0.2 }}>
             {Math.round(progress * 100)}%
           </Text>
         )}
         {label && (
-          <Text style={styles.label} numberOfLines={1}>
+          <Text className="text-text-secondary text-xs font-medium mt-[2px]" numberOfLines={1}>
             {label}
           </Text>
         )}
         {sublabel && (
-          <Text style={styles.sublabel} numberOfLines={1}>
+          <Text className="text-text-muted text-xs" numberOfLines={1}>
             {sublabel}
           </Text>
         )}
@@ -98,31 +98,3 @@ export function ProgressCircle({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  svg: {
-    position: 'absolute',
-  },
-  content: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  percentage: {
-    color: Colors.text.primary,
-    fontWeight: FontWeight.bold,
-  },
-  label: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    marginTop: 2,
-  },
-  sublabel: {
-    color: Colors.text.muted,
-    fontSize: FontSize.xs,
-  },
-});

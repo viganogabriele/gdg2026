@@ -2,14 +2,15 @@
  * Quick Actions — Challenge and Review action buttons
  */
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing, Shadow } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/theme';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -29,9 +30,9 @@ export function QuickActions({
   challengeAvailable,
 }: QuickActionsProps) {
   return (
-    <View style={styles.container}>
+    <View className="flex-row gap-md">
       <ActionButton
-        icon="⚔️"
+        iconName="game-controller-outline"
         title="Take Challenge"
         subtitle={challengeAvailable ? 'Test your knowledge' : 'No challenge available'}
         onPress={onTakeChallenge}
@@ -39,7 +40,7 @@ export function QuickActions({
         color={Colors.accent.primary}
       />
       <ActionButton
-        icon="🧠"
+        iconName="bulb-outline"
         title="Quick Review"
         subtitle={hasDueReviews ? `${dueReviewCount} cards due` : 'No reviews due'}
         onPress={onQuickReview}
@@ -52,7 +53,7 @@ export function QuickActions({
 }
 
 function ActionButton({
-  icon,
+  iconName,
   title,
   subtitle,
   onPress,
@@ -60,7 +61,7 @@ function ActionButton({
   color,
   badge,
 }: {
-  icon: string;
+  iconName: string;
   title: string;
   subtitle: string;
   onPress: () => void;
@@ -76,10 +77,9 @@ function ActionButton({
 
   return (
     <AnimatedTouchable
+      className={`flex-1 bg-bg-secondary rounded-lg p-lg items-center border relative ${disabled ? 'opacity-50' : ''}`}
       style={[
-        styles.actionBtn,
         { borderColor: disabled ? Colors.border.subtle : `${color}44` },
-        disabled && styles.disabledBtn,
         animatedStyle,
       ]}
       onPress={() => {
@@ -95,68 +95,18 @@ function ActionButton({
       disabled={disabled}
       activeOpacity={0.7}
     >
-      <Text style={styles.actionIcon}>{icon}</Text>
-      <Text style={[styles.actionTitle, disabled && styles.disabledText]}>
+      <View className="mb-sm">
+        <Ionicons name={iconName as any} size={28} color={Colors.text.primary} />
+      </View>
+      <Text className={`text-md font-semibold ${disabled ? 'text-text-muted' : 'text-text-primary'}`}>
         {title}
       </Text>
-      <Text style={styles.actionSubtitle}>{subtitle}</Text>
+      <Text className="text-text-muted text-xs mt-xs text-center">{subtitle}</Text>
       {badge !== undefined && badge > 0 && (
-        <View style={[styles.badge, { backgroundColor: color }]}>
-          <Text style={styles.badgeText}>{badge}</Text>
+        <View className="absolute top-[-6px] right-[-6px] w-[24px] h-[24px] rounded-full items-center justify-center" style={{ backgroundColor: color }}>
+          <Text className="text-text-primary text-xs font-bold">{badge}</Text>
         </View>
       )}
     </AnimatedTouchable>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  actionBtn: {
-    flex: 1,
-    backgroundColor: Colors.bg.secondary,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    position: 'relative',
-  },
-  disabledBtn: {
-    opacity: 0.5,
-  },
-  actionIcon: {
-    fontSize: 28,
-    marginBottom: Spacing.sm,
-  },
-  actionTitle: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-  },
-  disabledText: {
-    color: Colors.text.muted,
-  },
-  actionSubtitle: {
-    color: Colors.text.muted,
-    fontSize: FontSize.xs,
-    marginTop: Spacing.xs,
-    textAlign: 'center',
-  },
-  badge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeText: {
-    color: Colors.text.primary,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.bold,
-  },
-});

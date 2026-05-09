@@ -3,31 +3,27 @@
  */
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { HapticTab } from '@/components/haptic-tab';
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    home: '🏠',
-    roadmap: '🗺️',
-    profile: '👤',
+  const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
+    home: 'home',
+    roadmap: 'map-outline',
+    profile: 'person',
   };
   return (
-    <View style={[tabStyles.iconWrapper, focused && tabStyles.iconFocused]}>
-      <Text style={[tabStyles.icon, focused && tabStyles.iconTextFocused]}>
-        {icons[name] || '📱'}
-      </Text>
+    <View className={`items-center justify-center w-[40px] h-[32px] rounded-[16px] ${focused ? 'bg-[rgba(108,92,231,0.15)]' : ''}`}>
+      <Ionicons
+        name={icons[name] || 'apps'}
+        size={focused ? 22 : 20}
+        color={focused ? Colors.accent.primary : Colors.text.muted}
+      />
     </View>
   );
 }
-
-const tabStyles = StyleSheet.create({
-  iconWrapper: { alignItems: 'center', justifyContent: 'center', width: 40, height: 32, borderRadius: 16 },
-  iconFocused: { backgroundColor: 'rgba(108, 92, 231, 0.15)' },
-  icon: { fontSize: 20 },
-  iconTextFocused: { fontSize: 22 },
-});
 
 export default function TabLayout() {
   return (
@@ -46,8 +42,8 @@ export default function TabLayout() {
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: FontSize.xs,
-          fontWeight: FontWeight.medium,
+          fontSize: 11,
+          fontWeight: '500',
         },
       }}
     >

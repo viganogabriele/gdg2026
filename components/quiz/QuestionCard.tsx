@@ -2,7 +2,7 @@
  * Question Card — quiz question with option selection and feedback
  */
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -10,7 +10,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/theme';
 import type { QuizQuestion } from '@/types';
 
 interface QuestionCardProps {
@@ -48,75 +49,69 @@ export function QuestionCard({
 
   const answered = question.userAnswer !== undefined;
 
-  const getOptionStyle = (index: number) => {
+  const getOptionBorderClass = (index: number) => {
     if (answered && showFeedback) {
-      if (index === question.correctIndex) return styles.correctOption;
-      if (index === question.userAnswer) return styles.wrongOption;
+      if (index === question.correctIndex) return 'border-accent-success bg-[rgba(0,230,118,0.1)]';
+      if (index === question.userAnswer) return 'border-accent-danger bg-[rgba(255,82,82,0.1)]';
     } else if (answered && index === question.userAnswer) {
-      return styles.selectedOption;
+      return 'border-accent-primary bg-[rgba(108,92,231,0.1)]';
     }
-    return null;
+    return 'border-border-subtle';
   };
 
   return (
-    <Animated.View style={[styles.container, containerStyle]}>
-      <View style={styles.progress}>
-        <Text style={styles.progressText}>{questionNumber} / {totalQuestions}</Text>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${(questionNumber / totalQuestions) * 100}%` }]} />
+    <Animated.View className="p-lg" style={containerStyle}>
+      <View className="mb-xxl">
+        <Text className="text-text-muted text-sm font-medium mb-xs text-center">
+          {questionNumber} / {totalQuestions}
+        </Text>
+        <View className="h-[4px] bg-bg-tertiary rounded-[2px] overflow-hidden">
+          <View
+            className="h-full bg-accent-primary rounded-[2px]"
+            style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
+          />
         </View>
       </View>
 
-      <Text style={styles.questionText}>{question.text}</Text>
+      <Text className="text-text-primary text-xl font-semibold leading-[28px] mb-xxl">
+        {question.text}
+      </Text>
 
-      <View style={styles.options}>
+      <View className="gap-md">
         {question.options.map((option, index) => {
           const letter = String.fromCharCode(65 + index);
           return (
             <TouchableOpacity
               key={index}
-              style={[styles.option, getOptionStyle(index)]}
+              className={`flex-row items-center bg-bg-secondary rounded-md p-lg border-[1.5px] gap-md ${getOptionBorderClass(index)}`}
               onPress={() => handleAnswer(index)}
               disabled={answered}
               activeOpacity={0.7}
             >
-              <View style={styles.letterBadge}>
-                <Text style={styles.letterText}>{letter}</Text>
+              <View className="w-[32px] h-[32px] rounded-[16px] bg-bg-tertiary items-center justify-center">
+                <Text className="text-text-secondary text-sm font-bold">{letter}</Text>
               </View>
-              <Text style={[styles.optionText, { flex: 1 }]}>{option}</Text>
+              <Text className="text-text-primary text-md leading-[22px] flex-1">{option}</Text>
             </TouchableOpacity>
           );
         })}
       </View>
 
       {answered && showFeedback && (
-        <View style={styles.explanation}>
-          <Text style={styles.explanationTitle}>
-            {question.userAnswer === question.correctIndex ? '✅ Correct!' : '❌ Incorrect'}
-          </Text>
-          <Text style={styles.explanationText}>{question.explanation}</Text>
+        <View className="bg-bg-tertiary rounded-md p-lg mt-xxl border border-border-subtle">
+          <View className="flex-row items-center gap-sm mb-sm">
+            <Ionicons
+              name={question.userAnswer === question.correctIndex ? 'checkmark-circle' : 'close-circle'}
+              size={18}
+              color={question.userAnswer === question.correctIndex ? Colors.accent.success : Colors.accent.danger}
+            />
+            <Text className="text-text-primary text-md font-semibold">
+              {question.userAnswer === question.correctIndex ? 'Correct!' : 'Incorrect'}
+            </Text>
+          </View>
+          <Text className="text-text-secondary text-sm leading-[20px]">{question.explanation}</Text>
         </View>
       )}
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { padding: Spacing.lg },
-  progress: { marginBottom: Spacing.xxl },
-  progressText: { color: Colors.text.muted, fontSize: FontSize.sm, fontWeight: FontWeight.medium, marginBottom: Spacing.xs, textAlign: 'center' },
-  progressBar: { height: 4, backgroundColor: Colors.bg.tertiary, borderRadius: 2, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: Colors.accent.primary, borderRadius: 2 },
-  questionText: { color: Colors.text.primary, fontSize: FontSize.xl, fontWeight: FontWeight.semibold, lineHeight: 28, marginBottom: Spacing.xxl },
-  options: { gap: Spacing.md },
-  option: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, padding: Spacing.lg, borderWidth: 1.5, borderColor: Colors.border.subtle, gap: Spacing.md },
-  selectedOption: { borderColor: Colors.accent.primary, backgroundColor: 'rgba(108, 92, 231, 0.1)' },
-  correctOption: { borderColor: Colors.accent.success, backgroundColor: 'rgba(0, 230, 118, 0.1)' },
-  wrongOption: { borderColor: Colors.accent.danger, backgroundColor: 'rgba(255, 82, 82, 0.1)' },
-  letterBadge: { width: 32, height: 32, borderRadius: 16, backgroundColor: Colors.bg.tertiary, alignItems: 'center', justifyContent: 'center' },
-  letterText: { color: Colors.text.secondary, fontSize: FontSize.sm, fontWeight: FontWeight.bold },
-  optionText: { color: Colors.text.primary, fontSize: FontSize.md, lineHeight: 22 },
-  explanation: { backgroundColor: Colors.bg.tertiary, borderRadius: BorderRadius.md, padding: Spacing.lg, marginTop: Spacing.xxl, borderWidth: 1, borderColor: Colors.border.subtle },
-  explanationTitle: { color: Colors.text.primary, fontSize: FontSize.md, fontWeight: FontWeight.semibold, marginBottom: Spacing.sm },
-  explanationText: { color: Colors.text.secondary, fontSize: FontSize.sm, lineHeight: 20 },
-});

@@ -2,14 +2,13 @@
  * Onboarding Step 5 — Assessment quiz (10-15 questions)
  */
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
-import { Colors, Spacing } from '@/constants/theme';
 
 export default function AssessmentScreen() {
   const activeQuiz = useStudyStore((s) => s.activeQuiz);
@@ -44,8 +43,8 @@ export default function AssessmentScreen() {
 
   if (!currentQuestion) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.empty} />
+      <SafeAreaView className="flex-1 bg-bg-primary">
+        <View className="flex-1" />
       </SafeAreaView>
     );
   }
@@ -53,9 +52,9 @@ export default function AssessmentScreen() {
   const answered = currentQuestion.userAnswer !== undefined;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
       <StepIndicator totalSteps={6} currentStep={4} />
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 48 }}>
         <QuestionCard
           question={currentQuestion}
           questionNumber={currentIndex + 1}
@@ -66,7 +65,7 @@ export default function AssessmentScreen() {
       </ScrollView>
 
       {answered && (
-        <View style={styles.footer}>
+        <View className="px-xxl pb-xxl">
           <Button
             title={currentIndex < questions.length - 1 ? 'Next Question' : 'See Results'}
             onPress={handleNext}
@@ -78,11 +77,3 @@ export default function AssessmentScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  scroll: { flex: 1 },
-  scrollContent: { paddingBottom: Spacing.huge },
-  empty: { flex: 1 },
-  footer: { paddingHorizontal: Spacing.xxl, paddingBottom: Spacing.xxl },
-});

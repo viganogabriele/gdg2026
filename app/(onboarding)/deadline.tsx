@@ -2,14 +2,15 @@
  * Onboarding Step 3 — "When is your deadline?"
  */
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useStudyStore } from '@/hooks/useStudyStore';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 const HOURS_OPTIONS = [5, 10, 15, 20, 30];
 
@@ -51,13 +52,13 @@ export default function DeadlineScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
+      <View className="flex-1 px-xxl">
         <StepIndicator totalSteps={6} currentStep={2} />
 
-        <View style={styles.body}>
-          <Text style={styles.title}>When is your deadline?</Text>
-          <Text style={styles.subtitle}>
+        <View className="flex-1 pt-xxl">
+          <Text className="text-text-primary text-xxl font-bold">When is your deadline?</Text>
+          <Text className="text-text-secondary text-md mt-sm mb-xxl">
             We'll plan your study schedule around this date
           </Text>
 
@@ -66,32 +67,36 @@ export default function DeadlineScreen() {
             placeholder="YYYY-MM-DD (e.g. 2025-06-15)"
             value={dateText}
             onChangeText={setDateText}
-            containerStyle={styles.dateInput}
+            containerStyle={{ marginBottom: 16 }}
           />
 
           {/* Quick date options */}
-          <View style={styles.quickDates}>
+          <View className="flex-row gap-sm mb-xxxl">
             {[7, 14, 30, 60, 90].map((days) => (
               <TouchableOpacity
                 key={days}
-                style={styles.quickDateBtn}
+                className="bg-bg-secondary rounded-md px-lg py-sm border border-border-subtle"
                 onPress={() => setQuickDeadline(days)}
               >
-                <Text style={styles.quickDateText}>{days}d</Text>
+                <Text className="text-text-secondary text-sm font-medium">{days}d</Text>
               </TouchableOpacity>
             ))}
           </View>
 
           {/* Hours per week */}
-          <Text style={styles.hoursLabel}>Hours per week available</Text>
-          <View style={styles.hoursOptions}>
+          <Text className="text-text-primary text-md font-semibold mb-md">Hours per week available</Text>
+          <View className="flex-row gap-sm mb-xxl">
             {HOURS_OPTIONS.map((h) => (
               <TouchableOpacity
                 key={h}
-                style={[styles.hoursBtn, hoursPerWeek === h && styles.hoursBtnActive]}
+                className={`flex-1 rounded-md py-md items-center border ${
+                  hoursPerWeek === h
+                    ? 'bg-accent-primary border-accent-primary'
+                    : 'bg-bg-secondary border-border-subtle'
+                }`}
                 onPress={() => setHoursPerWeek(h)}
               >
-                <Text style={[styles.hoursText, hoursPerWeek === h && styles.hoursTextActive]}>
+                <Text className={`text-md font-semibold ${hoursPerWeek === h ? 'text-text-primary' : 'text-text-secondary'}`}>
                   {h}h
                 </Text>
               </TouchableOpacity>
@@ -99,15 +104,18 @@ export default function DeadlineScreen() {
           </View>
 
           {dateText && (
-            <View style={styles.summary}>
-              <Text style={styles.summaryText}>
-                📅 Studying ~{hoursPerWeek}h/week until your deadline
-              </Text>
+            <View className="bg-bg-secondary rounded-md p-lg border border-border-subtle">
+              <View className="flex-row items-center justify-center gap-sm">
+                <Ionicons name="calendar-outline" size={16} color={Colors.text.secondary} />
+                <Text className="text-text-secondary text-sm text-center">
+                  Studying ~{hoursPerWeek}h/week until your deadline
+                </Text>
+              </View>
             </View>
           )}
         </View>
 
-        <View style={styles.footer}>
+        <View className="gap-sm pb-xxl">
           <Button title="Generate Study Plan" onPress={handleContinue} fullWidth size="lg" />
           <Button title="Back" variant="ghost" onPress={() => router.back()} fullWidth />
         </View>
@@ -115,24 +123,3 @@ export default function DeadlineScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { flex: 1, paddingHorizontal: Spacing.xxl },
-  body: { flex: 1, paddingTop: Spacing.xxl },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold },
-  subtitle: { color: Colors.text.secondary, fontSize: FontSize.md, marginTop: Spacing.sm, marginBottom: Spacing.xxl },
-  dateInput: { marginBottom: Spacing.lg },
-  quickDates: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xxxl },
-  quickDateBtn: { backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderWidth: 1, borderColor: Colors.border.subtle },
-  quickDateText: { color: Colors.text.secondary, fontSize: FontSize.sm, fontWeight: FontWeight.medium },
-  hoursLabel: { color: Colors.text.primary, fontSize: FontSize.md, fontWeight: FontWeight.semibold, marginBottom: Spacing.md },
-  hoursOptions: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xxl },
-  hoursBtn: { flex: 1, backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border.subtle },
-  hoursBtnActive: { backgroundColor: Colors.accent.primary, borderColor: Colors.accent.primary },
-  hoursText: { color: Colors.text.secondary, fontSize: FontSize.md, fontWeight: FontWeight.semibold },
-  hoursTextActive: { color: Colors.text.primary },
-  summary: { backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, padding: Spacing.lg, borderWidth: 1, borderColor: Colors.border.subtle },
-  summaryText: { color: Colors.text.secondary, fontSize: FontSize.sm, textAlign: 'center' },
-  footer: { gap: Spacing.sm, paddingBottom: Spacing.xxl },
-});

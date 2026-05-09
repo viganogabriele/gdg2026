@@ -2,14 +2,15 @@
  * Onboarding Step 1 — "What are you studying?"
  */
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export default function SubjectScreen() {
   const setOnboardingSubject = useStudyStore((s) => s.setOnboardingSubject);
@@ -23,17 +24,20 @@ export default function SubjectScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
       <KeyboardAvoidingView
-        style={styles.content}
+        className="flex-1 px-xxl"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <StepIndicator totalSteps={6} currentStep={0} />
 
-        <View style={styles.body}>
-          <Text style={styles.greeting}>👋 Let's get started</Text>
-          <Text style={styles.title}>What are you studying?</Text>
-          <Text style={styles.subtitle}>
+        <View className="flex-1 justify-center">
+          <View className="flex-row items-center gap-sm mb-sm">
+            <Ionicons name="hand-left-outline" size={24} color={Colors.text.primary} />
+            <Text className="text-xxl text-text-primary">Let's get started</Text>
+          </View>
+          <Text className="text-text-primary text-xxxl font-bold mb-md">What are you studying?</Text>
+          <Text className="text-text-secondary text-md leading-[22px] mb-xxxl">
             Enter the subject or course name you want to master
           </Text>
 
@@ -41,14 +45,14 @@ export default function SubjectScreen() {
             placeholder="e.g. Calculus II, Organic Chemistry, History..."
             value={subject}
             onChangeText={setSubject}
-            containerStyle={styles.input}
+            containerStyle={{ marginTop: 16 }}
             autoFocus
             returnKeyType="done"
             onSubmitEditing={handleContinue}
           />
         </View>
 
-        <View style={styles.footer}>
+        <View className="pb-xxl">
           <Button
             title="Continue"
             onPress={handleContinue}
@@ -61,14 +65,3 @@ export default function SubjectScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { flex: 1, paddingHorizontal: Spacing.xxl },
-  body: { flex: 1, justifyContent: 'center' },
-  greeting: { fontSize: FontSize.xxl, marginBottom: Spacing.sm },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxxl, fontWeight: FontWeight.bold, marginBottom: Spacing.md },
-  subtitle: { color: Colors.text.secondary, fontSize: FontSize.md, lineHeight: 22, marginBottom: Spacing.xxxl },
-  input: { marginTop: Spacing.lg },
-  footer: { paddingBottom: Spacing.xxl },
-});

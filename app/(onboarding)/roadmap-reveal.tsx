@@ -2,18 +2,17 @@
  * Onboarding Step 6 — Roadmap Reveal with animated level cascade
  */
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import Animated, {
-  FadeInDown, useSharedValue, useAnimatedStyle,
-  withDelay, withTiming,
+  FadeInDown,
 } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
-import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export default function RoadmapRevealScreen() {
   const store = useStudyStore();
@@ -62,65 +61,70 @@ export default function RoadmapRevealScreen() {
   const score = Math.round(store.onboardingData.assessmentScore * 100);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.delay(200)}>
-          <Text style={styles.emoji}>🎓</Text>
-          <Text style={styles.title}>Your Study Plan is Ready!</Text>
-          <Text style={styles.subtitle}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
+      <ScrollView contentContainerStyle={{ padding: 24, paddingTop: 48 }} showsVerticalScrollIndicator={false}>
+        <Animated.View entering={FadeInDown.delay(200)} className="items-center">
+          <View className="mb-lg">
+            <Ionicons name="school-outline" size={64} color={Colors.accent.xp} />
+          </View>
+          <Text className="text-text-primary text-xxl font-bold text-center">Your Study Plan is Ready!</Text>
+          <Text className="text-text-secondary text-md text-center mt-sm mb-xxxl">
             Assessment score: {score}% — {score >= 70 ? 'Great foundation!' : score >= 40 ? 'Good start!' : "We'll build you up!"}
           </Text>
         </Animated.View>
 
         {/* Level List */}
-        <View style={styles.levelList}>
+        <View className="gap-md">
           {levels.map((level, i) => (
             <Animated.View
               key={level.id}
               entering={FadeInDown.delay(400 + i * 150)}
-              style={[styles.levelItem, level.status === 'active' && styles.activeLevelItem]}
+              className={`flex-row items-center bg-bg-secondary rounded-md p-lg border gap-md ${
+                level.status === 'active' ? 'border-accent-primary border-[1.5px]' : 'border-border-subtle'
+              }`}
             >
-              <View style={[styles.levelDot, {
+              <View className="w-[36px] h-[36px] rounded-[18px] items-center justify-center" style={{
                 backgroundColor: level.status === 'completed'
                   ? Colors.accent.success
                   : level.status === 'active'
                   ? Colors.accent.primary
                   : Colors.bg.tertiary,
-              }]}>
-                <Text style={styles.levelNum}>{level.levelNumber}</Text>
+              }}>
+                <Text className="text-text-primary text-sm font-bold">{level.levelNumber}</Text>
               </View>
-              <View style={styles.levelInfo}>
-                <Text style={styles.levelTitle}>{level.title}</Text>
-                <Text style={styles.levelStatus}>
-                  {level.status === 'completed' ? '✅ Already known' :
-                   level.status === 'active' ? '📖 Start here' : '🔒 Locked'}
-                </Text>
+              <View className="flex-1">
+                <Text className="text-text-primary text-md font-semibold">{level.title}</Text>
+                <View className="flex-row items-center gap-xs mt-[2px]">
+                  <Ionicons
+                    name={
+                      level.status === 'completed' ? 'checkmark-circle'
+                      : level.status === 'active' ? 'book-outline'
+                      : 'lock-closed'
+                    }
+                    size={12}
+                    color={Colors.text.muted}
+                  />
+                  <Text className="text-text-muted text-xs">
+                    {level.status === 'completed' ? 'Already known' :
+                     level.status === 'active' ? 'Start here' : 'Locked'}
+                  </Text>
+                </View>
               </View>
             </Animated.View>
           ))}
         </View>
 
-        <Animated.View entering={FadeInDown.delay(400 + levels.length * 150)} style={styles.footer}>
-          <Button title="Start Studying! 🚀" onPress={handleStart} fullWidth size="lg" loading={loading} />
+        <Animated.View entering={FadeInDown.delay(400 + levels.length * 150)} className="mt-xxxl pb-xxl">
+          <Button
+            title="Start Studying!"
+            icon={<Ionicons name="rocket-outline" size={18} color={Colors.text.primary} />}
+            onPress={handleStart}
+            fullWidth
+            size="lg"
+            loading={loading}
+          />
         </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { padding: Spacing.xxl, paddingTop: Spacing.huge },
-  emoji: { fontSize: 64, textAlign: 'center', marginBottom: Spacing.lg },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold, textAlign: 'center' },
-  subtitle: { color: Colors.text.secondary, fontSize: FontSize.md, textAlign: 'center', marginTop: Spacing.sm, marginBottom: Spacing.xxxl },
-  levelList: { gap: Spacing.md },
-  levelItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.md, padding: Spacing.lg, borderWidth: 1, borderColor: Colors.border.subtle, gap: Spacing.md },
-  activeLevelItem: { borderColor: Colors.accent.primary, borderWidth: 1.5 },
-  levelDot: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  levelNum: { color: Colors.text.primary, fontSize: FontSize.sm, fontWeight: FontWeight.bold },
-  levelInfo: { flex: 1 },
-  levelTitle: { color: Colors.text.primary, fontSize: FontSize.md, fontWeight: FontWeight.semibold },
-  levelStatus: { color: Colors.text.muted, fontSize: FontSize.xs, marginTop: 2 },
-  footer: { marginTop: Spacing.xxxl, paddingBottom: Spacing.xxl },
-});

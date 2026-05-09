@@ -2,14 +2,15 @@
  * Profile / Settings Screen — stats, badges, preferences
  */
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet, Switch, Alert } from 'react-native';
+import { ScrollView, View, Text, Switch, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { BadgeDisplay } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { BadgeDefinitions } from '@/constants/gamification';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export default function ProfileScreen() {
   const stats = useStudyStore((s) => s.stats);
@@ -38,32 +39,38 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Profile</Text>
+    <SafeAreaView className="flex-1 bg-bg-primary" edges={['top']}>
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 48 }} showsVerticalScrollIndicator={false}>
+        <Text className="text-text-primary text-xxl font-bold mb-xxl">Profile</Text>
 
         {/* Stats Cards */}
-        <View style={styles.statsGrid}>
-          <StatCard icon="⏱" label="Study Time" value={formatHours(stats.totalStudyMinutes)} />
-          <StatCard icon="⭐" label="Total XP" value={String(stats.totalPoints)} />
-          <StatCard icon="📚" label="Levels Done" value={String(stats.levelsCompleted)} />
-          <StatCard icon="🔥" label="Best Streak" value={`${stats.longestStreak}d`} />
+        <View className="flex-row flex-wrap gap-md mb-xxl">
+          <StatCard iconName="time-outline" label="Study Time" value={formatHours(stats.totalStudyMinutes)} />
+          <StatCard iconName="star" label="Total XP" value={String(stats.totalPoints)} />
+          <StatCard iconName="library-outline" label="Levels Done" value={String(stats.levelsCompleted)} />
+          <StatCard iconName="flame" label="Best Streak" value={`${stats.longestStreak}d`} />
         </View>
 
         {/* Current Subject */}
         {subjects[0] && (
-          <Card style={styles.subjectCard}>
-            <Text style={styles.sectionTitle}>📖 Current Subject</Text>
-            <Text style={styles.subjectName}>{subjects[0].title}</Text>
-            <Text style={styles.subjectMeta}>
+          <Card style={{ marginBottom: 24 }}>
+            <View className="flex-row items-center gap-sm mb-sm">
+              <Ionicons name="book-outline" size={18} color={Colors.text.primary} />
+              <Text className="text-text-primary text-lg font-bold">Current Subject</Text>
+            </View>
+            <Text className="text-text-primary text-lg font-semibold mt-sm">{subjects[0].title}</Text>
+            <Text className="text-text-muted text-sm mt-xs">
               Deadline: {new Date(subjects[0].deadline).toLocaleDateString()}
             </Text>
           </Card>
         )}
 
         {/* Badges */}
-        <Text style={styles.sectionTitle}>🏆 Badges</Text>
-        <View style={styles.badgeGrid}>
+        <View className="flex-row items-center gap-sm mb-md mt-lg">
+          <Ionicons name="trophy-outline" size={18} color={Colors.text.primary} />
+          <Text className="text-text-primary text-lg font-bold">Badges</Text>
+        </View>
+        <View className="flex-row flex-wrap gap-md mb-lg">
           {BadgeDefinitions.map((def) => (
             <BadgeDisplay
               key={def.id}
@@ -77,8 +84,11 @@ export default function ProfileScreen() {
         </View>
 
         {/* Notification Settings */}
-        <Text style={styles.sectionTitle}>🔔 Notifications</Text>
-        <Card style={styles.settingsCard}>
+        <View className="flex-row items-center gap-sm mb-md mt-lg">
+          <Ionicons name="notifications-outline" size={18} color={Colors.text.primary} />
+          <Text className="text-text-primary text-lg font-bold">Notifications</Text>
+        </View>
+        <Card style={{ marginBottom: 24 }}>
           <SettingRow label="Daily Reminder" value={prefs.dailyReminder}
             onChange={(v) => updatePrefs({ dailyReminder: v })} />
           <SettingRow label="Deadline Warnings" value={prefs.deadlineWarnings}
@@ -90,7 +100,7 @@ export default function ProfileScreen() {
         </Card>
 
         {/* Danger Zone */}
-        <View style={styles.dangerZone}>
+        <View className="mt-xxl pb-xxl">
           <Button title="Reset All Data" variant="danger" onPress={handleReset} fullWidth />
         </View>
       </ScrollView>
@@ -98,49 +108,23 @@ export default function ProfileScreen() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: string; label: string; value: string }) {
+function StatCard({ iconName, label, value }: { iconName: string; label: string; value: string }) {
   return (
-    <View style={statStyles.card}>
-      <Text style={statStyles.icon}>{icon}</Text>
-      <Text style={statStyles.value}>{value}</Text>
-      <Text style={statStyles.label}>{label}</Text>
+    <View className="flex-1 min-w-[45%] bg-bg-secondary rounded-lg p-lg items-center border border-border-subtle">
+      <Ionicons name={iconName as any} size={24} color={Colors.text.primary} />
+      <Text className="text-text-primary text-xxl font-bold mt-sm">{value}</Text>
+      <Text className="text-text-muted text-xs mt-xs">{label}</Text>
     </View>
   );
 }
 
 function SettingRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
-    <View style={settingStyles.row}>
-      <Text style={settingStyles.label}>{label}</Text>
+    <View className="flex-row justify-between items-center py-md border-b border-border-subtle">
+      <Text className="text-text-primary text-md">{label}</Text>
       <Switch value={value} onValueChange={onChange}
         trackColor={{ false: Colors.bg.tertiary, true: Colors.accent.primary }}
         thumbColor={Colors.text.primary} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { padding: Spacing.lg, paddingBottom: Spacing.huge },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold, marginBottom: Spacing.xxl },
-  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md, marginBottom: Spacing.xxl },
-  subjectCard: { marginBottom: Spacing.xxl },
-  subjectName: { color: Colors.text.primary, fontSize: FontSize.lg, fontWeight: FontWeight.semibold, marginTop: Spacing.sm },
-  subjectMeta: { color: Colors.text.muted, fontSize: FontSize.sm, marginTop: Spacing.xs },
-  sectionTitle: { color: Colors.text.primary, fontSize: FontSize.lg, fontWeight: FontWeight.bold, marginBottom: Spacing.md, marginTop: Spacing.lg },
-  badgeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md, marginBottom: Spacing.lg },
-  settingsCard: { marginBottom: Spacing.xxl },
-  dangerZone: { marginTop: Spacing.xxl, paddingBottom: Spacing.xxl },
-});
-
-const statStyles = StyleSheet.create({
-  card: { flex: 1, minWidth: '45%', backgroundColor: Colors.bg.secondary, borderRadius: BorderRadius.lg, padding: Spacing.lg, alignItems: 'center', borderWidth: 1, borderColor: Colors.border.subtle },
-  icon: { fontSize: 24, marginBottom: Spacing.sm },
-  value: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold },
-  label: { color: Colors.text.muted, fontSize: FontSize.xs, marginTop: Spacing.xs },
-});
-
-const settingStyles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.border.subtle },
-  label: { color: Colors.text.primary, fontSize: FontSize.md },
-});

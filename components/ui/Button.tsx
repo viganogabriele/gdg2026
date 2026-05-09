@@ -5,7 +5,6 @@ import React from 'react';
 import {
   TouchableOpacity,
   Text,
-  StyleSheet,
   ViewStyle,
   TextStyle,
   ActivityIndicator,
@@ -16,7 +15,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -70,12 +69,10 @@ export function Button({
 
   return (
     <AnimatedTouchable
+      className={`flex-row items-center justify-center rounded-md ${fullWidth ? 'w-full' : ''} ${disabled ? 'opacity-50' : ''}`}
       style={[
-        styles.base,
         variantStyles.container,
         sizeStyles.container,
-        fullWidth && styles.fullWidth,
-        disabled && styles.disabled,
         animatedStyle,
         style,
       ]}
@@ -94,8 +91,8 @@ export function Button({
         <>
           {icon}
           <Text
+            className="font-semibold text-center"
             style={[
-              styles.text,
               { color: variantStyles.textColor },
               sizeStyles.text,
               icon ? { marginLeft: Spacing.sm } : undefined,
@@ -116,39 +113,27 @@ function getVariantStyles(variant: ButtonVariant): {
   switch (variant) {
     case 'primary':
       return {
-        container: {
-          backgroundColor: Colors.accent.primary,
-        },
+        container: { backgroundColor: Colors.accent.primary },
         textColor: Colors.text.primary,
       };
     case 'secondary':
       return {
-        container: {
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          borderColor: Colors.accent.primary,
-        },
+        container: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: Colors.accent.primary },
         textColor: Colors.accent.primary,
       };
     case 'ghost':
       return {
-        container: {
-          backgroundColor: 'transparent',
-        },
+        container: { backgroundColor: 'transparent' },
         textColor: Colors.text.secondary,
       };
     case 'danger':
       return {
-        container: {
-          backgroundColor: Colors.accent.danger,
-        },
+        container: { backgroundColor: Colors.accent.danger },
         textColor: Colors.text.primary,
       };
     case 'success':
       return {
-        container: {
-          backgroundColor: Colors.accent.success,
-        },
+        container: { backgroundColor: Colors.accent.success },
         textColor: Colors.text.inverse,
       };
   }
@@ -162,36 +147,17 @@ function getSizeStyles(size: ButtonSize): {
     case 'sm':
       return {
         container: { paddingVertical: Spacing.sm, paddingHorizontal: Spacing.lg },
-        text: { fontSize: FontSize.sm },
+        text: { fontSize: 13 },
       };
     case 'md':
       return {
         container: { paddingVertical: Spacing.md, paddingHorizontal: Spacing.xl },
-        text: { fontSize: FontSize.md },
+        text: { fontSize: 15 },
       };
     case 'lg':
       return {
         container: { paddingVertical: Spacing.lg, paddingHorizontal: Spacing.xxl },
-        text: { fontSize: FontSize.lg },
+        text: { fontSize: 17 },
       };
   }
 }
-
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: BorderRadius.md,
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  text: {
-    fontWeight: FontWeight.semibold,
-    textAlign: 'center',
-  },
-});

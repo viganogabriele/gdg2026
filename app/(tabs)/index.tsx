@@ -2,16 +2,17 @@
  * Home Dashboard — Daily objectives, level, streak, quick actions
  */
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Text } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { LevelIndicator } from '@/components/home/LevelIndicator';
 import { StreakCounter } from '@/components/home/StreakCounter';
 import { QuickActions } from '@/components/home/QuickActions';
 import { DailyObjectives } from '@/components/home/DailyObjectives';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export default function HomeScreen() {
   const subjects = useStudyStore((s) => s.subjects);
@@ -42,21 +43,27 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView className="flex-1 bg-bg-primary" edges={['top']}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View className="flex-row justify-between items-start mb-lg">
           <View>
-            <Text style={styles.greeting}>Welcome back 👋</Text>
-            <Text style={styles.subject} numberOfLines={1}>
+            <View className="flex-row items-center gap-xs">
+              <Text className="text-text-secondary text-md">Welcome back</Text>
+              <Ionicons name="hand-left-outline" size={18} color={Colors.text.secondary} />
+            </View>
+            <Text className="text-text-primary text-xxl font-bold mt-[4px] max-w-[250px]" numberOfLines={1}>
               {activeSubject?.title || 'StudyQuest'}
             </Text>
           </View>
-          <View style={styles.xpBadge}>
-            <Text style={styles.xpText}>⭐ {stats.totalPoints}</Text>
+          <View className="bg-[rgba(255,215,0,0.1)] rounded-[20px] px-md py-sm border border-[rgba(255,215,0,0.2)]">
+            <View className="flex-row items-center gap-[4px]">
+              <Ionicons name="star" size={16} color={Colors.accent.xp} />
+              <Text className="text-accent-xp text-md font-bold">{stats.totalPoints}</Text>
+            </View>
           </View>
         </View>
 
@@ -77,7 +84,7 @@ export default function HomeScreen() {
         />
 
         {/* Quick Actions */}
-        <View style={styles.section}>
+        <View className="mt-xxl">
           <QuickActions
             onTakeChallenge={handleChallenge}
             onQuickReview={handleQuickReview}
@@ -88,7 +95,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Daily Objectives */}
-        <View style={styles.section}>
+        <View className="mt-xxl">
           <DailyObjectives
             objectives={dailyObjectives}
             onComplete={completeObjective}
@@ -99,14 +106,3 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  content: { padding: Spacing.lg, paddingBottom: Spacing.huge },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: Spacing.lg },
-  greeting: { color: Colors.text.secondary, fontSize: FontSize.md },
-  subject: { color: Colors.text.primary, fontSize: FontSize.xxl, fontWeight: FontWeight.bold, marginTop: 4, maxWidth: 250 },
-  xpBadge: { backgroundColor: 'rgba(255, 215, 0, 0.1)', borderRadius: 20, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderWidth: 1, borderColor: 'rgba(255, 215, 0, 0.2)' },
-  xpText: { color: Colors.accent.xp, fontSize: FontSize.md, fontWeight: FontWeight.bold },
-  section: { marginTop: Spacing.xxl },
-});

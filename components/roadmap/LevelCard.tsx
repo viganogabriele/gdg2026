@@ -2,14 +2,15 @@
  * Level Card — expandable card for roadmap timeline
  */
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming,
   useSharedValue,
 } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing, Shadow } from '@/constants/theme';
+import { Colors, Shadow } from '@/constants/theme';
 import type { StudyLevel } from '@/types';
 
 interface LevelCardProps {
@@ -33,10 +34,10 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
   }));
 
   const statusConfig = {
-    locked: { color: Colors.text.muted, icon: '🔒', label: 'Locked' },
-    active: { color: Colors.accent.primary, icon: '📖', label: 'In Progress' },
-    completed: { color: Colors.accent.success, icon: '✅', label: 'Completed' },
-    failed: { color: Colors.accent.danger, icon: '❌', label: 'Needs Review' },
+    locked: { color: Colors.text.muted, icon: 'lock-closed' as const, label: 'Locked' },
+    active: { color: Colors.accent.primary, icon: 'book-outline' as const, label: 'In Progress' },
+    completed: { color: Colors.accent.success, icon: 'checkmark-circle' as const, label: 'Completed' },
+    failed: { color: Colors.accent.danger, icon: 'close-circle' as const, label: 'Needs Review' },
   }[level.status];
 
   const progress =
@@ -51,43 +52,42 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
 
   return (
     <TouchableOpacity
-      style={[
-        styles.container,
-        level.status === 'active' && styles.activeContainer,
-        level.status === 'completed' && styles.completedContainer,
-      ]}
+      className={`bg-bg-secondary rounded-lg p-lg border mb-md ${
+        level.status === 'active' ? 'border-accent-primary' : 'border-border-subtle'
+      } ${level.status === 'completed' ? 'opacity-80' : ''}`}
+      style={level.status === 'active' ? Shadow.sm : undefined}
       onPress={toggleExpand}
       activeOpacity={0.8}
     >
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.levelBadge}>
-          <Text style={[styles.levelNumber, { color: statusConfig.color }]}>
+      <View className="flex-row items-center gap-md">
+        <View className="w-[40px] h-[40px] rounded-[20px] bg-bg-tertiary items-center justify-center border-[1.5px] border-border-medium">
+          <Text className="text-lg font-bold" style={{ color: statusConfig.color }}>
             {level.levelNumber}
           </Text>
         </View>
-        <View style={styles.headerInfo}>
-          <Text style={styles.title} numberOfLines={1}>
+        <View className="flex-1">
+          <Text className="text-text-primary text-md font-semibold" numberOfLines={1}>
             {level.title}
           </Text>
-          <View style={styles.statusRow}>
-            <Text style={styles.statusIcon}>{statusConfig.icon}</Text>
-            <Text style={[styles.statusText, { color: statusConfig.color }]}>
+          <View className="flex-row items-center gap-sm mt-[4px]">
+            <Ionicons name={statusConfig.icon} size={12} color={statusConfig.color} />
+            <Text className="text-xs font-medium" style={{ color: statusConfig.color }}>
               {statusConfig.label}
             </Text>
             {level.status !== 'completed' && level.status !== 'locked' && (
-              <Text style={styles.deadline}>
+              <Text className="text-text-muted text-xs ml-auto">
                 {daysLeft > 0 ? `${daysLeft}d left` : 'Due today'}
               </Text>
             )}
           </View>
         </View>
-        <Text style={styles.expandArrow}>{expanded ? '▲' : '▼'}</Text>
+        <Text className="text-text-muted text-[10px]">{expanded ? '▲' : '▼'}</Text>
       </View>
 
       {/* Progress Bar */}
       {level.status !== 'locked' && (
-        <View style={styles.progressContainer}>
+        <View className="mt-md">
           <ProgressBar
             progress={progress}
             height={6}
@@ -98,30 +98,30 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
       )}
 
       {/* Expanded Content */}
-      <Animated.View style={[styles.expandedContent, expandStyle]}>
+      <Animated.View className="overflow-hidden mt-md" style={expandStyle}>
         {level.topics.map((topic) => (
-          <View key={topic.id} style={styles.topicItem}>
-            <Text style={styles.topicBullet}>
+          <View key={topic.id} className="flex-row gap-sm mb-md">
+            <Text className="text-accent-primary text-md font-bold w-[20px] text-center">
               {topic.completed ? '✓' : '○'}
             </Text>
-            <View style={styles.topicInfo}>
+            <View className="flex-1">
               <Text
-                style={[
-                  styles.topicTitle,
-                  topic.completed && styles.topicCompleted,
-                ]}
+                className={`text-sm font-medium mb-[4px] ${topic.completed ? 'line-through text-text-muted' : 'text-text-primary'}`}
               >
                 {topic.title}
               </Text>
               {topic.arguments.map((arg, i) => (
-                <Text key={i} style={styles.topicArg}>
+                <Text key={i} className="text-text-secondary text-xs ml-sm mb-[2px]">
                   • {arg}
                 </Text>
               ))}
               {topic.sourceRefs.map((ref, i) => (
-                <Text key={i} style={styles.sourceRef}>
-                  📎 {ref.label}
-                </Text>
+                <View key={i} className="flex-row items-center gap-[4px] mt-[4px]">
+                  <Ionicons name="attach-outline" size={12} color={Colors.accent.secondary} />
+                  <Text className="text-accent-secondary text-xs">
+                    {ref.label}
+                  </Text>
+                </View>
               ))}
             </View>
           </View>
@@ -129,15 +129,15 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
 
         {/* Actions */}
         {(level.status === 'active' || level.status === 'failed') && (
-          <TouchableOpacity style={styles.quizBtn} onPress={onTakeQuiz}>
-            <Text style={styles.quizBtnText}>
+          <TouchableOpacity className="bg-accent-primary rounded-md py-md items-center mt-sm" onPress={onTakeQuiz}>
+            <Text className="text-text-primary text-md font-semibold">
               {level.status === 'failed' ? 'Retry Quiz' : 'Take Level Quiz'}
             </Text>
           </TouchableOpacity>
         )}
 
         {level.completedAt && (
-          <Text style={styles.completedDate}>
+          <Text className="text-text-muted text-xs text-center mt-sm">
             Completed {new Date(level.completedAt).toLocaleDateString()}
           </Text>
         )}
@@ -145,131 +145,3 @@ export function LevelCard({ level, onPress, onTakeQuiz }: LevelCardProps) {
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.bg.secondary,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.border.subtle,
-    marginBottom: Spacing.md,
-  },
-  activeContainer: {
-    borderColor: Colors.accent.primary,
-    ...Shadow.sm,
-  },
-  completedContainer: {
-    opacity: 0.8,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
-  levelBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.bg.tertiary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: Colors.border.medium,
-  },
-  levelNumber: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.bold,
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  title: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    marginTop: 4,
-  },
-  statusIcon: {
-    fontSize: 12,
-  },
-  statusText: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-  },
-  deadline: {
-    color: Colors.text.muted,
-    fontSize: FontSize.xs,
-    marginLeft: 'auto',
-  },
-  expandArrow: {
-    color: Colors.text.muted,
-    fontSize: 10,
-  },
-  progressContainer: {
-    marginTop: Spacing.md,
-  },
-  expandedContent: {
-    overflow: 'hidden',
-    marginTop: Spacing.md,
-  },
-  topicItem: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-  },
-  topicBullet: {
-    color: Colors.accent.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.bold,
-    width: 20,
-    textAlign: 'center',
-  },
-  topicInfo: {
-    flex: 1,
-  },
-  topicTitle: {
-    color: Colors.text.primary,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-    marginBottom: 4,
-  },
-  topicCompleted: {
-    textDecorationLine: 'line-through',
-    color: Colors.text.muted,
-  },
-  topicArg: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.xs,
-    marginLeft: Spacing.sm,
-    marginBottom: 2,
-  },
-  sourceRef: {
-    color: Colors.accent.secondary,
-    fontSize: FontSize.xs,
-    marginTop: 4,
-  },
-  quizBtn: {
-    backgroundColor: Colors.accent.primary,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
-    marginTop: Spacing.sm,
-  },
-  quizBtnText: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-  },
-  completedDate: {
-    color: Colors.text.muted,
-    fontSize: FontSize.xs,
-    textAlign: 'center',
-    marginTop: Spacing.sm,
-  },
-});

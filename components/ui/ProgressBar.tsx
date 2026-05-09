@@ -2,14 +2,14 @@
  * Animated Progress Bar — horizontal bar with gradient fill
  */
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface ProgressBarProps {
   progress: number; // 0-1
@@ -42,55 +42,22 @@ export function ProgressBar({
   }));
 
   return (
-    <View style={styles.container}>
+    <View className="w-full">
       {(label || showPercentage) && (
-        <View style={styles.header}>
-          {label && <Text style={styles.label}>{label}</Text>}
+        <View className="flex-row justify-between items-center mb-xs">
+          {label && <Text className="text-text-secondary text-sm font-medium">{label}</Text>}
           {showPercentage && (
-            <Text style={styles.percentage}>
+            <Text className="text-text-secondary text-sm font-semibold">
               {Math.round(progress * 100)}%
             </Text>
           )}
         </View>
       )}
-      <View style={[styles.track, { height, backgroundColor, borderRadius: height / 2 }]}>
+      <View className="w-full overflow-hidden" style={{ height, backgroundColor, borderRadius: height / 2 }}>
         <Animated.View
-          style={[
-            styles.fill,
-            { backgroundColor: color, borderRadius: height / 2 },
-            fillStyle,
-          ]}
+          style={[{ height: '100%', backgroundColor: color, borderRadius: height / 2 }, fillStyle]}
         />
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.xs,
-  },
-  label: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-  },
-  percentage: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-  },
-  track: {
-    width: '100%',
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-  },
-});

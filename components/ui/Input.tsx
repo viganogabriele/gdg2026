@@ -6,7 +6,6 @@ import {
   View,
   TextInput,
   Text,
-  StyleSheet,
   TextInputProps,
   ViewStyle,
 } from 'react-native';
@@ -15,7 +14,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -56,62 +55,25 @@ export function Input({
   };
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View className="w-full" style={containerStyle}>
       {label && (
-        <Text style={[styles.label, isFocused && styles.labelFocused]}>
+        <Text className={`text-sm font-medium mb-xs ${isFocused ? 'text-accent-primary' : 'text-text-secondary'}`}>
           {label}
         </Text>
       )}
-      <Animated.View style={[styles.inputContainer, borderStyle]}>
+      <Animated.View className="border-[1.5px] rounded-md bg-bg-secondary overflow-hidden" style={borderStyle}>
         <TextInput
-          style={[styles.input, style]}
+          className="text-text-primary text-md px-lg py-md min-h-[48px]"
           placeholderTextColor={Colors.text.muted}
           selectionColor={Colors.accent.primary}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          style={style}
           {...rest}
         />
       </Animated.View>
-      {error && <Text style={styles.error}>{error}</Text>}
-      {hint && !error && <Text style={styles.hint}>{hint}</Text>}
+      {error && <Text className="text-accent-danger text-xs mt-xs">{error}</Text>}
+      {hint && !error && <Text className="text-text-muted text-xs mt-xs">{hint}</Text>}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  label: {
-    color: Colors.text.secondary,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-    marginBottom: Spacing.xs,
-  },
-  labelFocused: {
-    color: Colors.accent.primary,
-  },
-  inputContainer: {
-    borderWidth: 1.5,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.bg.secondary,
-    overflow: 'hidden',
-  },
-  input: {
-    color: Colors.text.primary,
-    fontSize: FontSize.md,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    minHeight: 48,
-  },
-  error: {
-    color: Colors.accent.danger,
-    fontSize: FontSize.xs,
-    marginTop: Spacing.xs,
-  },
-  hint: {
-    color: Colors.text.muted,
-    fontSize: FontSize.xs,
-    marginTop: Spacing.xs,
-  },
-});

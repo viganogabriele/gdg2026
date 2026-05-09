@@ -2,7 +2,7 @@
  * Quiz Screen — level quiz or challenge, accessed via /quiz/[id]
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import * as api from '@/services/api';
-import { Colors, Spacing } from '@/constants/theme';
 import { Points, LevelThresholds } from '@/constants/gamification';
 import type { QuizQuestion } from '@/types';
 
@@ -94,14 +93,14 @@ export default function QuizScreen() {
   };
 
   if (loading) {
-    return <SafeAreaView style={styles.container}><View style={styles.loading} /></SafeAreaView>;
+    return <SafeAreaView className="flex-1 bg-bg-primary"><View className="flex-1" /></SafeAreaView>;
   }
 
   if (showResults) {
     const correct = questions.filter((q) => q.userAnswer === q.correctIndex).length;
     const passed = score >= LevelThresholds.PASS_PERCENTAGE;
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView className="flex-1 bg-bg-primary">
         <QuizResults
           score={score}
           totalQuestions={questions.length}
@@ -120,8 +119,8 @@ export default function QuizScreen() {
   if (!currentQ) return null;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scroll}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
+      <ScrollView className="flex-1">
         <QuestionCard
           question={currentQ}
           questionNumber={currentIndex + 1}
@@ -131,7 +130,7 @@ export default function QuizScreen() {
         />
       </ScrollView>
       {currentQ.userAnswer !== undefined && (
-        <View style={styles.footer}>
+        <View className="px-xxl pb-xxl">
           <Button
             title={currentIndex < questions.length - 1 ? 'Next' : 'Finish'}
             onPress={handleNext}
@@ -142,10 +141,3 @@ export default function QuizScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
-  loading: { flex: 1 },
-  scroll: { flex: 1 },
-  footer: { paddingHorizontal: Spacing.xxl, paddingBottom: Spacing.xxl },
-});

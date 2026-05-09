@@ -2,10 +2,11 @@
  * Quiz Results — score display with topic breakdown
  */
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
 import { Button } from '@/components/ui/Button';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface QuizResultsProps {
   score: number;
@@ -25,9 +26,17 @@ export function QuizResults({
   const passed = score >= passThreshold;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.emoji}>{passed ? '🎉' : '📖'}</Text>
-      <Text style={styles.title}>{passed ? 'Level Complete!' : 'Keep Studying'}</Text>
+    <ScrollView contentContainerStyle={{ alignItems: 'center', padding: 24, paddingTop: 48 }}>
+      <View className="mb-lg">
+        <Ionicons
+          name={passed ? 'ribbon-outline' : 'book-outline'}
+          size={64}
+          color={passed ? Colors.accent.xp : Colors.text.primary}
+        />
+      </View>
+      <Text className="text-text-primary text-xxxl font-bold mb-xxl">
+        {passed ? 'Level Complete!' : 'Keep Studying'}
+      </Text>
 
       <ProgressCircle
         progress={score}
@@ -37,19 +46,21 @@ export function QuizResults({
         showPercentage
       />
 
-      <Text style={styles.scoreText}>
+      <Text className="text-text-secondary text-lg mt-lg">
         {correctAnswers} / {totalQuestions} correct
       </Text>
 
       {pointsEarned !== undefined && pointsEarned > 0 && (
-        <View style={styles.xpBadge}>
-          <Text style={styles.xpText}>+{pointsEarned} XP</Text>
+        <View className="bg-[rgba(255,215,0,0.15)] rounded-full px-lg py-sm mt-md">
+          <Text className="text-accent-xp text-lg font-bold">+{pointsEarned} XP</Text>
         </View>
       )}
 
-      <Text style={styles.feedback}>{feedback}</Text>
+      <Text className="text-text-secondary text-md text-center mt-xxl leading-[22px] px-lg">
+        {feedback}
+      </Text>
 
-      <View style={styles.actions}>
+      <View className="w-full gap-md mt-xxxl">
         <Button title={passed ? 'Continue' : 'Back to Study'} onPress={onContinue} fullWidth />
         {!passed && onRetry && (
           <Button title="Retry Quiz" variant="secondary" onPress={onRetry} fullWidth />
@@ -58,14 +69,3 @@ export function QuizResults({
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { alignItems: 'center', padding: Spacing.xxl, paddingTop: Spacing.huge },
-  emoji: { fontSize: 64, marginBottom: Spacing.lg },
-  title: { color: Colors.text.primary, fontSize: FontSize.xxxl, fontWeight: FontWeight.bold, marginBottom: Spacing.xxl },
-  scoreText: { color: Colors.text.secondary, fontSize: FontSize.lg, marginTop: Spacing.lg },
-  xpBadge: { backgroundColor: 'rgba(255, 215, 0, 0.15)', borderRadius: BorderRadius.full, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, marginTop: Spacing.md },
-  xpText: { color: Colors.accent.xp, fontSize: FontSize.lg, fontWeight: FontWeight.bold },
-  feedback: { color: Colors.text.secondary, fontSize: FontSize.md, textAlign: 'center', marginTop: Spacing.xxl, lineHeight: 22, paddingHorizontal: Spacing.lg },
-  actions: { width: '100%', gap: Spacing.md, marginTop: Spacing.xxxl },
-});
