@@ -1,5 +1,5 @@
 #### Intro
-An app to assist the student in the preliminary phase of the study process.
+An app to assist the student in the planning phase of the study process, consenting in rearranging it and to stick to it to reach the goal. 
 #### Steps
 1. Student provides the sources (PDF, notes or website links) 
 2. Student provides a deadline and an optional available time (hours)
@@ -13,10 +13,12 @@ An app to assist the student in the preliminary phase of the study process.
 10. To make gamified and engaging we can introduce concepts like "streaks", "points", "badges", "levels"
 11. The student need to be tested on his knowledge of a subject to generate the roadmap and to understand his level of knowledge of the subject.
 12. the level of knowledge need to be updated while the student is studying. To understand if he can go to next step or not. In case the level is too low, the app should suggest to study the current topic more and to reschedule the study plan.
-13. 
+13. Based on the topic it should create levels and showing how to upgrade the level (more study session, better quality of study session, etc). The user can also study more than planned to upgrade the level, and the app should adjust the study plan accordingly. The level should be topic based.
+14. 
 
 #### Features
 - Source-centric knowledge ranking system
-- Notification
+- Notification are sent to remind the user of the study plan.
 - iOS, Android, Web builds
 - "leaderboards", etc.
+- 
