@@ -6,27 +6,28 @@
  * of which API keys are available or working.
  */
 import type {
-  Source,
-  SourceSection,
-  QuizQuestion,
-  StudyLevel,
-  DailyObjective,
-  LevelTopic,
-  Subject,
+    DailyObjective,
+    LevelTopic,
+    QuizQuestion,
+    Source,
+    SourceSection,
+    StudyLevel,
+    Subject,
 } from '@/types';
 import {
-  geminiAnalyzeSources,
-  geminiGenerateAssessment,
-  geminiGenerateRoadmap,
-  geminiGenerateLevelQuiz,
-  geminiGenerateSpacedRepQuestions,
+    geminiAnalyzeSources,
+    geminiGenerateAssessment,
+    geminiGenerateLevelQuiz,
+    geminiGenerateRoadmap,
+    geminiGenerateSpacedRepQuestions,
+    MOCK_MODE
 } from './gemini';
 import {
-  mockAnalyzeSources,
-  mockGenerateAssessment,
-  mockGenerateRoadmap,
-  mockGenerateLevelQuiz,
-  mockGenerateSpacedRepQuestions,
+    mockAnalyzeSources,
+    mockGenerateAssessment,
+    mockGenerateLevelQuiz,
+    mockGenerateRoadmap,
+    mockGenerateSpacedRepQuestions,
 } from './mockData';
 
 // ─── 3-tier fallback: Gemini → OpenRouter → Mock ────────────────────
@@ -36,6 +37,13 @@ async function withFallback<T>(
   mockCall: () => T,
   label: string
 ): Promise<T> {
+  // If no API keys are set, immediately use mock responses without attempting network calls.
+  if (MOCK_MODE) {
+    console.warn(`📦 ${label}: MOCK_MODE active — using mock data without network calls`);
+    // small delay to keep behavior consistent with non-mock path
+    await new Promise((r) => setTimeout(r, 200 + Math.random() * 200));
+    return mockCall();
+  }
   // Tier 1: Gemini
   try {
     const result = await aiCall('gemini');

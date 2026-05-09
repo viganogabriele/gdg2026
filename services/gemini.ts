@@ -27,6 +27,9 @@ const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const OPENROUTER_MODEL = 'google/gemini-2.0-flash-001';
 const TIMEOUT_MS = 30_000;
 
+// If neither API key is provided, run in mock mode and avoid network/sdk calls.
+export const MOCK_MODE = !process.env.EXPO_PUBLIC_GEMINI_API_KEY && !process.env.EXPO_PUBLIC_OPEN_ROUTER_API_KEY;
+
 export type AIProvider = 'gemini' | 'openrouter';
 
 // ─── SDK singleton ──────────────────────────────────────────────────
@@ -36,14 +39,22 @@ let _genAI: GoogleGenerativeAI | null = null;
 function getGenAI(): GoogleGenerativeAI {
   if (_genAI) return _genAI;
   const key = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
-  if (!key) throw new Error('EXPO_PUBLIC_GEMINI_API_KEY is not set');
+  if (!key && !MOCK_MODE) throw new Error('EXPO_PUBLIC_GEMINI_API_KEY is not set');
+  if (!key && MOCK_MODE) {
+    // In mock mode we don't construct the SDK instance.
+    throw new Error('Gemini SDK not available in mock mode');
+  }
   _genAI = new GoogleGenerativeAI(key);
   return _genAI;
 }
 
 function getOpenRouterKey(): string {
   const key = process.env.EXPO_PUBLIC_OPEN_ROUTER_API_KEY || '';
-  if (!key) throw new Error('EXPO_PUBLIC_OPEN_ROUTER_API_KEY is not set');
+  if (!key && !MOCK_MODE) throw new Error('EXPO_PUBLIC_OPEN_ROUTER_API_KEY is not set');
+  if (!key && MOCK_MODE) {
+    // In mock mode we don't call the OpenRouter API.
+    throw new Error('OpenRouter API not available in mock mode');
+  }
   return key;
 }
 
@@ -117,6 +128,11 @@ async function callOpenRouter<T>(req: AIRequest): Promise<T> {
  * Unified caller — dispatches to Gemini SDK or OpenRouter based on provider.
  */
 export async function callAI<T>(req: AIRequest, provider: AIProvider = 'gemini'): Promise<T> {
+  if (MOCK_MODE) {
+    // Prevent any downstream attempt to call external services when running in mock mode.
+    throw new Error('AI keys not set — caller should use mock responses');
+  }
+
   if (provider === 'openrouter') return callOpenRouter<T>(req);
   return callGemini<T>(req);
 }
