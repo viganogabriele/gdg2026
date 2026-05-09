@@ -1,7 +1,7 @@
 /**
  * Question Card — quiz question with option selection and feedback
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -30,10 +30,20 @@ export function QuestionCard({
     transform: [{ translateX: shakeX.value }],
   }));
 
-  const handleAnswer = (index: number) => {
-    onAnswer(index);
+  const shuffledOptions = useMemo(() => {
+    const optionsWithOriginalIndex = question.options.map((text, index) => ({ text, originalIndex: index }));
+    // Fisher-Yates shuffle
+    for (let i = optionsWithOriginalIndex.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [optionsWithOriginalIndex[i], optionsWithOriginalIndex[j]] = [optionsWithOriginalIndex[j], optionsWithOriginalIndex[i]];
+    }
+    return optionsWithOriginalIndex;
+  }, [question.text]); // Depend on question text to avoid re-shuffling on re-renders
+
+  const handleAnswer = (originalIndex: number) => {
+    onAnswer(originalIndex);
     if (showFeedback) {
-      if (index === question.correctIndex) {
+      if (originalIndex === question.correctIndex) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -49,11 +59,11 @@ export function QuestionCard({
 
   const answered = question.userAnswer !== undefined;
 
-  const getOptionBorderClass = (index: number) => {
+  const getOptionBorderClass = (originalIndex: number) => {
     if (answered && showFeedback) {
-      if (index === question.correctIndex) return 'border-accent-success bg-[rgba(0,230,118,0.1)]';
-      if (index === question.userAnswer) return 'border-accent-danger bg-[rgba(255,82,82,0.1)]';
-    } else if (answered && index === question.userAnswer) {
+      if (originalIndex === question.correctIndex) return 'border-accent-success bg-[rgba(0,230,118,0.1)]';
+      if (originalIndex === question.userAnswer) return 'border-accent-danger bg-[rgba(255,82,82,0.1)]';
+    } else if (answered && originalIndex === question.userAnswer) {
       return 'border-accent-primary bg-[rgba(108,92,231,0.1)]';
     }
     return 'border-border-subtle';
@@ -78,20 +88,21 @@ export function QuestionCard({
       </Text>
 
       <View className="gap-md">
-        {question.options.map((option, index) => {
-          const letter = String.fromCharCode(65 + index);
+        {shuffledOptions.map((optionObj, displayIndex) => {
+          const letter = String.fromCharCode(65 + displayIndex);
+          const { text, originalIndex } = optionObj;
           return (
             <TouchableOpacity
-              key={index}
-              className={`flex-row items-center bg-bg-secondary rounded-md p-lg border-[1.5px] gap-md ${getOptionBorderClass(index)}`}
-              onPress={() => handleAnswer(index)}
+              key={originalIndex}
+              className={`flex-row items-center bg-bg-secondary rounded-md p-lg border-[1.5px] gap-md ${getOptionBorderClass(originalIndex)}`}
+              onPress={() => handleAnswer(originalIndex)}
               disabled={answered}
               activeOpacity={0.7}
             >
               <View className="w-[32px] h-[32px] rounded-[16px] bg-bg-tertiary items-center justify-center">
                 <Text className="text-text-secondary text-sm font-bold">{letter}</Text>
               </View>
-              <Text className="text-text-primary text-md leading-[22px] flex-1">{option}</Text>
+              <Text className="text-text-primary text-md leading-[22px] flex-1">{text}</Text>
             </TouchableOpacity>
           );
         })}

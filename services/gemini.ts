@@ -6,17 +6,17 @@
  * All functions return structured JSON via responseSchema / json_object mode.
  */
 import type {
-    DailyObjective,
-    LevelTopic,
-    QuizQuestion,
-    Source,
-    SourceSection,
-    StudyLevel,
-    Subject,
+  DailyObjective,
+  LevelTopic,
+  QuizQuestion,
+  Source,
+  SourceSection,
+  StudyLevel,
+  Subject,
 } from '@/types';
 import {
-    GoogleGenerativeAI,
-    SchemaType,
+  GoogleGenerativeAI,
+  SchemaType,
 } from '@google/generative-ai';
 
 // ─── Configuration ──────────────────────────────────────────────────
@@ -489,8 +489,8 @@ Return JSON:
       status: i < skipLevels
         ? 'completed'
         : i === skipLevels
-        ? 'active'
-        : 'locked',
+          ? 'active'
+          : 'locked',
       completedAt: i < skipLevels ? now.toISOString() : undefined,
       quizAttempts: 0,
       requiredStudyMinutes: level.requiredStudyMinutes || 120,
