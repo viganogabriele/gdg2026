@@ -48,3 +48,5 @@
 **Cross-platform**
 - iOS, Android, Web con stesso codice
 - Dati salvati localmente (offline-first)
+
+i tempi degli eventi.  Valutare implementazione con Braynr
