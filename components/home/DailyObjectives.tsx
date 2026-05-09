@@ -2,9 +2,8 @@
  * Daily Objectives — scrollable card list with source refs and completion
  */
 import { Card } from '@/components/ui/Card';
-import { Colors } from '@/constants/theme';
-import type { DailyObjective } from '@/types';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
+import type { DailyObjective } from '@/types';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -27,7 +26,7 @@ export function DailyObjectives({
 
   return (
     <View className="gap-sm">
-      <Text className="text-text-primary text-lg font-bold mb-xs">Today's Objectives</Text>
+      <Text className="text-text-primary text-lg font-bold mb-xs">Don't know what to study?</Text>
       {objectives.map((obj) => (
         <TouchableOpacity key={obj.id} onPress={() => onPress(obj)} activeOpacity={0.7} className="mb-xs">
           <Card className={obj.completed ? 'opacity-60' : ''}>
