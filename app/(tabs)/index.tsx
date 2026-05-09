@@ -9,7 +9,7 @@ import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -19,7 +19,12 @@ export default function HomeScreen() {
   const stats = useStudyStore((s) => s.stats);
   const dailyObjectives = useStudyStore((s) => s.dailyObjectives);
   const completeObjective = useStudyStore((s) => s.completeObjective);
+  const updateStreak = useStudyStore((s) => s.updateStreak);
   const { hasDueCards, dueCount } = useSpacedRepetition();
+
+  useEffect(() => {
+    updateStreak();
+  }, []);
 
   const activeSubject = subjects[0];
   const activeLevel = levels.find((l) => l.status === 'active');
