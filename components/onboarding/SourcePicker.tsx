@@ -161,7 +161,7 @@ export function SourcePicker({
         {activeTab === 'notes' && (
           <View className="gap-sm">
             <TextInput
-              className="flex-1 bg-bg-secondary rounded-md border border-border-subtle px-lg py-md text-text-primary text-md min-h-[120px]"
+              className="bg-bg-secondary rounded-md border border-border-subtle px-lg py-md text-text-primary text-md min-h-[120px]"
               placeholder="Paste your notes or key topics here..."
               placeholderTextColor={Colors.text.muted}
               value={notesInput}
@@ -184,11 +184,12 @@ export function SourcePicker({
       {/* Source List */}
       {sources.length > 0 && (
         <ScrollView style={{ maxHeight: 200 }} showsVerticalScrollIndicator={false}>
-          <Text className="text-text-secondary text-sm font-medium mb-sm">
+          <Text className="text-text-secondary text-sm font-medium mb-md">
             Added Sources ({sources.length})
           </Text>
+          <View className="gap-md">
           {sources.map((source) => (
-            <View key={source.id} className="flex-row items-center bg-bg-secondary rounded-md p-md mb-sm border border-border-subtle">
+            <View key={source.id} className="flex-row items-center bg-bg-secondary rounded-md p-md border border-border-subtle">
               <View className="mr-md">
                 <Ionicons
                   name={tabConfig[source.type]?.icon as any || 'document-outline'}
@@ -212,6 +213,7 @@ export function SourcePicker({
               </TouchableOpacity>
             </View>
           ))}
+          </View>
         </ScrollView>
       )}
     </View>
