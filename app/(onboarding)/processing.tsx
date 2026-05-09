@@ -1,18 +1,21 @@
 /**
  * Onboarding Step 4 — Processing screen with animated progress
  */
-import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
-import Animated, {
-  useSharedValue, useAnimatedStyle, withRepeat,
-  withSequence, withTiming, Easing,
-} from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
-import { Colors } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSequence, withTiming,
+} from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const STEPS = [
   { label: 'Analyzing your sources...', icon: 'document-outline' as const },
