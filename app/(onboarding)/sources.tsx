@@ -1,15 +1,15 @@
 /**
  * Onboarding Step 2 — "What are your sources?"
  */
-import React from 'react';
-import { View, Text } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { SourcePicker } from '@/components/onboarding/SourcePicker';
+import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import type { Source } from '@/types';
+import { router } from 'expo-router';
+import React from 'react';
+import { Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SourcesScreen() {
   const sources = useStudyStore((s) => s.onboardingData.sources);
@@ -44,7 +44,7 @@ export default function SourcesScreen() {
         <View className="gap-sm pb-xxl">
           <Button
             title={sources.length > 0 ? 'Continue' : 'Skip for now'}
-            variant={sources.length > 0 ? 'primary' : 'ghost'}
+            variant='primary'
             onPress={() => router.push('/(onboarding)/deadline')}
             fullWidth
             size="lg"
