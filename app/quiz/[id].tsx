@@ -4,7 +4,7 @@
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { QuizResults } from '@/components/quiz/QuizResults';
 import { Button } from '@/components/ui/Button';
-import { LevelThresholds, Points } from '@/constants/gamification';
+import { LevelThresholds } from '@/constants/gamification';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
@@ -24,6 +24,7 @@ export default function QuizScreen() {
   const [loading, setLoading] = useState(true);
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+  const [pointsEarned, setPointsEarned] = useState(0);
 
   const level = store.levels.find((l) => l.id === levelId);
   const flaggedObjectives = store.dailyObjectives.filter(o => o.completed);
@@ -78,10 +79,10 @@ export default function QuizScreen() {
   };
 
   const finishQuiz = () => {
+    const pointsBefore = useStudyStore.getState().stats.totalPoints;
     const correct = questions.filter((q) => q.userAnswer === q.correctIndex).length;
     const s = questions.length > 0 ? correct / questions.length : 0;
     setScore(s);
-    setShowResults(true);
 
     // Add questions to spaced repetition
     addCardsFromQuiz(questions);
@@ -102,6 +103,10 @@ export default function QuizScreen() {
         }
       }
     }
+
+    const pointsAfter = useStudyStore.getState().stats.totalPoints;
+    setPointsEarned(Math.max(0, pointsAfter - pointsBefore));
+    setShowResults(true);
   };
 
   const handleContinue = () => router.back();
@@ -128,7 +133,7 @@ export default function QuizScreen() {
           feedback={passed ? 'Great job! You\'ve mastered this level.' : 'Keep studying and try again.'}
           onContinue={handleContinue}
           onRetry={!passed ? handleRetry : undefined}
-          pointsEarned={passed ? Points.LEVEL_PASSED : 0}
+          pointsEarned={pointsEarned}
         />
       </SafeAreaView>
     );
