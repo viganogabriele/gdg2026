@@ -78,6 +78,7 @@ export interface QuizQuestion {
   explanation: string;
   sourceRef?: SourceRef;
   topicId?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
   userAnswer?: number;
 }
 

@@ -6,17 +6,17 @@
  * All functions return structured JSON via responseSchema / json_object mode.
  */
 import type {
-  DailyObjective,
-  LevelTopic,
-  QuizQuestion,
-  Source,
-  SourceSection,
-  StudyLevel,
-  Subject,
+    DailyObjective,
+    LevelTopic,
+    QuizQuestion,
+    Source,
+    SourceSection,
+    StudyLevel,
+    Subject,
 } from '@/types';
 import {
-  GoogleGenerativeAI,
-  SchemaType,
+    GoogleGenerativeAI,
+    SchemaType,
 } from '@google/generative-ai';
 
 // ─── Configuration ──────────────────────────────────────────────────
@@ -259,6 +259,8 @@ Requirements:
 - Include clear explanations for the correct answer
 - Make the questions specific and educational, not generic
 - The correctIndex is 0-based (0, 1, 2, or 3)
+- Include a difficulty field set to one of: easy, medium, hard
+- Keep roughly 40% easy, 35% medium, 25% hard
 
 Return JSON with this structure:
 {
@@ -269,7 +271,8 @@ Return JSON with this structure:
       "options": ["Option A", "Option B", "Option C", "Option D"],
       "correctIndex": 0,
       "explanation": "Why this is correct.",
-      "topicId": "section_id_from_above"
+      "topicId": "section_id_from_above",
+      "difficulty": "easy"
     }
   ]
 }`;
@@ -288,6 +291,7 @@ Return JSON with this structure:
             correctIndex: { type: SchemaType.INTEGER },
             explanation: { type: SchemaType.STRING },
             topicId: { type: SchemaType.STRING },
+            difficulty: { type: SchemaType.STRING, enum: ['easy', 'medium', 'hard'] },
           },
           required: ['id', 'text', 'options', 'correctIndex', 'explanation'],
         },
@@ -306,6 +310,7 @@ Return JSON with this structure:
     ...q,
     id: q.id || uid(),
     topicId: sections[i % sections.length]?.id || q.topicId,
+    difficulty: q.difficulty || (i < Math.ceil(count * 0.4) ? 'easy' : i >= Math.ceil(count * 0.75) ? 'hard' : 'medium'),
     sourceRef: {
       sourceId: 'source_1',
       sectionId: sections[i % sections.length]?.id || '',

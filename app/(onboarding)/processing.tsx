@@ -24,7 +24,9 @@ const STEPS: { label: string; icon: NucleoIconName }[] = [
 ];
 
 export default function ProcessingScreen() {
-  const store = useStudyStore();
+  const onboardingData = useStudyStore((s) => s.onboardingData);
+  const setOnboardingSections = useStudyStore((s) => s.setOnboardingSections);
+  const startQuiz = useStudyStore((s) => s.startQuiz);
   const [currentStep, setCurrentStep] = useState(0);
 
   const pulse = useSharedValue(1);
@@ -36,7 +38,7 @@ export default function ProcessingScreen() {
         withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) })
       ), -1, true
     );
-  }, []);
+  }, [pulse]);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,12 +47,12 @@ export default function ProcessingScreen() {
         // Step 1: Analyze sources
         setCurrentStep(0);
         const { sections } = await api.analyzeSources(
-          store.onboardingData.subjectTitle,
-          store.onboardingData.sources
+          onboardingData.subjectTitle,
+          onboardingData.sources
         );
 
         if (cancelled) return;
-        store.setOnboardingSections(sections);
+        setOnboardingSections(sections);
         setCurrentStep(1);
         await new Promise((r) => setTimeout(r, 800));
 
@@ -58,9 +60,9 @@ export default function ProcessingScreen() {
         if (cancelled) return;
         setCurrentStep(2);
         const { questions } = await api.generateAssessment(
-          store.onboardingData.subjectTitle,
+          onboardingData.subjectTitle,
           sections,
-          6
+          10
         );
 
         if (cancelled) return;
@@ -68,7 +70,7 @@ export default function ProcessingScreen() {
         await new Promise((r) => setTimeout(r, 600));
 
         // Navigate to assessment with questions stored
-        store.startQuiz({
+        startQuiz({
           id: 'assessment_initial',
           type: 'assessment',
           subjectId: 'subject_1',
@@ -85,7 +87,7 @@ export default function ProcessingScreen() {
     }
     process();
     return () => { cancelled = true; };
-  }, []);
+  }, [onboardingData.subjectTitle, onboardingData.sources, setOnboardingSections, startQuiz]);
 
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulse.value }],
@@ -116,7 +118,7 @@ export default function ProcessingScreen() {
 
         <Text className="text-text-muted text-sm text-center mt-xxxl leading-[20px]">
           Preparing your personalized study plan for{'\n'}
-          "{store.onboardingData.subjectTitle}"
+          &quot;{onboardingData.subjectTitle}&quot;
         </Text>
       </View>
     </SafeAreaView>

@@ -310,11 +310,12 @@ export const useStudyStore = create<StudyState>()(
         if (!state.activeQuiz) return;
 
         const quiz = state.activeQuiz;
-        const totalQuestions = quiz.questions.length;
-        const correct = quiz.questions.filter(
+        const answeredQuestions = quiz.questions.filter((q) => q.userAnswer !== undefined);
+        const totalQuestions = answeredQuestions.length;
+        const correct = answeredQuestions.filter(
           (q) => q.userAnswer === q.correctIndex
         ).length;
-        const score = correct / totalQuestions;
+        const score = totalQuestions > 0 ? correct / totalQuestions : 0;
 
         const completedQuiz: Quiz = {
           ...quiz,

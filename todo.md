@@ -2,7 +2,7 @@ TODO:
 1. [ ] Animazione con livello che sale.
 2. [ ] Migliorare le 6 domande iniziali per capire il livello di conoscenza. Valutare il fatto di dire non so niente sull'argomento.
 3. [ ] Guardare l'algoritmo di spaced repetition
-4. [ ] Si riaggiusta la rodmap quando non fai qualcosa il giorno
+4. [ ] Si riaggiusta la roadmap quando non fai qualcosa il giorno
 5. [ ] Implementare tutto ciò che ci ha suggerito Alessandro: prendere i dati che da braynr, tipo quanto un utente sta su una pagina, da quello capire le difficoltà che ha lo studente e nel caso rimodificare la roadmap. Fare in modo che i materiali caricati siano anche velocemente condivisibili da uno all'altro. Anche i quiz e spaced repetition li hanno loro. Vedere se si può trovare un punto in comune con la loro app, ma renderlo opzionale, lo studente può studiare con quello che vuole.
 
 Feature finali:
