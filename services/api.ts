@@ -17,6 +17,7 @@ import type {
 import {
     geminiAnalyzeSources,
     geminiGenerateAssessment,
+    geminiGenerateDailyChallengeQuiz,
     geminiGenerateLevelQuiz,
     geminiGenerateRoadmap,
     geminiGenerateSpacedRepQuestions,
@@ -25,6 +26,7 @@ import {
 import {
     mockAnalyzeSources,
     mockGenerateAssessment,
+    mockGenerateDailyChallengeQuiz,
     mockGenerateLevelQuiz,
     mockGenerateRoadmap,
     mockGenerateSpacedRepQuestions,
@@ -126,6 +128,18 @@ export async function generateLevelQuiz(
     (provider) => geminiGenerateLevelQuiz(levelId, levelTitle, topics, count, provider, flaggedObjectives, sources),
     () => ({ questions: mockGenerateLevelQuiz(levelTitle, topics, count) }),
     'generateLevelQuiz'
+  );
+}
+
+export async function generateDailyChallengeQuiz(
+  flaggedObjectives: DailyObjective[],
+  sources: Source[],
+  count: number = 8
+): Promise<{ questions: QuizQuestion[] }> {
+  return withFallback(
+    (provider) => geminiGenerateDailyChallengeQuiz(flaggedObjectives, sources, count, provider),
+    () => ({ questions: mockGenerateDailyChallengeQuiz(flaggedObjectives, sources, count) }),
+    'generateDailyChallengeQuiz'
   );
 }
 

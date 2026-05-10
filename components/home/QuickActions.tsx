@@ -84,7 +84,7 @@ function ActionButton({
   const iconRotation = useSharedValue(0);
 
   useEffect(() => {
-    if ((iconName === 'rocket' || iconName === 'sparkle') && !disabled) {
+    if (((iconName === 'rocket' && boosted) || iconName === 'sparkle') && !disabled) {
       iconScale.value = withRepeat(
         withSequence(
           withTiming(1.15, { duration: 600, easing: Easing.inOut(Easing.ease) }),
@@ -102,8 +102,12 @@ function ActionButton({
         -1,
         true
       );
+    } else {
+      // Reset animations if disabled or not boosted
+      iconScale.value = withTiming(1);
+      iconRotation.value = withTiming(0);
     }
-  }, [iconName, disabled]);
+  }, [iconName, disabled, boosted]);
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [
@@ -121,12 +125,12 @@ function ActionButton({
   const resolvedIconName = disabled
     ? iconName
     : isRocket
-      ? 'rocket-red'
+      ? (boosted ? 'rocket-red' : iconName)
       : isSparkle
         ? 'sparkle-yellow'
         : iconName;
 
-  const shouldAnimate = (isRocket || isSparkle) && !disabled;
+  const shouldAnimate = ((isRocket && boosted) || isSparkle) && !disabled;
 
   return (
     <AnimatedTouchable

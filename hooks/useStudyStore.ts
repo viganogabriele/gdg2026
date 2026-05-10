@@ -19,6 +19,9 @@ import type {
   Badge,
 } from '@/types';
 import { Points, BadgeDefinitions } from '@/constants/gamification';
+function uid(): string {
+  return Math.random().toString(36).substring(2, 11);
+}
 
 // ─── Store State ────────────────────────────────────────────────────
 
@@ -49,6 +52,8 @@ interface StudyState {
   // Active State
   activeSubjectId: string | null;
   activeQuiz: Quiz | null;
+  currentDayIndex: number;
+  dayAdvanceReady: boolean;
 
   // Actions — Onboarding
   setOnboardingSubject: (title: string) => void;
@@ -71,6 +76,8 @@ interface StudyState {
   // Actions — Objectives
   setDailyObjectives: (objectives: DailyObjective[]) => void;
   completeObjective: (objectiveId: string) => void;
+  advanceToDay: (dayIndex: number) => void;
+  setDayAdvanceReady: (ready: boolean) => void;
 
   // Actions — Quizzes
   startQuiz: (quiz: Quiz) => void;
@@ -143,6 +150,8 @@ export const useStudyStore = create<StudyState>()(
       notificationPrefs: { ...initialNotificationPrefs },
       activeSubjectId: null,
       activeQuiz: null,
+      currentDayIndex: 0,
+      dayAdvanceReady: false,
 
       // ─── Onboarding Actions ─────────────────────────────────────
       setOnboardingSubject: (title) =>
@@ -267,20 +276,58 @@ export const useStudyStore = create<StudyState>()(
               state.stats.totalPoints +
               (completing ? Points.STUDY_SESSION_COMPLETE : -Points.STUDY_SESSION_COMPLETE),
           },
-          levels: state.levels.map((l) =>
-            l.id === activeLevelId
-              ? {
-                  ...l,
-                  completedStudyMinutes: Math.max(
-                    0,
-                    l.completedStudyMinutes + (completing ? minutes : -minutes)
-                  ),
-                }
-              : l
-          ),
+          levels: state.levels.map((l) => {
+            if (l.id !== activeLevelId) return l;
+            return {
+              ...l,
+              completedStudyMinutes: Math.max(
+                0,
+                l.completedStudyMinutes + (completing ? minutes : -minutes)
+              ),
+            };
+          }),
         }));
         if (completing) get().updateStreak();
       },
+
+      advanceToDay: (dayIndex: number) => {
+        const state = get();
+        const activeLevel = state.levels.find(l => l.status === 'active');
+        if (!activeLevel || dayIndex >= activeLevel.topics.length) return;
+
+        // Mark the previous day's topic as completed
+        const prevTopicId = activeLevel.topics[state.currentDayIndex]?.id;
+        if (prevTopicId) {
+          set((s) => ({
+            levels: s.levels.map((l) =>
+              l.id === activeLevel.id
+                ? { ...l, topics: l.topics.map(t => t.id === prevTopicId ? { ...t, completed: true } : t) }
+                : l
+            ),
+          }));
+        }
+
+        const topic = activeLevel.topics[dayIndex];
+        const newObjectives: DailyObjective[] = topic.arguments.map((arg) => ({
+          id: uid(),
+          title: `${topic.title}: ${arg}`,
+          description: `Focus on: ${arg}`,
+          sourceRefs: topic.sourceRefs,
+          type: 'study' as const,
+          completed: false,
+          estimatedMinutes: 30,
+          levelId: activeLevel.id,
+          topicId: topic.id,
+        }));
+
+        set({
+          currentDayIndex: dayIndex,
+          dailyObjectives: newObjectives,
+          dayAdvanceReady: false,
+        });
+      },
+
+      setDayAdvanceReady: (ready: boolean) => set({ dayAdvanceReady: ready }),
 
       // ─── Quiz Actions ──────────────────────────────────────────
       startQuiz: (quiz) => set({ activeQuiz: quiz }),
@@ -515,6 +562,8 @@ export const useStudyStore = create<StudyState>()(
           notificationPrefs: { ...initialNotificationPrefs },
           activeSubjectId: null,
           activeQuiz: null,
+          currentDayIndex: 0,
+          dayAdvanceReady: false,
         }),
     }),
     {
@@ -532,6 +581,8 @@ export const useStudyStore = create<StudyState>()(
         stats: state.stats,
         notificationPrefs: state.notificationPrefs,
         activeSubjectId: state.activeSubjectId,
+        currentDayIndex: state.currentDayIndex,
+        dayAdvanceReady: state.dayAdvanceReady,
       }),
     }
   )

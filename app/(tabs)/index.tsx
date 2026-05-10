@@ -35,13 +35,11 @@ export default function HomeScreen() {
     : 30;
 
   const completedObjectivesCount = dailyObjectives.filter(o => o.completed).length;
-  const challengeAvailable = !!activeLevel;
+  const challengeAvailable = completedObjectivesCount > 0;
   const challengeBoosted = dailyObjectives.length > 0 && completedObjectivesCount === dailyObjectives.length;
 
   const handleChallenge = () => {
-    if (activeLevel) {
-      router.push(`/quiz/${activeLevel.id}`);
-    }
+    router.push('/quiz/daily-challenge');
   };
 
   const handleQuickReview = () => {
