@@ -1,5 +1,4 @@
 TODO:
-1. [ ] Animazione con livello che sale.
 2. [ ] Migliorare le 6 domande iniziali per capire il livello di conoscenza. Valutare il fatto di dire non so niente sull'argomento.
 3. [ ] Guardare l'algoritmo di spaced repetition
 4. [ ] Si riaggiusta la roadmap quando non fai qualcosa il giorno
