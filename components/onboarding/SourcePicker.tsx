@@ -1,22 +1,22 @@
 /**
  * Source Picker — PDF, URL, and Notes input component
  */
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  Platform,
-} from 'react-native';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
 import type { Source } from '@/types';
+import React, { useState } from 'react';
+import {
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 interface SourcePickerProps {
   sources: Source[];
-  onAddSource: (source: Source) => void;
+  onAddSource: (source: Source[]) => void;
   onRemoveSource: (sourceId: string) => void;
 }
 
@@ -43,15 +43,14 @@ export function SourcePicker({
       });
 
       if (!result.canceled) {
-        result.assets.forEach((asset) => {
-          onAddSource({
-            id: uid(),
-            type: 'pdf',
-            title: asset.name || 'PDF Document',
-            uri: asset.uri,
-            sections: [],
-          });
-        });
+        onAddSource(result.assets.map((asset) => ({
+          id: uid(),
+          type: 'pdf',
+          title: asset.name || 'PDF Document',
+          uri: asset.uri,
+          sections: [],
+        })
+        ));
       }
     } catch (error) {
       console.warn('PDF picker error:', error);
@@ -60,25 +59,25 @@ export function SourcePicker({
 
   const handleAddUrl = () => {
     if (!urlInput.trim()) return;
-    onAddSource({
+    onAddSource([{
       id: uid(),
       type: 'url',
       title: urlInput.replace(/^https?:\/\//, '').split('/')[0] || 'Web Link',
       uri: urlInput.trim(),
       sections: [],
-    });
+    }]);
     setUrlInput('');
   };
 
   const handleAddNotes = () => {
     if (!notesInput.trim()) return;
-    onAddSource({
+    onAddSource([{
       id: uid(),
       type: 'notes',
       title: `Notes ${sources.filter((s) => s.type === 'notes').length + 1}`,
       rawText: notesInput.trim(),
       sections: [],
-    });
+    }]);
     setNotesInput('');
   };
 
@@ -95,11 +94,10 @@ export function SourcePicker({
         {(['pdf', 'url', 'notes'] as const).map((tab) => (
           <TouchableOpacity
             key={tab}
-            className={`flex-1 py-md rounded-md items-center border ${
-              activeTab === tab
-                ? 'bg-bg-tertiary border-accent-primary'
-                : 'bg-bg-secondary border-border-subtle'
-            }`}
+            className={`flex-1 py-md rounded-md items-center border ${activeTab === tab
+              ? 'bg-bg-tertiary border-accent-primary'
+              : 'bg-bg-secondary border-border-subtle'
+              }`}
             onPress={() => setActiveTab(tab)}
           >
             <View className="flex-row items-center gap-[6px]">
@@ -189,30 +187,30 @@ export function SourcePicker({
             Added Sources ({sources.length})
           </Text>
           <View className="gap-md">
-          {sources.map((source) => (
-            <View key={source.id} className="flex-row items-center bg-bg-secondary rounded-md p-md border border-border-subtle">
-              <View className="mr-md">
-                <NucleoIcon
-                  name={tabConfig[source.type]?.icon || 'book-open'}
-                  size={20}
-                />
+            {sources.map((source) => (
+              <View key={source.id} className="flex-row items-center bg-bg-secondary rounded-md p-md border border-border-subtle">
+                <View className="mr-md">
+                  <NucleoIcon
+                    name={tabConfig[source.type]?.icon || 'book-open'}
+                    size={20}
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-text-primary text-md font-medium" numberOfLines={1}>
+                    {source.title}
+                  </Text>
+                  <Text className="text-text-muted text-xs font-medium mt-[2px]">
+                    {source.type.toUpperCase()}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  className="w-[28px] h-[28px] rounded-[14px] bg-bg-tertiary items-center justify-center"
+                  onPress={() => onRemoveSource(source.id)}
+                >
+                  <Text className="text-text-muted text-sm">✕</Text>
+                </TouchableOpacity>
               </View>
-              <View className="flex-1">
-                <Text className="text-text-primary text-md font-medium" numberOfLines={1}>
-                  {source.title}
-                </Text>
-                <Text className="text-text-muted text-xs font-medium mt-[2px]">
-                  {source.type.toUpperCase()}
-                </Text>
-              </View>
-              <TouchableOpacity
-                className="w-[28px] h-[28px] rounded-[14px] bg-bg-tertiary items-center justify-center"
-                onPress={() => onRemoveSource(source.id)}
-              >
-                <Text className="text-text-muted text-sm">✕</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+            ))}
           </View>
         </ScrollView>
       )}
