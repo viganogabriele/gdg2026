@@ -8,6 +8,7 @@ import { Colors, Shadow } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
 import { parseBraynrJson } from '@/services/braynrParser';
+import { mergeDailyObjectives, mergeRoadmapLevels } from '@/services/roadmapMerge';
 import React, { useState } from 'react';
 import { Animated, Modal, Pressable, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,8 @@ export default function SettingsScreen() {
   const setStudyProfile = useStudyStore((s) => s.setStudyProfile);
   const setLevels = useStudyStore((s) => s.setLevels);
   const setDailyObjectives = useStudyStore((s) => s.setDailyObjectives);
+  const currentLevels = useStudyStore((s) => s.levels);
+  const currentObjectives = useStudyStore((s) => s.dailyObjectives);
   const braynrLastSyncedAt = useStudyStore((s) => s.braynrLastSyncedAt);
   const onboardingData = useStudyStore((s) => s.onboardingData);
   const onboardingComplete = useStudyStore((s) => s.onboardingComplete);
@@ -111,8 +114,10 @@ export default function SettingsScreen() {
           onboardingData.assessmentScore,
           profile,
         );
-        setLevels(result.levels);
-        setDailyObjectives(result.dailyObjectives);
+        const mergedLevels = mergeRoadmapLevels(currentLevels, result.levels);
+        const mergedObjectives = mergeDailyObjectives(currentObjectives, result.dailyObjectives);
+        setLevels(mergedLevels);
+        setDailyObjectives(mergedObjectives);
       }
       closeBraynrModal();
     } catch {

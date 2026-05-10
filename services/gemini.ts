@@ -344,12 +344,25 @@ export async function geminiGenerateRoadmap(
     .map((s, i) => `${i + 1}. ${s.title} — ${s.summary || 'No summary'}`)
     .join('\n');
 
+  const studyProfileContext = studyProfile
+    ? `
+- Braynr reading speed: ${studyProfile.pagesPerHour.toFixed(1)} pages/hour
+- Braynr retention rate: ${Math.round(studyProfile.retentionRate * 100)}%
+- Braynr difficulty ratio: ${Math.round(studyProfile.difficultyRatio * 100)}%
+- Braynr average session length: ${studyProfile.avgSessionMinutes} minutes
+- Braynr studied days: ${studyProfile.studiedDays.length} tracked days
+- Braynr total study time: ${studyProfile.totalStudyMinutes} minutes
+`
+    : '\n- Braynr study profile: not available\n';
+
   const prompt = `You are a study planner. Create a levelled study roadmap for "${subject.title}".
 
 Student context:
 - Assessment score: ${Math.round(assessmentScore * 100)}%
 - Deadline: ${deadlineDate.toLocaleDateString()} (${totalDays} days away)
 - Available: ${subject.hoursPerWeek} hours/week
+- Personal study profile:
+${studyProfileContext}
 - Sections to cover:
 ${sectionList}
 
@@ -361,6 +374,12 @@ Rules:
 - Levels should be numbered 1 through ${sections.length}
 - Space deadlines evenly across ${totalDays} days
 - Estimate required study minutes per level (90-180 min)
+- If Braynr profile is available, adapt the roadmap to the student's real pace, retention, and average session length
+- If Braynr reading speed is slower, break sections into smaller day-by-day topics and avoid overly dense days
+- If Braynr retention is weaker, add more reinforcement-oriented daily sequencing inside topics
+- If Braynr retention is stronger, allow slightly faster progression while keeping workload realistic
+- If Braynr difficulty ratio is high, favor more gradual progression and slightly lighter topic chunks
+- Tailor the number of day-by-day topics in each level to the student's availability and Braynr profile, not just to the section count
 
 Also create exactly 3 daily study objectives for today based on the FIRST topic (Day 1) of the first active level. Each objective should correspond to one of the topic's arguments. Do NOT include review-type objectives.
 
