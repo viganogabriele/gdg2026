@@ -704,14 +704,13 @@ export const useStudyStore = create<StudyState>()(
           notificationPrefs: { ...state.notificationPrefs, ...prefs },
         })),
 
-<<<<<<< HEAD
       // ─── Braynr ─────────────────────────────────────────────────
       setStudyProfile: (profile) =>
         set({
           studyProfile: profile,
           braynrLastSyncedAt: new Date().toISOString(),
         }),
-=======
+
       // ─── Multi-Roadmap Actions ──────────────────────────────────
 
       startNewRoadmapOnboarding: () => {
@@ -791,19 +790,19 @@ export const useStudyStore = create<StudyState>()(
         const activeRm = state.roadmaps.find((rm) => rm.id === state.activeRoadmapId);
         if (activeRm) {
           set({
+            ...loadRoadmapState(activeRm, state.stats),
             isAddingRoadmap: false,
             onboardingComplete: true,
             onboardingData: { ...initialOnboardingData },
-            ...loadRoadmapState(activeRm, state.stats),
           });
         } else if (state.roadmaps.length > 0) {
           // fallback: load the first roadmap
           const first = state.roadmaps[0];
           set({
+            ...loadRoadmapState(first, state.stats),
             isAddingRoadmap: false,
             onboardingComplete: true,
             onboardingData: { ...initialOnboardingData },
-            ...loadRoadmapState(first, state.stats),
           });
         } else {
           // No roadmaps at all — stay in onboarding
@@ -814,7 +813,6 @@ export const useStudyStore = create<StudyState>()(
           });
         }
       },
->>>>>>> 4c9ae3a317b9a403587bdf2a62bb5f4e9096d3e1
 
       // ─── Reset ──────────────────────────────────────────────────
       resetStore: () =>
