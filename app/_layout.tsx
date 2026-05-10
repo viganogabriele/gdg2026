@@ -30,6 +30,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const onboardingComplete = useStudyStore((s) => s.onboardingComplete);
+  const isAddingRoadmap = useStudyStore((s) => s.isAddingRoadmap);
   const segments = useSegments();
   const router = useRouter();
   const pathname = usePathname();
@@ -44,11 +45,11 @@ export default function RootLayout() {
 
       if (!onboardingComplete && !inOnboarding) {
         router.replace('/(onboarding)/subject');
-      } else if (onboardingComplete && inOnboarding) {
+      } else if (onboardingComplete && inOnboarding && !isAddingRoadmap) {
         router.replace('/(tabs)');
       }
     }, 10);
-  }, [onboardingComplete, segments, router]);
+  }, [onboardingComplete, isAddingRoadmap, segments, router]);
 
   const tiltToFocusEnabled = useStudyStore((s) => s.notificationPrefs.tiltToFocusEnabled);
   const isHomeTab = pathname === '/' || pathname === '/(tabs)' || pathname === '/(tabs)/index';

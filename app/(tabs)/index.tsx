@@ -4,6 +4,7 @@
 import { DailyObjectives } from '@/components/home/DailyObjectives';
 import { LevelIndicator } from '@/components/home/LevelIndicator';
 import { QuickActions } from '@/components/home/QuickActions';
+import { RoadmapSelector } from '@/components/roadmap/RoadmapSelector';
 import { StreakCounter } from '@/components/home/StreakCounter';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
@@ -63,9 +64,7 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View className="mb-lg">
-          <Text className="text-text-primary text-xxl font-bold mt-[4px]" numberOfLines={1}>
-            {activeSubject?.title || 'StudyQuest'}
-          </Text>
+          <RoadmapSelector />
         </View>
 
         {/* Level Indicator */}

@@ -148,6 +148,27 @@ export interface NotificationPreferences {
   tiltToFocusEnabled: boolean;
 }
 
+// ─── Multi-Roadmap Container ────────────────────────────────────────
+export interface Roadmap {
+  id: string;
+  subject: Subject;
+  levels: StudyLevel[];
+  dailyObjectives: DailyObjective[];
+  spacedRepCards: SpacedRepetitionCard[];
+  quizzes: Quiz[];
+  sessions: StudySession[];
+  currentDayIndex: number;
+  dayAdvanceReady: boolean;
+  onboardingData: {
+    subjectTitle: string;
+    sources: Source[];
+    deadline: string;
+    hoursPerWeek: number;
+    sections: SourceSection[];
+    assessmentScore: number;
+  };
+}
+
 // API request/response types
 export interface AnalyzeSourcesResponse {
   sections: SourceSection[];

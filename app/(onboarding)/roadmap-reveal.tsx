@@ -22,8 +22,9 @@ export default function RoadmapRevealScreen() {
   useEffect(() => {
     async function generateRoadmap() {
       try {
+        const subjectId = Math.random().toString(36).substring(2, 11);
         const subject = {
-          id: 'subject_1',
+          id: subjectId,
           title: store.onboardingData.subjectTitle,
           sources: store.onboardingData.sources,
           deadline: store.onboardingData.deadline,
@@ -43,8 +44,14 @@ export default function RoadmapRevealScreen() {
         const activeLevel = result.levels.find((l) => l.status === 'active');
         subject.currentLevel = activeLevel?.levelNumber || 1;
 
-        store.completeOnboarding(subject, result.levels, result.dailyObjectives);
-        setLevels(result.levels);
+        // Update level subjectIds to match the new subject
+        const levelsWithSubjectId = result.levels.map((l) => ({
+          ...l,
+          subjectId,
+        }));
+
+        store.completeOnboarding(subject, levelsWithSubjectId, result.dailyObjectives);
+        setLevels(levelsWithSubjectId);
       } catch (error) {
         console.error('Roadmap generation error:', error);
       } finally {
