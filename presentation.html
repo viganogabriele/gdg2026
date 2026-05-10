@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyQuest — DedSec Pitch</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet">
+    <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0B151E;
+      --bg2:     #0F1E2D;
+      --bg3:     #152232;
+      --blue:    #1156ae;
+      --purple:  #9333ea;
+      --cyan:    #36c6e2;
+      --gold:    #FFD000;
+      --green:   #22c55e;
+      --red:     #ba1c1e;
+      --text:    #E8EFF5;
+      --muted:   #5B7A9A;
+      --border:  rgba(255,255,255,0.07);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      user-select: none;
+      cursor: default;
+    }
+
+    /* ─── Slides ─────────────────────────────── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 72px 80px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(.4,0,.2,1);
+    }
+    .slide.active { opacity: 1; pointer-events: all; }
+
+    /* ─── Staggered children ─────────────────── */
+    .stagger > * {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .slide.active .stagger > *              { opacity: 1; transform: none; }
+    .slide.active .stagger > *:nth-child(1) { transition-delay: 0.08s; }
+    .slide.active .stagger > *:nth-child(2) { transition-delay: 0.22s; }
+    .slide.active .stagger > *:nth-child(3) { transition-delay: 0.38s; }
+    .slide.active .stagger > *:nth-child(4) { transition-delay: 0.54s; }
+    .slide.active .stagger > *:nth-child(5) { transition-delay: 0.70s; }
+    .slide.active .stagger > *:nth-child(6) { transition-delay: 0.86s; }
+
+    /* ─── Grid stagger ───────────────────────── */
+    .grid-stagger > * {
+      opacity: 0;
+      transform: translateY(24px) scale(0.97);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .slide.active .grid-stagger > *              { opacity: 1; transform: none; }
+    .slide.active .grid-stagger > *:nth-child(1) { transition-delay: 0.35s; }
+    .slide.active .grid-stagger > *:nth-child(2) { transition-delay: 0.48s; }
+    .slide.active .grid-stagger > *:nth-child(3) { transition-delay: 0.61s; }
+    .slide.active .grid-stagger > *:nth-child(4) { transition-delay: 0.74s; }
+
+    /* ─── Orbs / Background ──────────────────── */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Chrome ─────────────────────────────── */
+    .chrome {
+      position: fixed;
+      z-index: 200;
+      pointer-events: none;
+    }
+    #team-badge {
+      top: 28px; left: 36px;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    #slide-counter {
+      top: 28px; right: 36px;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted);
+    }
+
+    /* Progress bar at bottom */
+    #progress-bar-track {
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--border);
+    }
+    #progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--cyan));
+      transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* Dot nav */
+    #dots {
+      bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px;
+      pointer-events: all;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 3px;
+      background: var(--muted);
+      transition: width 0.3s ease, background 0.3s ease;
+      cursor: pointer;
+    }
+    .dot.active { width: 22px; background: var(--cyan); }
+
+    /* Nav arrows */
+    .nav-btn {
+      position: fixed; bottom: 36px; z-index: 200;
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(15,30,45,0.6);
+      color: var(--text); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; pointer-events: all;
+      backdrop-filter: blur(12px);
+      transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    }
+    .nav-btn:hover  { background: rgba(17,86,174,0.25); border-color: var(--blue); }
+    .nav-btn:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
+    #btn-prev { left: 36px; }
+    #btn-next { right: 36px; }
+
+    /* ─── Typography ─────────────────────────── */
+    .label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 14px;
+      display: block;
+    }
+    .title-hero {
+      font-size: clamp(64px, 9vw, 108px);
+      font-weight: 900; line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+    .title-lg {
+      font-size: clamp(38px, 5.5vw, 68px);
+      font-weight: 800; line-height: 1.05;
+      letter-spacing: -0.025em;
+    }
+    .title-md {
+      font-size: clamp(26px, 3.5vw, 44px);
+      font-weight: 700; line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: clamp(15px, 1.8vw, 20px);
+      color: var(--muted); line-height: 1.65;
+      font-weight: 400;
+    }
+    .grad {
+      background: linear-gradient(130deg, var(--purple) 0%, var(--cyan) 55%, var(--blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Cards / Pill ───────────────────────── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 999px;
+      font-size: 15px; font-weight: 600;
+    }
+
+    /* ─── Animations ─────────────────────────── */
+    @keyframes floatA {
+      0%,100% { transform: translateY(0)   translateX(0); }
+      40%      { transform: translateY(-22px) translateX(14px); }
+      70%      { transform: translateY(12px)  translateX(-8px); }
+    }
+    @keyframes floatB {
+      0%,100% { transform: translateY(0)   translateX(0); }
+      35%      { transform: translateY(18px)  translateX(-12px); }
+      70%      { transform: translateY(-10px) translateX(10px); }
+    }
+    @keyframes pulse {
+      0%,100% { transform: translate(-50%,-50%) scale(1);   opacity: 0.7; }
+      50%      { transform: translate(-50%,-50%) scale(1.12); opacity: 1; }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+
+    /* ── SLIDE 1 ── */
+    #s1 .orb1 {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(147,51,234,.28) 0%, transparent 68%);
+      top: -280px; left: -180px;
+      animation: floatA 9s ease-in-out infinite;
+    }
+    #s1 .orb2 {
+      width: 550px; height: 550px;
+      background: radial-gradient(circle, rgba(17,86,174,.22) 0%, transparent 68%);
+      bottom: -200px; right: -120px;
+      animation: floatB 11s ease-in-out infinite;
+    }
+    #s1 .orb3 {
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(54,198,226,.18) 0%, transparent 68%);
+      top: 40%; right: 80px;
+      animation: floatA 7s ease-in-out infinite reverse;
+    }
+
+    /* ── SLIDE 2 – Problem ── */
+    #s2 .orb1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(186,28,30,.15) 0%, transparent 70%);
+      top: -100px; right: -80px;
+    }
+    .problem-row {
+      display: flex; align-items: flex-start; gap: 18px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 26px;
+      max-width: 620px; width: 100%;
+      transition: border-color .3s;
+    }
+    .problem-row:hover { border-color: rgba(17,86,174,.4); }
+    .problem-emoji { font-size: 30px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+    .problem-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .problem-desc  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── SLIDE 3 – Solution ── */
+    #s3 .orb1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(17,86,174,.2) 0%, transparent 68%);
+      bottom: -200px; left: -100px;
+    }
+    .roadmap-row { display: flex; align-items: center; }
+    .rm-node { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .rm-dot {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: var(--bg3); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .rm-dot.done  { border-color: var(--cyan);  background: rgba(54,198,226,.12); }
+    .rm-dot.today { border-color: var(--blue);  background: rgba(17,86,174,.18); }
+    .rm-label { font-size: 11px; color: var(--muted); font-weight: 600; text-align: center; }
+    .rm-label.today { color: var(--blue); }
+    .rm-line { width: 36px; height: 2px; background: var(--border); flex-shrink: 0; margin-bottom: 24px; }
+    .rm-line.done { background: var(--cyan); }
+
+    /* ── SLIDE 4 – Video ── */
+    #s4 { padding: 44px; }
+    .video-wrap {
+      width: 100%; max-width: 920px;
+      border-radius: 20px; overflow: hidden;
+      border: 1px solid rgba(17,86,174,.35);
+      box-shadow: 0 0 80px rgba(17,86,174,.25), 0 0 160px rgba(147,51,234,.1);
+      background: #000;
+    }
+    .video-wrap video { width: 100%; display: block; }
+    .video-placeholder {
+      aspect-ratio: 16/9;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg2);
+      color: var(--muted); font-size: 16px; font-weight: 600;
+      flex-direction: column; gap: 12px;
+    }
+
+    /* ── SLIDE 5 – Features ── */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%; max-width: 820px;
+    }
+    .feat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      display: flex; gap: 16px; align-items: flex-start;
+      transition: border-color .3s, transform .3s;
+    }
+    .feat-card:hover { border-color: rgba(17,86,174,.45); transform: translateY(-2px); }
+    .feat-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .feat-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .feat-desc  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── SLIDE 6 – AI ── */
+    #s6 .orb1 {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(147,51,234,.2) 0%, transparent 70%);
+      top: -200px; right: -200px;
+    }
+    .ai-flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .ai-node {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 18px;
+      font-size: 14px; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ai-arrow { color: var(--muted); font-size: 18px; }
+    .ai-mini-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .ai-mini {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 18px;
+      font-size: 13px; font-weight: 600;
+    }
+
+    /* ── SLIDE 7 – Close ── */
+    #s7 .orb1 {
+      width: 900px; height: 900px;
+      background: radial-gradient(circle, rgba(147,51,234,.18) 0%, transparent 65%);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: pulse 5s ease-in-out infinite;
+    }
+    #s7 .orb2 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(17,86,174,.15) 0%, transparent 65%);
+      bottom: -200px; right: -100px;
+      animation: floatB 8s ease-in-out infinite;
+    }
+    .closing-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .closing-card {
+      border-radius: 16px; padding: 18px 32px; text-align: center;
+    }
+    .closing-card-label { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+    .closing-card-value { font-size: 22px; font-weight: 800; }
+  </style>
+  </head>
+  <body>
+
+    <!-- Chrome -->
+    <div class="chrome" id="team-badge">DedSec</div>
+    <div class="chrome" id="slide-counter"><span id="cur">1</span> <span
+        style="color:#2a4a6a">/</span> <span id="tot">7</span></div>
+    <div class="chrome" id="progress-bar-track"><div
+        id="progress-bar-fill"></div></div>
+    <div class="chrome" id="dots"></div>
+    <button class="nav-btn" id="btn-prev">←</button>
+    <button class="nav-btn" id="btn-next">→</button>
+
+    <!-- ═══════════════════════════════════════════
+     SLIDE 1 — HERO
+════════════════════════════════════════════ -->
+    <div class="slide" id="s1">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+
+      <div class="stagger"
+        style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;">
+
+        <div>
+          <span class="pill"
+            style="background:rgba(17,86,174,.15);border:1px solid rgba(17,86,174,.4);color:var(--cyan);">
+            🎓 DedSec &nbsp;·&nbsp; GDG 2026
+          </span>
+        </div>
+
+        <div>
+          <h1 class="title-hero">
+            <span class="grad">Study</span><span
+              style="color:var(--text)">Quest</span>
+          </h1>
+        </div>
+
+        <div>
+          <p
+            style="font-size:clamp(17px,2.2vw,26px);color:var(--muted);font-weight:500;max-width:820px;line-height:1.45;">
+            From <strong
+              style="color:var(--text);font-weight:800;">lost</strong> to
+            <strong style="color:var(--cyan);font-weight:800;">leveled
+              up</strong>, your AI-powered study companion
+          </p>
+        </div>
+
+        <div
+          style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px;">
+          <span class="pill"
+            style="background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.35);color:#64b4ff;"><img
+              src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="18"
+              height="18" style="vertical-align:middle;">
+            AI Roadmap</span>
+          <span class="pill"
+            style="background:rgba(255,210,0,.1);border:1px solid rgba(255,210,0,.35);color:#ffd200;"><img
+              src="assets/svg/nucleo-glass/icon-award-gold.svg" width="18"
+              height="18" style="vertical-align:middle;">
+            Gamification</span>
+          <span class="pill"
+            style="background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.35);color:#ffaa00;"><img
+              src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="18"
+              height="18" style="vertical-align:middle;">
+            Spaced Repetition</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SLIDE 2 — PROBLEM
+════════════════════════════════════════════ -->
+    <div class="slide" id="s2">
+      <div class="orb orb1"></div>
+
+      <div class="stagger"
+        style="position:relative;z-index:1;max-width:680px;width:100%;display:flex;flex-direction:column;gap:16px;">
+
+        <div>
+          <span class="label">The Problem</span>
+          <h2 class="title-lg">
+            We're students too.<br>
+            <span
+              style="color:var(--muted);font-size:.58em;font-weight:500;">And we
+              know the struggle.</span>
+          </h2>
+        </div>
+
+        <div class="problem-row">
+          <div class="problem-emoji"><img
+              src="assets/svg/nucleo-glass/icon-book-open.svg" width="32"
+              height="32"></div>
+          <div>
+            <div class="problem-title">"Where do I even start?"</div>
+            <div class="problem-desc">A new subject feels overwhelming — no
+              clear entry point, no structure, no plan.</div>
+          </div>
+        </div>
+
+        <div class="problem-row">
+          <div class="problem-emoji"><img
+              src="assets/svg/nucleo-glass/icon-calendar.svg" width="32"
+              height="32"></div>
+          <div>
+            <div class="problem-title">"What should I study today?"</div>
+            <div class="problem-desc">Even when motivated, deciding what to do
+              next wastes precious time.</div>
+          </div>
+        </div>
+
+        <div class="problem-row"
+          style="border-color:rgba(186,28,30,.35);background:rgba(186,28,30,.06);">
+          <div class="problem-emoji"><img
+              src="assets/svg/nucleo-glass/icon-bell.svg" width="32"
+              height="32"></div>
+          <div>
+            <div class="problem-title"
+              style="color:#f87171;">"I'll start tomorrow..."</div>
+            <div class="problem-desc">Procrastination wins. Every. Single.
+              Time.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SLIDE 3 — SOLUTION
+════════════════════════════════════════════ -->
+    <div class="slide" id="s3">
+      <div class="orb orb1"></div>
+
+      <div class="stagger"
+        style="position:relative;z-index:1;max-width:780px;width:100%;display:flex;flex-direction:column;gap:28px;">
+
+        <div>
+          <span class="label">The Solution</span>
+          <h2 class="title-lg">
+            An AI agent that<br>
+            <span class="grad">builds your roadmap.</span>
+          </h2>
+        </div>
+
+        <div>
+          <p class="subtitle" style="max-width:600px;">
+            Tell it your subject, your sources, your deadline — it generates a
+            personalized
+            day-by-day study plan in seconds. No more "where do I start."
+          </p>
+        </div>
+
+        <div>
+          <div class="card" style="border-radius:20px;">
+            <p
+              style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:22px;">
+              Your roadmap, generated in seconds
+            </p>
+            <div class="roadmap-row">
+              <div class="rm-node">
+                <div class="rm-dot done"><img
+                    src="assets/svg/nucleo-glass/icon-circle-check.svg"
+                    width="22" height="22"></div>
+                <div class="rm-label">Day 1<br>Intro</div>
+              </div>
+              <div class="rm-line done"></div>
+              <div class="rm-node">
+                <div class="rm-dot done"><img
+                    src="assets/svg/nucleo-glass/icon-circle-check.svg"
+                    width="22" height="22"></div>
+                <div class="rm-label">Day 2<br>Basics</div>
+              </div>
+              <div class="rm-line done"></div>
+              <div class="rm-node">
+                <div class="rm-dot today"><img
+                    src="assets/svg/nucleo-glass/icon-flame-fire.svg" width="22"
+                    height="22"></div>
+                <div class="rm-label today">Day
+                  3<br><strong>Today</strong></div>
+              </div>
+              <div class="rm-line"></div>
+              <div class="rm-node">
+                <div class="rm-dot"><img
+                    src="assets/svg/nucleo-glass/icon-lock.svg" width="20"
+                    height="20"></div>
+                <div class="rm-label">Day 4<br>...</div>
+              </div>
+              <div class="rm-line"></div>
+              <div class="rm-node">
+                <div class="rm-dot"><img
+                    src="assets/svg/nucleo-glass/icon-lock.svg" width="20"
+                    height="20"></div>
+                <div class="rm-label">Day 5<br>...</div>
+              </div>
+              <div class="rm-line"></div>
+              <div class="rm-node">
+                <div class="rm-dot"><img
+                    src="assets/svg/nucleo-glass/icon-award-gold.svg" width="22"
+                    height="22"></div>
+                <div class="rm-label">Exam<br>Day</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SLIDE 4 — DEMO VIDEO
+════════════════════════════════════════════ -->
+    <div class="slide" id="s4">
+      <div class="stagger"
+        style="position:relative;z-index:1;width:100%;max-width:960px;display:flex;flex-direction:column;gap:22px;align-items:center;">
+
+        <div style="text-align:center;">
+          <span class="label">See it in action</span>
+          <h2 class="title-md">StudyQuest — Live Demo</h2>
+        </div>
+
+        <div>
+          <div class="video-wrap">
+            <!--
+          ⬇️  Replace "video.mp4" with the path to your video file.
+              Put it in the same folder as this HTML.
+        -->
+            <video id="demo-video" src="video.mp4" muted playsinline loop
+              controls>
+              <div class="video-placeholder">
+                <span style="font-size:48px">🎬</span>
+                <span>Drop your video here — rename it
+                  <code>video.mp4</code></span>
+              </div>
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SLIDE 5 — FEATURES
+════════════════════════════════════════════ -->
+    <div class="slide" id="s5">
+      <div class="stagger"
+        style="position:relative;z-index:1;max-width:860px;width:100%;display:flex;flex-direction:column;gap:28px;">
+
+        <div>
+          <span class="label">What it does</span>
+          <h2 class="title-md">
+            Everything you need.<br>
+            <span style="color:var(--muted);font-weight:500;">Nothing you
+              don't.</span>
+          </h2>
+        </div>
+
+        <div>
+          <div class="feat-grid grid-stagger">
+
+            <div class="feat-card">
+              <div class="feat-icon" style="background:rgba(255,208,0,.12);">
+                <img src="assets/svg/nucleo-glass/icon-award-gold.svg"
+                  width="26" height="26">
+              </div>
+              <div>
+                <div class="feat-title">Gamification</div>
+                <div class="feat-desc">XP, streaks, badges, leaderboard —
+                  studying feels like a game you actually want to play.</div>
+              </div>
+            </div>
+
+            <div class="feat-card">
+              <div class="feat-icon" style="background:rgba(54,198,226,.12);">
+                <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg"
+                  width="26" height="26">
+              </div>
+              <div>
+                <div class="feat-title">Spaced Repetition</div>
+                <div class="feat-desc">SM-2 algorithm schedules your reviews at
+                  the perfect moment. Long-term memory, guaranteed.</div>
+              </div>
+            </div>
+
+            <div class="feat-card">
+              <div class="feat-icon" style="background:rgba(34,197,94,.12);">
+                <img src="assets/svg/nucleo-glass/icon-eye.svg" width="26"
+                  height="26">
+              </div>
+              <div>
+                <div class="feat-title">Focus Mode</div>
+                <div class="feat-desc">Built-in Pomodoro timer. Rotate your
+                  phone to start — no friction, pure flow.</div>
+              </div>
+            </div>
+
+            <div class="feat-card">
+              <div class="feat-icon" style="background:rgba(147,51,234,.12);">
+                <img src="assets/svg/nucleo-glass/icon-link.svg" width="26"
+                  height="26">
+              </div>
+              <div>
+                <div class="feat-title">Braynr Sync</div>
+                <div class="feat-desc">Connect your Braynr stats. The AI
+                  recalculates your roadmap based on your real retention
+                  data.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SLIDE 6 — AI ROLE
+════════════════════════════════════════════ -->
+    <div class="slide" id="s6">
+      <div class="orb orb1"></div>
+
+      <div class="stagger"
+        style="position:relative;z-index:1;max-width:780px;width:100%;display:flex;flex-direction:column;gap:30px;">
+
+        <div>
+          <span class="label">Powered by AI</span>
+          <h2 class="title-lg">
+            Gemini at the core.<br>
+            <span class="grad">Always adapting.</span>
+          </h2>
+        </div>
+
+        <div>
+          <p class="subtitle">
+            The AI doesn't just generate your roadmap once — it watches how you
+            perform
+            and recalibrates your entire study plan in real time.
+          </p>
+        </div>
+
+        <div>
+          <div class="ai-flow">
+            <div class="ai-node"
+              style="border-color:rgba(147,51,234,.4);background:rgba(147,51,234,.08);">
+              <img src="assets/svg/nucleo-glass/icon-book-open.svg" width="20"
+                height="20"> Your sources</div>
+            <div class="ai-arrow">→</div>
+            <div class="ai-node"
+              style="border-color:rgba(17,86,174,.4);background:rgba(17,86,174,.08);">
+              <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="20"
+                height="20"> Gemini AI</div>
+            <div class="ai-arrow">→</div>
+            <div class="ai-node"
+              style="border-color:rgba(54,198,226,.4);background:rgba(54,198,226,.08);">
+              <img src="assets/svg/nucleo-glass/icon-folder.svg" width="20"
+                height="20"> Roadmap</div>
+            <div class="ai-arrow">→</div>
+            <div class="ai-node"
+              style="border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08);">
+              <img src="assets/svg/nucleo-glass/icon-star-xp.svg" width="20"
+                height="20"> Your results</div>
+            <div class="ai-arrow">↩</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="ai-mini-grid grid-stagger">
+            <div class="ai-mini">
+              <div style="margin-bottom:8px;"><img
+                  src="assets/svg/nucleo-glass/icon-flame-fire.svg" width="28"
+                  height="28"></div>
+              Personalized from day one
+            </div>
+            <div class="ai-mini">
+              <div style="margin-bottom:8px;"><img
+                  src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg"
+                  width="28" height="28"></div>
+              Re-generates on failure
+            </div>
+            <div class="ai-mini">
+              <div style="margin-bottom:8px;"><img
+                  src="assets/svg/nucleo-glass/icon-star-xp.svg" width="28"
+                  height="28"></div>
+              Braynr-enhanced timing
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SLIDE 7 — CLOSING
+════════════════════════════════════════════ -->
+    <div class="slide" id="s7">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+
+      <div class="stagger"
+        style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;">
+
+        <div>
+          <h2 class="title-hero" style="line-height:1.05;">
+            Stop procrastinating.<br>
+            <span class="grad">Start Questing.</span>
+          </h2>
+        </div>
+
+        <div>
+          <p
+            style="font-size:clamp(15px,1.8vw,21px);color:var(--muted);max-width:500px;line-height:1.55;">
+            Because the only thing standing between you and your exam
+            is knowing <strong style="color:var(--text);">where to
+              start.</strong>
+          </p>
+        </div>
+
+        <div>
+          <div class="closing-cards">
+            <div class="closing-card"
+              style="background:linear-gradient(135deg,rgba(147,51,234,.15),rgba(17,86,174,.15));border:1px solid rgba(17,86,174,.35);">
+              <div class="closing-card-label">Team</div>
+              <div class="closing-card-value">DedSec</div>
+            </div>
+            <div class="closing-card"
+              style="background:linear-gradient(135deg,rgba(54,198,226,.12),rgba(147,51,234,.12));border:1px solid rgba(54,198,226,.3);">
+              <div class="closing-card-label">Project</div>
+              <div class="closing-card-value"><span
+                  class="grad">StudyQuest</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px;">
+          <span class="pill"
+            style="background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.35);color:#64b4ff;">
+            <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="18"
+              height="18" style="vertical-align:middle;"> Gemini AI</span>
+          <span class="pill"
+            style="background:rgba(255,210,0,.1);border:1px solid rgba(255,210,0,.35);color:#ffd200;">
+            <img src="assets/svg/nucleo-glass/icon-award-gold.svg" width="18"
+              height="18" style="vertical-align:middle;"> Gamified</span>
+          <span class="pill"
+            style="background:rgba(56,120,210,.1);border:1px solid rgba(56,120,210,.35);color:#3878d2;">
+            <img src="assets/svg/nucleo-glass/icon-house.svg" width="18"
+              height="18" style="vertical-align:middle;"> React Native</span>
+          <span class="pill"
+            style="background:rgba(200,216,240,.06);border:1px solid rgba(160,180,210,.3);color:#c8d8f0;">
+            <img src="assets/svg/nucleo-glass/icon-link.svg" width="18"
+              height="18" style="vertical-align:middle;"> Braynr</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SCRIPT
+════════════════════════════════════════════ -->
+    <script>
+  const slides   = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl   = document.getElementById('dots');
+  const curEl    = document.getElementById('cur');
+  const totEl    = document.getElementById('tot');
+  const fillEl   = document.getElementById('progress-bar-fill');
+  const btnPrev  = document.getElementById('btn-prev');
+  const btnNext  = document.getElementById('btn-next');
+  const N        = slides.length;
+  let   current  = 0;
+
+  totEl.textContent = N;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(idx) {
+    // Leave current
+    const leaving = slides[current];
+    leaving.classList.remove('active');
+
+    // Pause / reset video on leave
+    const oldVid = leaving.querySelector('video');
+    if (oldVid) { try { oldVid.pause(); oldVid.currentTime = 0; } catch(e){} }
+
+    current = Math.max(0, Math.min(N - 1, idx));
+    const entering = slides[current];
+    entering.classList.add('active');
+
+    // Autoplay video if slide has one
+    const vid = entering.querySelector('video');
+    if (vid && vid.getAttribute('src')) {
+      vid.play().catch(() => {});
+    }
+
+    // Update chrome
+    curEl.textContent = current + 1;
+    fillEl.style.width = ((current + 1) / N * 100) + '%';
+    document.querySelectorAll('.dot').forEach((d, i) =>
+      d.classList.toggle('active', i === current)
+    );
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current === N - 1;
+  }
+
+  const next = () => { if (current < N - 1) goTo(current + 1); };
+  const prev = () => { if (current > 0)     goTo(current - 1); };
+
+  btnNext.addEventListener('click', next);
+  btnPrev.addEventListener('click', prev);
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft','ArrowUp'].includes(e.key))         { e.preventDefault(); prev(); }
+  });
+
+  // Click anywhere on slide to advance
+  document.addEventListener('click', e => {
+    if (e.target.closest('#dots') ||
+        e.target.closest('.nav-btn') ||
+        e.target.closest('video') ||
+        e.target.closest('button'))  return;
+    next();
+  });
+
+  // Init
+  goTo(0);
+</script>
+
+  </body>
+</html>
