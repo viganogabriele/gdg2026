@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyQuest — DedSec Pitch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #07101A;
+      --bg2:     #0B1C2C;
+      --bg3:     #102030;
+      --blue:    #1156ae;
+      --blue2:   #1a72e0;
+      --purple:  #9333ea;
+      --purple2: #b366ff;
+      --cyan:    #36c6e2;
+      --cyan2:   #60d8ef;
+      --gold:    #FFD200;
+      --orange:  #ff6400;
+      --green:   #22c55e;
+      --red:     #f87171;
+      --text:    #EDF2F8;
+      --muted:   #445F77;
+      --muted2:  #6B8EAA;
+      --border:  rgba(255,255,255,0.055);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Dot grid texture */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Slides ── */
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 72px 88px;
+      opacity: 0;
+      transform: translateY(28px) scale(0.972);
+      filter: blur(8px);
+      pointer-events: none;
+      transition:
+        opacity   0.75s cubic-bezier(.22,1,.36,1),
+        transform 0.75s cubic-bezier(.22,1,.36,1),
+        filter    0.75s cubic-bezier(.22,1,.36,1);
+      z-index: 1;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+      pointer-events: all;
+    }
+
+    /* ── Stagger children in ── */
+    .stagger > * {
+      opacity: 0;
+      transform: translateY(40px);
+      transition:
+        opacity   0.7s cubic-bezier(.22,1,.36,1),
+        transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .slide.active .stagger > * { opacity: 1; transform: none; }
+    .slide.active .stagger > *:nth-child(1) { transition-delay: 0.06s; }
+    .slide.active .stagger > *:nth-child(2) { transition-delay: 0.18s; }
+    .slide.active .stagger > *:nth-child(3) { transition-delay: 0.30s; }
+    .slide.active .stagger > *:nth-child(4) { transition-delay: 0.42s; }
+    .slide.active .stagger > *:nth-child(5) { transition-delay: 0.54s; }
+    .slide.active .stagger > *:nth-child(6) { transition-delay: 0.66s; }
+
+    .grid-in > * {
+      opacity: 0;
+      transform: translateY(30px) scale(0.94);
+      transition:
+        opacity   0.65s cubic-bezier(.22,1,.36,1),
+        transform 0.65s cubic-bezier(.22,1,.36,1);
+    }
+    .slide.active .grid-in > * { opacity: 1; transform: none; }
+    .slide.active .grid-in > *:nth-child(1) { transition-delay: 0.26s; }
+    .slide.active .grid-in > *:nth-child(2) { transition-delay: 0.38s; }
+    .slide.active .grid-in > *:nth-child(3) { transition-delay: 0.50s; }
+    .slide.active .grid-in > *:nth-child(4) { transition-delay: 0.62s; }
+
+    /* ── Ambient orbs ── */
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Glassmorphism ── */
+    .glass {
+      background: rgba(10,22,36,0.62);
+      backdrop-filter: blur(30px) saturate(160%);
+      -webkit-backdrop-filter: blur(30px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,0.07);
+    }
+
+    /* ── Chrome UI ── */
+    .chrome { position: fixed; z-index: 200; pointer-events: none; }
+
+    #team-badge {
+      top: 26px; left: 34px;
+      font-size: 10px; font-weight: 800;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    #slide-counter {
+      top: 26px; right: 34px;
+      font-size: 12px; font-weight: 600;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    #progress-bar-track {
+      bottom: 0; left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,0.04);
+    }
+    #progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--cyan));
+      transition: width 0.55s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 14px rgba(54,198,226,.6);
+    }
+    #dots {
+      bottom: 15px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 6px;
+      pointer-events: all;
+    }
+    .dot {
+      width: 4px; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.14);
+      transition: width 0.35s cubic-bezier(.22,1,.36,1), background 0.3s;
+      cursor: pointer;
+    }
+    .dot.active {
+      width: 24px;
+      background: linear-gradient(90deg, var(--purple), var(--cyan));
+    }
+
+    .nav-btn {
+      position: fixed; bottom: 30px; z-index: 200;
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(7,16,26,0.85);
+      backdrop-filter: blur(16px);
+      color: var(--muted2); font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; pointer-events: all;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .nav-btn:hover {
+      border-color: rgba(54,198,226,.4);
+      color: var(--cyan);
+      transform: scale(1.1);
+    }
+    .nav-btn:disabled { opacity: 0.1; pointer-events: none; }
+    #btn-prev { left: 34px; }
+    #btn-next { right: 34px; }
+
+    /* ── Typography ── */
+    .eyebrow {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--cyan);
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .t-hero {
+      font-size: clamp(76px, 11.5vw, 136px);
+      font-weight: 900; line-height: 0.88; letter-spacing: -0.055em;
+    }
+    .t-xl {
+      font-size: clamp(48px, 6.8vw, 86px);
+      font-weight: 900; line-height: 0.92; letter-spacing: -0.045em;
+    }
+    .t-lg {
+      font-size: clamp(34px, 4.4vw, 60px);
+      font-weight: 800; line-height: 1.06; letter-spacing: -0.03em;
+    }
+    .t-md {
+      font-size: clamp(15px, 1.7vw, 21px);
+      font-weight: 400; color: var(--muted2); line-height: 1.65;
+    }
+
+    /* Animated seamless infinite gradient */
+    .grad {
+      background: linear-gradient(
+        108deg,
+        var(--purple2) 0%,
+        var(--cyan)    16.6%,
+        #60a5fa        33.3%,
+        var(--purple2) 50%,
+        var(--cyan)    66.6%,
+        #60a5fa        83.3%,
+        var(--purple2) 100%
+      );
+      background-size: 300% 100%;
+      animation: shimmer 4s linear infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    /* ── Pill ── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 999px;
+      font-size: 14px; font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── Keyframes ── */
+    @keyframes floatA {
+      0%,100% { transform: translateY(0) translateX(0); }
+      40%     { transform: translateY(-34px) translateX(18px); }
+      70%     { transform: translateY(16px) translateX(-12px); }
+    }
+    @keyframes floatB {
+      0%,100% { transform: translateY(0) translateX(0); }
+      35%     { transform: translateY(26px) translateX(-18px); }
+      70%     { transform: translateY(-14px) translateX(14px); }
+    }
+    @keyframes todayPulse {
+      0%,100% { box-shadow: 0 0 18px rgba(17,86,174,.5), 0 0 6px rgba(54,198,226,.25); }
+      50%     { box-shadow: 0 0 36px rgba(17,86,174,.8), 0 0 20px rgba(54,198,226,.45); }
+    }
+    @keyframes spin  { to { transform: rotate(360deg);  } }
+    @keyframes spinr { to { transform: rotate(-360deg); } }
+    @keyframes dotOrbit {
+      from { transform: rotate(0deg)   translateX(146px) rotate(0deg);   }
+      to   { transform: rotate(360deg) translateX(146px) rotate(-360deg); }
+    }
+    @keyframes dotOrbit2 {
+      from { transform: rotate(180deg) translateX(164px) rotate(-180deg); }
+      to   { transform: rotate(540deg) translateX(164px) rotate(-540deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       S1 – HERO
+    ═══════════════════════════════════════════════════════ */
+    #s1 .orb1 { width:950px;height:950px;background:radial-gradient(circle,rgba(147,51,234,.30) 0%,transparent 65%);top:-380px;left:-280px;animation:floatA 12s ease-in-out infinite; }
+    #s1 .orb2 { width:750px;height:750px;background:radial-gradient(circle,rgba(17,86,174,.22) 0%,transparent 65%);bottom:-280px;right:-200px;animation:floatB 15s ease-in-out infinite; }
+    #s1 .orb3 { width:420px;height:420px;background:radial-gradient(circle,rgba(54,198,226,.18) 0%,transparent 65%);top:28%;right:6%;animation:floatA 9s ease-in-out infinite reverse; }
+
+    .stat-chip {
+      padding: 12px 22px; border-radius: 16px;
+      background: rgba(10,22,36,.7);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 4px 20px rgba(0,0,0,.35);
+      display: inline-flex; align-items: center; gap: 12px;
+    }
+    .stat-chip-num {
+      font-size: 24px; font-weight: 900; line-height: 1;
+    }
+    .stat-chip-label {
+      font-size: 10px; color: var(--muted); font-weight: 600;
+      margin-top: 2px; letter-spacing: 0.04em;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       S2 – PROBLEM
+    ═══════════════════════════════════════════════════════ */
+    #s2 .orb1 { width:600px;height:600px;background:radial-gradient(circle,rgba(186,28,30,.13) 0%,transparent 65%);top:-100px;right:-130px;animation:floatB 13s ease-in-out infinite; }
+    #s2 .orb2 { width:500px;height:500px;background:radial-gradient(circle,rgba(17,86,174,.1) 0%,transparent 65%);bottom:-110px;left:-80px;animation:floatA 15s ease-in-out infinite; }
+
+    .prob-card {
+      display: flex; align-items: flex-start; gap: 20px;
+      padding: 22px 24px; border-radius: 20px;
+      background: rgba(10,22,36,.58);
+      backdrop-filter: blur(28px);
+      border: 1px solid rgba(255,255,255,0.055);
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 28px rgba(0,0,0,.3);
+      transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s;
+    }
+    .prob-card:hover { transform: translateX(7px) translateY(-2px); box-shadow: 0 8px 36px rgba(0,0,0,.4); }
+    .prob-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      border-radius: 0 2px 2px 0;
+    }
+    .prob-card.c1::before { background: linear-gradient(180deg, var(--cyan), var(--blue2)); }
+    .prob-card.c2::before { background: linear-gradient(180deg, var(--gold), var(--orange)); }
+    .prob-card.c3::before { background: linear-gradient(180deg, #f87171, #dc2626); }
+
+    .prob-icon {
+      width: 44px; height: 44px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .prob-card.c1 .prob-icon { background: rgba(54,198,226,.09); }
+    .prob-card.c2 .prob-icon { background: rgba(255,210,0,.09); }
+    .prob-card.c3 .prob-icon { background: rgba(248,113,113,.09); }
+
+    .prob-num   { font-size:9px;font-weight:800;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin-bottom:5px; }
+    .prob-title { font-size:17px;font-weight:800;line-height:1.2;margin-bottom:4px; }
+    .prob-desc  { font-size:13px;color:var(--muted2);line-height:1.5; }
+
+    /* ═══════════════════════════════════════════════════════
+       S3 – SOLUTION
+    ═══════════════════════════════════════════════════════ */
+    #s3 .orb1 { width:750px;height:750px;background:radial-gradient(circle,rgba(17,86,174,.22) 0%,transparent 65%);bottom:-240px;left:-130px;animation:floatA 14s ease-in-out infinite; }
+    #s3 .orb2 { width:460px;height:460px;background:radial-gradient(circle,rgba(147,51,234,.13) 0%,transparent 65%);top:-80px;right:-60px;animation:floatB 11s ease-in-out infinite; }
+
+    .rm-track { display:flex;flex-direction:column;gap:0;position:relative; }
+    .rm-track::before {
+      content:'';position:absolute;left:21px;top:26px;bottom:26px;width:2px;
+      background:linear-gradient(180deg, var(--cyan) 28%, rgba(255,255,255,.04) 100%);
+    }
+    .rm-row { display:flex;align-items:center;gap:14px;padding:9px 0;position:relative;z-index:1; }
+    .rm-dot {
+      width:44px;height:44px;border-radius:13px;flex-shrink:0;
+      background:rgba(10,22,36,.85);
+      border:1.5px solid rgba(255,255,255,0.075);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .rm-dot.done  { border-color:rgba(54,198,226,.45);background:rgba(54,198,226,.07); }
+    .rm-dot.today {
+      border-color:rgba(17,86,174,.85);
+      background:rgba(17,86,174,.14);
+      animation:todayPulse 2.5s ease-in-out infinite;
+    }
+    .rm-day   { font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase; }
+    .rm-title { font-size:15px;font-weight:700;color:var(--text);margin-top:1px; }
+    .rm-title.today-t { color:var(--cyan); }
+    .rm-badge { font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);background:rgba(54,198,226,.12);border:1px solid rgba(54,198,226,.3);border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:middle; }
+
+    /* ═══════════════════════════════════════════════════════
+       S5 – FEATURES
+    ═══════════════════════════════════════════════════════ */
+    .feat-card {
+      background: rgba(10,22,36,.62);
+      backdrop-filter: blur(28px);
+      border: 1px solid rgba(255,255,255,0.065);
+      border-radius: 24px;
+      padding: 28px 26px 26px;
+      display: flex; flex-direction: column; gap: 16px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 28px rgba(0,0,0,.3);
+      transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s, border-color 0.35s;
+    }
+    /* subtle gradient wash */
+    .feat-card::before {
+      content:'';position:absolute;inset:0;opacity:.055;border-radius:24px;
+    }
+    /* top gradient border */
+    .feat-card::after {
+      content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+    }
+    .feat-card.f1::before { background:linear-gradient(140deg, var(--gold), var(--orange)); }
+    .feat-card.f1::after  { background:linear-gradient(90deg, transparent, var(--gold) 40%, var(--orange) 60%, transparent); }
+    .feat-card.f2::before { background:linear-gradient(140deg, var(--cyan), var(--blue2)); }
+    .feat-card.f2::after  { background:linear-gradient(90deg, transparent, var(--cyan) 40%, var(--blue2) 60%, transparent); }
+    .feat-card.f3::before { background:linear-gradient(140deg, var(--green), var(--cyan)); }
+    .feat-card.f3::after  { background:linear-gradient(90deg, transparent, var(--green) 40%, var(--cyan) 60%, transparent); }
+    .feat-card.f4::before { background:linear-gradient(140deg, var(--purple2), var(--cyan)); }
+    .feat-card.f4::after  { background:linear-gradient(90deg, transparent, var(--purple2) 40%, var(--cyan) 60%, transparent); }
+    .feat-card:hover { transform:translateY(-7px);box-shadow:0 16px 48px rgba(0,0,0,.45);border-color:rgba(255,255,255,.12); }
+
+    .feat-icon { width:56px;height:56px;border-radius:17px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1; }
+    .feat-title { font-size:17px;font-weight:800;position:relative;z-index:1; }
+    .feat-desc  { font-size:13px;color:var(--muted2);line-height:1.6;position:relative;z-index:1; }
+
+    /* ═══════════════════════════════════════════════════════
+       S6 – AI
+    ═══════════════════════════════════════════════════════ */
+    #s6 .orb1 { width:820px;height:820px;background:radial-gradient(circle,rgba(147,51,234,.19) 0%,transparent 65%);top:-230px;right:-230px;animation:floatB 12s ease-in-out infinite; }
+    #s6 .orb2 { width:520px;height:520px;background:radial-gradient(circle,rgba(17,86,174,.14) 0%,transparent 65%);bottom:-130px;left:-70px;animation:floatA 15s ease-in-out infinite; }
+
+    /* AI hub diagram */
+    .ai-hub-wrap { position:relative;width:380px;height:340px;flex-shrink:0; }
+    .ai-hub-svg  { position:absolute;inset:0;width:100%;height:100%;overflow:visible; }
+    @keyframes dashMarch { to { stroke-dashoffset: -20; } }
+
+    .ai-hub-center {
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      display:flex;flex-direction:column;align-items:center;gap:9px;
+      padding:20px 28px;border-radius:22px;
+      background:rgba(17,86,174,.16);
+      backdrop-filter:blur(24px);
+      border:1px solid rgba(100,180,255,.4);
+      box-shadow:0 0 50px rgba(17,86,174,.35),0 0 100px rgba(17,86,174,.12),inset 0 0 30px rgba(17,86,174,.08);
+      font-size:15px;font-weight:800;white-space:nowrap;z-index:2;
+    }
+    .ai-hub-node {
+      position:absolute;
+      display:flex;align-items:center;gap:9px;
+      padding:11px 16px;border-radius:14px;
+      background:rgba(10,22,36,.75);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:0 4px 18px rgba(0,0,0,.3);
+      font-size:13px;font-weight:700;white-space:nowrap;z-index:2;
+    }
+
+    .ai-insight-row {
+      display:flex;align-items:center;gap:12px;
+      padding:11px 16px;border-radius:13px;
+      background:rgba(10,22,36,.45);
+      border:1px solid rgba(255,255,255,.055);
+      font-size:14px;font-weight:600;color:var(--text);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       S7 – CLOSING
+    ═══════════════════════════════════════════════════════ */
+    #s7 { padding:72px 88px;align-items:stretch;justify-content:center; }
+    #s7 .orb1 { width:1100px;height:1100px;background:radial-gradient(circle,rgba(147,51,234,.2) 0%,transparent 58%);top:50%;right:-300px;transform:translateY(-50%);animation:floatB 13s ease-in-out infinite; }
+    #s7 .orb2 { width:750px;height:750px;background:radial-gradient(circle,rgba(17,86,174,.17) 0%,transparent 65%);bottom:-240px;left:-130px;animation:floatA 16s ease-in-out infinite; }
+
+    .s7-layout {
+      display:flex;flex-direction:row;align-items:center;
+      gap:80px;width:100%;max-width:1120px;margin:0 auto;
+      position:relative;z-index:1;
+    }
+    .s7-left { flex:1;display:flex;flex-direction:column;gap:30px; }
+    .s7-right { width:360px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:22px; }
+
+    /* orbiting brand ring */
+    .s7-ring-wrap {
+      position:relative;
+      width:320px;height:320px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .s7-ring-core {
+      width:260px;height:260px;border-radius:50%;
+      background:radial-gradient(circle at 40% 35%,rgba(147,51,234,.24),rgba(17,86,174,.18) 55%,transparent 78%);
+      border:1px solid rgba(255,255,255,.075);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+      box-shadow:
+        0 0 80px rgba(147,51,234,.18),
+        0 0 40px rgba(17,86,174,.12),
+        inset 0 0 60px rgba(147,51,234,.06);
+      position:relative;z-index:2;
+    }
+    .s7-ring-outer {
+      position:absolute;inset:0;border-radius:50%;
+      border:1px solid rgba(147,51,234,.16);
+      animation:spin 32s linear infinite;
+    }
+    .s7-ring-outer::before {
+      content:'';position:absolute;
+      top:-4px;left:50%;transform:translateX(-50%);
+      width:8px;height:8px;border-radius:50%;
+      background:var(--purple2);
+      box-shadow:0 0 14px var(--purple2),0 0 6px #fff;
+    }
+    .s7-ring-mid {
+      position:absolute;inset:-20px;border-radius:50%;
+      border:1px dashed rgba(100,180,255,.09);
+      animation:spinr 55s linear infinite;
+    }
+    .s7-ring-mid::before {
+      content:'';position:absolute;
+      bottom:-3px;right:20%;
+      width:5px;height:5px;border-radius:50%;
+      background:var(--cyan2);
+      box-shadow:0 0 10px var(--cyan2);
+    }
+    .s7-brand-name {
+      font-size:28px;font-weight:900;letter-spacing:-0.02em;
+      background:linear-gradient(130deg,#c084fc,#64b4ff 55%,#36c6e2);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .s7-brand-sub { font-size:9px;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:var(--muted); }
+
+    .s7-info-card {
+      width:100%;
+      background:rgba(10,22,36,.68);
+      backdrop-filter:blur(28px);
+      border:1px solid rgba(255,255,255,.065);
+      border-radius:18px;
+      padding:6px 0;
+      box-shadow:0 4px 28px rgba(0,0,0,.35);
+    }
+    .s7-info-row {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:13px 22px;
+    }
+    .s7-info-row:not(:last-child) { border-bottom:1px solid rgba(255,255,255,.045); }
+    .s7-info-label { font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--muted); }
+    .s7-info-value { font-size:14px;font-weight:800;color:var(--text); }
+
+    .s7-stack { display:flex;flex-wrap:wrap;gap:8px; }
+  </style>
+</head>
+<body>
+
+<div class="chrome" id="team-badge">DedSec</div>
+<div class="chrome" id="slide-counter"><span id="cur">1</span> <span style="color:#1a3450">/</span> <span id="tot">7</span></div>
+<div class="chrome" id="progress-bar-track"><div id="progress-bar-fill"></div></div>
+<div class="chrome" id="dots"></div>
+<button class="nav-btn" id="btn-prev">←</button>
+<button class="nav-btn" id="btn-next">→</button>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     S1 · HERO
+══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <div class="stagger" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:30px;text-align:center;max-width:980px;width:100%;">
+
+    <div>
+      <div class="eyebrow" style="justify-content:center;">DedSec &nbsp;·&nbsp; GDG DevFest 2026</div>
+    </div>
+
+    <div>
+      <h1 class="t-hero"><span class="grad">Study</span><span style="color:var(--text)">Quest</span></h1>
+      <p style="font-size:clamp(17px,2.1vw,25px);color:var(--muted2);font-style:italic;font-weight:300;margin-top:20px;line-height:1.5;letter-spacing:-.01em;">
+        From <strong style="color:var(--text);font-style:normal;font-weight:900;">lost</strong> to
+        <strong style="color:var(--cyan);font-style:normal;font-weight:900;">leveled up.</strong>
+        Your AI-powered study companion.
+      </p>
+    </div>
+
+    <div style="width:100%;max-width:580px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);"></div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+      <span class="pill" style="background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.28);color:#64b4ff;">
+        <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="18" height="18"> AI Roadmap</span>
+      <span class="pill" style="background:rgba(255,210,0,.1);border:1px solid rgba(255,210,0,.28);color:#ffd200;">
+        <img src="assets/svg/nucleo-glass/icon-award-gold.svg" width="18" height="18"> Gamification</span>
+      <span class="pill" style="background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.28);color:#ffaa00;">
+        <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="18" height="18"> Spaced Repetition</span>
+    </div>
+
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     S2 · PROBLEM
+══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
+
+    <div class="stagger" style="flex:0 0 230px;display:flex;flex-direction:column;gap:20px;">
+      <div><div class="eyebrow">The Problem</div></div>
+      <div><h2 class="t-xl">We're<br>students<br><span class="grad">too.</span></h2></div>
+      <div><p class="t-md" style="font-size:14px;max-width:210px;">We built this because we felt the pain first-hand.</p></div>
+    </div>
+
+    <div class="stagger" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+      <div class="prob-card c1">
+        <div class="prob-icon"><img src="assets/svg/nucleo-glass/icon-book-open.svg" width="24" height="24"></div>
+        <div>
+          <div class="prob-num">01</div>
+          <div class="prob-title">"Where do I even start?"</div>
+          <div class="prob-desc">A new subject feels overwhelming. No clear entry point, no structure, no plan.</div>
+        </div>
+      </div>
+      <div class="prob-card c2">
+        <div class="prob-icon"><img src="assets/svg/nucleo-glass/icon-calendar.svg" width="24" height="24"></div>
+        <div>
+          <div class="prob-num">02</div>
+          <div class="prob-title">"What should I study today?"</div>
+          <div class="prob-desc">Even when motivated, deciding what to do next wastes precious time.</div>
+        </div>
+      </div>
+      <div class="prob-card c3">
+        <div class="prob-icon"><img src="assets/svg/nucleo-glass/icon-bell.svg" width="24" height="24"></div>
+        <div>
+          <div class="prob-num">03</div>
+          <div class="prob-title" style="color:#f87171;">"I'll start tomorrow..."</div>
+          <div class="prob-desc">Procrastination wins. Every. Single. Time.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     S3 · SOLUTION
+══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
+
+    <div class="stagger" style="flex:1;">
+      <div><div class="eyebrow">The Solution</div></div>
+      <div>
+        <h2 class="t-xl" style="margin-top:18px;">An AI agent<br>that builds<br><span class="grad">your roadmap.</span></h2>
+      </div>
+      <div>
+        <p class="t-md" style="margin-top:18px;max-width:360px;">Tell it your subject, sources and deadline. It generates a personalized day-by-day plan in seconds, always adapting.</p>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:9px;flex-wrap:wrap;">
+        <span class="pill" style="background:rgba(54,198,226,.08);border:1px solid rgba(54,198,226,.2);color:var(--cyan);font-size:12px;padding:7px 14px;">
+          <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="14" height="14"> Gemini 2.0</span>
+        <span class="pill" style="background:rgba(147,51,234,.08);border:1px solid rgba(147,51,234,.2);color:var(--purple2);font-size:12px;padding:7px 14px;">
+          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="14" height="14"> Adaptive AI</span>
+        <span class="pill" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green);font-size:12px;padding:7px 14px;">
+          <img src="assets/svg/nucleo-glass/icon-circle-check.svg" width="14" height="14"> Personalized</span>
+      </div>
+    </div>
+
+    <div class="stagger" style="flex:0 0 305px;">
+      <div class="glass" style="padding:22px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);">Your roadmap</div>
+          <div style="font-size:9px;font-weight:800;color:var(--cyan);background:rgba(54,198,226,.1);border:1px solid rgba(54,198,226,.25);border-radius:8px;padding:3px 10px;letter-spacing:.06em;">Day 3 of 12</div>
+        </div>
+        <div class="rm-track">
+          <div class="rm-row">
+            <div class="rm-dot done"><img src="assets/svg/nucleo-glass/icon-circle-check.svg" width="20" height="20"></div>
+            <div><div class="rm-day">Day 1</div><div class="rm-title">Introduction</div></div>
+          </div>
+          <div class="rm-row">
+            <div class="rm-dot done"><img src="assets/svg/nucleo-glass/icon-circle-check.svg" width="20" height="20"></div>
+            <div><div class="rm-day">Day 2</div><div class="rm-title">Core Concepts</div></div>
+          </div>
+          <div class="rm-row">
+            <div class="rm-dot today"><img src="assets/svg/nucleo-glass/icon-flame-fire.svg" width="20" height="20"></div>
+            <div><div class="rm-day">Day 3 · Today</div><div class="rm-title today-t">Deep Dive <span class="rm-badge">NOW</span></div></div>
+          </div>
+          <div class="rm-row" style="opacity:.32;">
+            <div class="rm-dot"><img src="assets/svg/nucleo-glass/icon-lock.svg" width="16" height="16"></div>
+            <div><div class="rm-day">Day 4</div><div class="rm-title">Practice Sets</div></div>
+          </div>
+          <div class="rm-row" style="opacity:.32;">
+            <div class="rm-dot"><img src="assets/svg/nucleo-glass/icon-lock.svg" width="16" height="16"></div>
+            <div><div class="rm-day">Day 5</div><div class="rm-title">Review & Quiz</div></div>
+          </div>
+          <div class="rm-row" style="opacity:.32;">
+            <div class="rm-dot"><img src="assets/svg/nucleo-glass/icon-award-gold.svg" width="20" height="20"></div>
+            <div><div class="rm-day">Exam Day</div><div class="rm-title">You're ready.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     S4 · VIDEO DEMO
+══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s4" style="padding:40px 56px;">
+  <div class="stagger" style="position:relative;z-index:1;width:100%;max-width:1000px;display:flex;flex-direction:column;gap:18px;align-items:center;">
+    <div style="text-align:center;">
+      <div class="eyebrow" style="justify-content:center;">See it in action</div>
+      <h2 class="t-lg" style="margin-top:10px;">StudyQuest · Live Demo</h2>
+    </div>
+    <div style="width:100%;border-radius:20px;overflow:hidden;
+      border:1px solid rgba(17,86,174,.26);
+      box-shadow:
+        0 0 120px rgba(17,86,174,.22),
+        0 0 220px rgba(147,51,234,.1),
+        0 32px 80px rgba(0,0,0,.7);
+      background:#000;position:relative;">
+      <div style="position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:20px;
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);"></div>
+      <video id="demo-video" src="video.mp4" muted playsinline loop controls style="width:100%;display:block;"></video>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     S5 · FEATURES
+══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div style="position:relative;z-index:1;max-width:940px;width:100%;display:flex;flex-direction:column;gap:28px;">
+
+    <div class="stagger">
+      <div>
+        <div class="eyebrow">What it does</div>
+        <h2 class="t-xl" style="margin-top:12px;">Everything you <span class="grad">need.</span><br>
+          <span style="color:var(--muted);font-weight:300;font-size:.56em;letter-spacing:-.01em;">Nothing you don't.</span>
+        </h2>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" class="grid-in">
+      <div class="feat-card f1">
+        <div class="feat-icon" style="background:rgba(255,210,0,.1);">
+          <img src="assets/svg/nucleo-glass/icon-award-gold.svg" width="30" height="30">
+        </div>
+        <div>
+          <div class="feat-title">Gamification</div>
+          <div class="feat-desc">XP, streaks, badges, leaderboard. Studying feels like a game you actually want to play.</div>
+        </div>
+      </div>
+      <div class="feat-card f2">
+        <div class="feat-icon" style="background:rgba(54,198,226,.1);">
+          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="30" height="30">
+        </div>
+        <div>
+          <div class="feat-title">Spaced Repetition</div>
+          <div class="feat-desc">SM-2 algorithm schedules your reviews at the perfect moment. Long-term memory, guaranteed.</div>
+        </div>
+      </div>
+      <div class="feat-card f3">
+        <div class="feat-icon" style="background:rgba(34,197,94,.1);">
+          <img src="assets/svg/nucleo-glass/icon-eye.svg" width="30" height="30">
+        </div>
+        <div>
+          <div class="feat-title">Focus Mode</div>
+          <div class="feat-desc">Built-in Pomodoro timer. Rotate your phone to start. No friction, pure flow.</div>
+        </div>
+      </div>
+      <div class="feat-card f4">
+        <div class="feat-icon" style="background:rgba(147,51,234,.1);">
+          <img src="assets/svg/nucleo-glass/icon-link.svg" width="30" height="30">
+        </div>
+        <div>
+          <div class="feat-title">Braynr Sync</div>
+          <div class="feat-desc">Connect your Braynr stats. The AI recalculates your roadmap based on your real retention data.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     S6 · AI ENGINE
+══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
+
+    <!-- LEFT: text + insight rows -->
+    <div class="stagger" style="flex:1;display:flex;flex-direction:column;gap:24px;">
+      <div>
+        <div class="eyebrow">Powered by AI</div>
+        <h2 class="t-xl" style="margin-top:14px;">Gemini at the core.<br><span class="grad">Always adapting.</span></h2>
+        <p class="t-md" style="margin-top:16px;max-width:400px;">The AI watches your performance and recalibrates your roadmap in real time, every session.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div class="ai-insight-row">
+          <img src="assets/svg/nucleo-glass/icon-flame-fire.svg" width="22" height="22">
+          Personalized from day one
+        </div>
+        <div class="ai-insight-row">
+          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="22" height="22">
+          Re-generates when you fail
+        </div>
+        <div class="ai-insight-row">
+          <img src="assets/svg/nucleo-glass/icon-star-xp.svg" width="22" height="22">
+          Braynr-enhanced timing
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: hub diagram -->
+    <div class="stagger" style="flex:0 0 380px;">
+      <div class="ai-hub-wrap">
+
+        <!-- SVG connecting lines -->
+        <svg class="ai-hub-svg" viewBox="0 0 380 340" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lga" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#9333ea" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#36c6e2" stop-opacity=".55"/>
+            </linearGradient>
+            <linearGradient id="lgb" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#36c6e2" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#9333ea" stop-opacity=".55"/>
+            </linearGradient>
+          </defs>
+          <!-- center is at 190, 170 -->
+          <!-- TL node center ~68,36  TR ~312,36  BL ~68,310  BR ~312,310 -->
+          <line x1="190" y1="170" x2="100" y2="52"  stroke="url(#lga)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite"/>
+          <line x1="190" y1="170" x2="280" y2="52"  stroke="url(#lgb)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite 0.35s"/>
+          <line x1="190" y1="170" x2="100" y2="304" stroke="url(#lgb)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite 0.7s"/>
+          <line x1="190" y1="170" x2="280" y2="304" stroke="url(#lga)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite 1.05s"/>
+          <!-- glow dots at endpoints -->
+          <circle cx="100" cy="52"  r="3" fill="#9333ea" opacity=".7"/>
+          <circle cx="280" cy="52"  r="3" fill="#36c6e2" opacity=".7"/>
+          <circle cx="100" cy="304" r="3" fill="#36c6e2" opacity=".7"/>
+          <circle cx="280" cy="304" r="3" fill="#9333ea" opacity=".7"/>
+          <circle cx="190" cy="170" r="5" fill="#1a72e0" opacity=".5"/>
+        </svg>
+
+        <!-- Center: Gemini -->
+        <div class="ai-hub-center">
+          <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="30" height="30">
+          <span>Gemini 2.0</span>
+        </div>
+
+        <!-- TL: sources -->
+        <div class="ai-hub-node" style="top:16px;left:0;border-color:rgba(147,51,234,.3);background:rgba(147,51,234,.08);">
+          <img src="assets/svg/nucleo-glass/icon-book-open.svg" width="18" height="18"> Your sources
+        </div>
+        <!-- TR: profile -->
+        <div class="ai-hub-node" style="top:16px;right:0;border-color:rgba(54,198,226,.3);background:rgba(54,198,226,.07);">
+          <img src="assets/svg/nucleo-glass/icon-link.svg" width="18" height="18"> Braynr data
+        </div>
+        <!-- BL: roadmap -->
+        <div class="ai-hub-node" style="bottom:16px;left:0;border-color:rgba(54,198,226,.3);background:rgba(54,198,226,.07);">
+          <img src="assets/svg/nucleo-glass/icon-folder.svg" width="18" height="18"> Roadmap
+        </div>
+        <!-- BR: results -->
+        <div class="ai-hub-node" style="bottom:16px;right:0;border-color:rgba(255,210,0,.28);background:rgba(255,210,0,.05);">
+          <img src="assets/svg/nucleo-glass/icon-star-xp.svg" width="18" height="18"> Your results
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     S7 · CLOSING
+══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="s7-layout stagger">
+
+    <!-- LEFT: headline + copy + pills -->
+    <div class="s7-left">
+      <div><div class="eyebrow">DedSec &nbsp;·&nbsp; GDG 2026</div></div>
+
+      <div>
+        <h2 style="font-size:clamp(44px,5.8vw,82px);font-weight:900;line-height:0.92;letter-spacing:-0.04em;">
+          Stop<br>procrastinating.<br>
+          <span class="grad">Start Questing.</span>
+        </h2>
+      </div>
+
+      <div>
+        <p style="font-size:clamp(15px,1.6vw,20px);color:var(--muted2);max-width:420px;line-height:1.65;">
+          The only thing between you and your exam<br>
+          is knowing <strong style="color:var(--text);font-weight:800;">where to start.</strong>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: brand ring + info card -->
+    <div class="s7-right">
+
+      <div class="s7-ring-wrap">
+        <div class="s7-ring-outer"></div>
+        <div class="s7-ring-mid"></div>
+        <div class="s7-ring-core">
+          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="54" height="54" style="opacity:.95;">
+          <div class="s7-brand-name">StudyQuest</div>
+          <div class="s7-brand-sub">by DedSec</div>
+        </div>
+      </div>
+
+      <div class="s7-info-card">
+        <div class="s7-info-row">
+          <span class="s7-info-label">Team</span>
+          <span class="s7-info-value">DedSec</span>
+        </div>
+        <div class="s7-info-row">
+          <span class="s7-info-label">Event</span>
+          <span class="s7-info-value">GDG DevFest 2026</span>
+        </div>
+        <div class="s7-info-row">
+          <span class="s7-info-label">Platform</span>
+          <span class="s7-info-value" style="background:linear-gradient(90deg,#c084fc,#60b4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">iOS &amp; Android</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+  const slides  = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl  = document.getElementById('dots');
+  const curEl   = document.getElementById('cur');
+  const totEl   = document.getElementById('tot');
+  const fillEl  = document.getElementById('progress-bar-fill');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const N = slides.length;
+  let current = 0;
+
+  totEl.textContent = N;
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    const old = slides[current].querySelector('video');
+    if (old) { try { old.pause(); old.currentTime = 0; } catch(e){} }
+
+    current = Math.max(0, Math.min(N - 1, idx));
+    slides[current].classList.add('active');
+
+    const vid = slides[current].querySelector('video');
+    if (vid && vid.src) vid.play().catch(() => {});
+
+    curEl.textContent = current + 1;
+    fillEl.style.width = ((current + 1) / N * 100) + '%';
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current === N - 1;
+  }
+
+  const next = () => { if (current < N - 1) goTo(current + 1); };
+  const prev = () => { if (current > 0)     goTo(current - 1); };
+
+  btnNext.addEventListener('click', next);
+  btnPrev.addEventListener('click', prev);
+
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft','ArrowUp'].includes(e.key))         { e.preventDefault(); prev(); }
+  });
+  document.addEventListener('click', e => {
+    if (e.target.closest('#dots,.nav-btn,video,button')) return;
+    next();
+  });
+
+  goTo(0);
+</script>
+</body>
+</html>
