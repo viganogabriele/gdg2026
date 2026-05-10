@@ -36,9 +36,7 @@ export default function HomeScreen() {
     ? Math.max(1, Math.ceil(activeLevel.requiredStudyMinutes / 60 / (onboardingData.hoursPerWeek || 10) * 7))
     : 30;
 
-  const completedObjectivesCount = dailyObjectives.filter(o => o.completed).length;
   const challengeAvailable = !!activeLevel;
-  const challengeBoosted = dailyObjectives.length > 0 && completedObjectivesCount === dailyObjectives.length;
 
   const handleChallenge = () => {
     if (activeLevel) {
@@ -109,6 +107,7 @@ export default function HomeScreen() {
           requiredMinutes={activeLevel?.requiredStudyMinutes || 100}
           deadline={activeLevel?.deadline || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()}
           totalDays={levelTotalDays}
+          totalPoints={stats.totalPoints}
         />
 
         {/* Streak */}
@@ -125,7 +124,7 @@ export default function HomeScreen() {
             hasDueReviews={hasDueCards}
             dueReviewCount={dueCount}
             challengeAvailable={challengeAvailable}
-            challengeBoosted={challengeBoosted}
+
           />
         </View>
 

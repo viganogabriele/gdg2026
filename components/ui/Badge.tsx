@@ -32,18 +32,18 @@ export function BadgeDisplay({
       <View
         className={`rounded-lg items-center justify-center border-[1.5px] ${
           earned
-            ? 'bg-bg-tertiary border-accent-xp'
+            ? 'bg-bg-tertiary'
             : 'bg-bg-secondary border-border-subtle opacity-50'
         }`}
         style={[
           { width: sizeConfig.container, height: sizeConfig.container },
-          earned && { ...Shadow.glow, shadowColor: Colors.accent.xp },
+          earned && { ...Shadow.glow, borderColor: '#FFD000', shadowColor: '#FFD000' },
         ]}
       >
         <NucleoIcon
-          name={(earned ? icon : 'lock') as NucleoIconName}
+          name={icon as NucleoIconName}
           size={sizeConfig.icon}
-          className={!earned ? 'opacity-40' : undefined}
+          style={!earned ? { opacity: 0.25, tintColor: '#b8bbd6' } : undefined}
         />
       </View>
       <Text

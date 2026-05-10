@@ -122,7 +122,7 @@ function ActionButton({
     <AnimatedTouchable
       className={`flex-1 bg-bg-secondary rounded-lg p-lg items-center border relative ${disabled ? 'opacity-50' : ''}`}
       style={[
-        { borderColor: disabled ? Colors.border.subtle : `${color}44` },
+        { borderColor: disabled ? Colors.border.subtle : `${color}99` },
         animatedStyle,
       ]}
       onPress={() => {

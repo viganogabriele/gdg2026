@@ -3,7 +3,9 @@ import React from 'react';
 import { StyleProp } from 'react-native';
 
 export const NUCLEO_ICONS = {
+  'award-bronze': require('@/assets/svg/nucleo-glass/icon-award-bronze.svg'),
   'award-gold': require('@/assets/svg/nucleo-glass/icon-award-gold.svg'),
+  'award-silver': require('@/assets/svg/nucleo-glass/icon-award-silver.svg'),
   bell: require('@/assets/svg/nucleo-glass/icon-bell.svg'),
   'book-open': require('@/assets/svg/nucleo-glass/icon-book-open.svg'),
   calendar: require('@/assets/svg/nucleo-glass/icon-calendar.svg'),
