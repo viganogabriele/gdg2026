@@ -41,9 +41,9 @@ export function BadgeDisplay({
         ]}
       >
         <NucleoIcon
-          name={(earned ? icon : 'lock') as NucleoIconName}
+          name={icon as NucleoIconName}
           size={sizeConfig.icon}
-          className={!earned ? 'opacity-40' : undefined}
+          style={!earned ? { opacity: 0.25, tintColor: '#b8bbd6' } : undefined}
         />
       </View>
       <Text
