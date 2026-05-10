@@ -7,6 +7,7 @@ import {
   getDueCards,
   getCardsForSession,
   processAnswer,
+  processAnswerBool,
   createCard,
 } from '@/services/spacedRepetition';
 import type { QuizQuestion, SpacedRepetitionCard } from '@/types';
@@ -40,20 +41,37 @@ export function useSpacedRepetition() {
     [activeSubjectId, addSpacedRepCards]
   );
 
-  const reviewCard = useCallback(
-    (card: SpacedRepetitionCard, correct: boolean) => {
-      const updated = processAnswer(card, correct);
+  /**
+   * Primary review function — SM-2+ rating (0–5).
+   *   0 = wrong/blank  → review in 10 min
+   *   1 = wrong        → review tomorrow
+   *   2 = hard/wrong   → review in 2 days
+   *   3 = correct hard → same interval
+   *   4 = correct      → grow by EaseFactor
+   *   5 = perfect      → grow by EaseFactor × 1.1
+   */
+  const reviewCardRated = useCallback(
+    (card: SpacedRepetitionCard, rating: number) => {
+      const updated = processAnswer(card, rating);
       updateSpacedRepCard(updated);
 
-      if (correct) {
-        addPoints(5); // SPACED_REP_CORRECT
-      }
+      // Points proportional to quality
+      const pointsMap: Record<number, number> = { 0: 0, 1: 0, 2: 1, 3: 3, 4: 5, 5: 8 };
+      const pts = pointsMap[Math.max(0, Math.min(5, Math.round(rating)))] ?? 0;
+      if (pts > 0) addPoints(pts);
+    },
+    [updateSpacedRepCard, addPoints]
+  );
 
-      // If wrong, we need to schedule more reviews (card goes back to box 1)
-      if (!correct) {
-        // The processAnswer already moves to box 1, which schedules for tomorrow
-        // This naturally creates more review prompts
-      }
+  /**
+   * Backward-compatible boolean wrapper.
+   * correct=true → rating 4, correct=false → rating 1
+   */
+  const reviewCard = useCallback(
+    (card: SpacedRepetitionCard, correct: boolean) => {
+      const updated = processAnswerBool(card, correct);
+      updateSpacedRepCard(updated);
+      if (correct) addPoints(5);
     },
     [updateSpacedRepCard, addPoints]
   );
@@ -64,6 +82,7 @@ export function useSpacedRepetition() {
     hasDueCards,
     dueCount,
     addCardsFromQuiz,
-    reviewCard,
+    reviewCard,        // compat: bool
+    reviewCardRated,   // new: 0–5 rating
   };
 }

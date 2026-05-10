@@ -4,12 +4,11 @@
 import type { BraynrStudyProfile } from '@/services/braynrParser';
 import { minutesForPages } from '@/services/braynrParser';
 import type {
-  QuizQuestion,
-  StudyLevel,
-  DailyObjective,
-  SourceSection,
-  LevelTopic,
-  SourceRef,
+    DailyObjective,
+    LevelTopic,
+    QuizQuestion,
+    SourceSection,
+    StudyLevel
 } from '@/types';
 
 function uid(): string {
@@ -174,6 +173,10 @@ export function mockGenerateAssessment(
   for (let i = 0; i < count; i++) {
     const section = sections[i % sections.length];
     const template = questionTemplates[i % questionTemplates.length];
+    let difficulty: QuizQuestion['difficulty'] = 'medium';
+
+    if (i < Math.ceil(count * 0.4)) difficulty = 'easy';
+    else if (i >= Math.ceil(count * 0.75)) difficulty = 'hard';
 
     questions.push({
       id: uid(),
@@ -187,6 +190,7 @@ export function mockGenerateAssessment(
         label: section.title,
       },
       topicId: section.id,
+      difficulty,
     });
   }
 
