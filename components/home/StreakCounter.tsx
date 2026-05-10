@@ -67,12 +67,12 @@ export function StreakCounter({ currentStreak, longestStreak }: StreakCounterPro
             className={isActive ? 'opacity-100' : 'opacity-40'}
           />
         </Animated.View>
-        <View className="flex-1">
+        <View className="flex-1 flex-row items-baseline gap-sm">
           <Text className={`text-xxxl font-extrabold ${isActive ? 'text-accent-warning' : 'text-text-muted'}`}>
             {currentStreak}
           </Text>
-          <Text className="text-text-secondary text-sm font-medium mt-[-2px]">
-            day streak
+          <Text className={`text-md font-semibold ${isActive ? 'text-accent-warning' : 'text-text-muted'}`}>
+            Day Streak
           </Text>
         </View>
       </View>

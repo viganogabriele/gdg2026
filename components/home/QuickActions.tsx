@@ -1,12 +1,16 @@
 /**
  * Quick Actions — Challenge and Review action buttons
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withRepeat,
+  withSequence,
+  withTiming,
+  Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
@@ -45,7 +49,7 @@ export function QuickActions({
         subtitle={hasDueReviews ? `${dueReviewCount} cards due` : 'No reviews due'}
         onPress={onQuickReview}
         disabled={!hasDueReviews}
-        color={Colors.accent.secondary}
+        color="#FFD700"
         badge={hasDueReviews ? dueReviewCount : undefined}
       />
     </View>
@@ -70,10 +74,53 @@ function ActionButton({
   badge?: number;
 }) {
   const scale = useSharedValue(1);
+  const iconScale = useSharedValue(1);
+  const iconRotation = useSharedValue(0);
+
+  useEffect(() => {
+    if ((iconName === 'rocket' || iconName === 'sparkle') && !disabled) {
+      iconScale.value = withRepeat(
+        withSequence(
+          withTiming(1.15, { duration: 600, easing: Easing.inOut(Easing.ease) }),
+          withTiming(1, { duration: 600, easing: Easing.inOut(Easing.ease) })
+        ),
+        -1,
+        true
+      );
+      iconRotation.value = withRepeat(
+        withSequence(
+          withTiming(3, { duration: 400 }),
+          withTiming(-3, { duration: 400 }),
+          withTiming(0, { duration: 200 })
+        ),
+        -1,
+        true
+      );
+    }
+  }, [iconName, disabled]);
+
+  const iconStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: iconScale.value },
+      { rotate: `${iconRotation.value}deg` },
+    ],
+  }));
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
+
+  const isRocket = iconName === 'rocket';
+  const isSparkle = iconName === 'sparkle';
+  const resolvedIconName = disabled
+    ? iconName
+    : isRocket
+    ? 'rocket-blue'
+    : isSparkle
+    ? 'sparkle-yellow'
+    : iconName;
+
+  const shouldAnimate = (isRocket || isSparkle) && !disabled;
 
   return (
     <AnimatedTouchable
@@ -96,9 +143,18 @@ function ActionButton({
       activeOpacity={0.7}
     >
       <View className="mb-sm">
-        <NucleoIcon name={disabled ? iconName : iconName === 'rocket' ? 'rocket-blue' : iconName} size={28} />
+        {shouldAnimate ? (
+          <Animated.View style={iconStyle}>
+            <NucleoIcon name={resolvedIconName} size={28} />
+          </Animated.View>
+        ) : (
+          <NucleoIcon name={resolvedIconName} size={28} />
+        )}
       </View>
-      <Text className={`text-md font-semibold ${disabled ? 'text-text-muted' : 'text-text-primary'}`}>
+      <Text
+        className={`text-md font-semibold ${disabled ? 'text-text-muted' : ''}`}
+        style={!disabled ? { color } : undefined}
+      >
         {title}
       </Text>
       <Text className="text-text-muted text-xs mt-xs text-center">{subtitle}</Text>
