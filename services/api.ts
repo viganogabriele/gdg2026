@@ -118,10 +118,12 @@ export async function generateLevelQuiz(
   levelId: string,
   levelTitle: string,
   topics: LevelTopic[],
-  count: number = 8
+  count: number = 8,
+  flaggedObjectives?: DailyObjective[],
+  sources?: Source[]
 ): Promise<{ questions: QuizQuestion[] }> {
   return withFallback(
-    (provider) => geminiGenerateLevelQuiz(levelId, levelTitle, topics, count, provider),
+    (provider) => geminiGenerateLevelQuiz(levelId, levelTitle, topics, count, provider, flaggedObjectives, sources),
     () => ({ questions: mockGenerateLevelQuiz(levelTitle, topics, count) }),
     'generateLevelQuiz'
   );

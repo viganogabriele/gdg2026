@@ -1,20 +1,21 @@
 /**
  * Quick Actions — Challenge and Review action buttons
  */
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withRepeat,
-  withSequence,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
+import * as Haptics from 'expo-haptics';
+import React, { useEffect } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -38,10 +39,11 @@ export function QuickActions({
       <ActionButton
         iconName="rocket-blue"
         title="Take Challenge"
-        subtitle={challengeAvailable ? 'Test your knowledge' : 'No challenge available'}
+        subtitle={challengeAvailable ? 'Test what you studied today' : 'Flag an objective to start'}
         onPress={onTakeChallenge}
         disabled={!challengeAvailable}
         color={Colors.accent.primary}
+
       />
       <ActionButton
         iconName="sparkle-yellow"
@@ -112,13 +114,7 @@ function ActionButton({
 
   const isRocket = iconName === 'rocket-blue';
   const isSparkle = iconName === 'sparkle-yellow';
-  const resolvedIconName = disabled
-    ? iconName
-    : isRocket
-    ? 'rocket-blue'
-    : isSparkle
-    ? 'sparkle-yellow'
-    : iconName;
+  const resolvedIconName = iconName;
 
   const shouldAnimate = (isRocket || isSparkle) && !disabled;
 

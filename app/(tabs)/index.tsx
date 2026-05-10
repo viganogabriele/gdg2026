@@ -34,6 +34,10 @@ export default function HomeScreen() {
     ? Math.max(1, Math.ceil(activeLevel.requiredStudyMinutes / 60 / (onboardingData.hoursPerWeek || 10) * 7))
     : 30;
 
+  const completedObjectivesCount = dailyObjectives.filter(o => o.completed).length;
+  const challengeAvailable = !!activeLevel;
+  const challengeBoosted = dailyObjectives.length > 0 && completedObjectivesCount === dailyObjectives.length;
+
   const handleChallenge = () => {
     if (activeLevel) {
       router.push(`/quiz/${activeLevel.id}`);
@@ -87,7 +91,8 @@ export default function HomeScreen() {
             onQuickReview={handleQuickReview}
             hasDueReviews={hasDueCards}
             dueReviewCount={dueCount}
-            challengeAvailable={!!activeLevel}
+            challengeAvailable={challengeAvailable}
+            challengeBoosted={challengeBoosted}
           />
         </View>
 
