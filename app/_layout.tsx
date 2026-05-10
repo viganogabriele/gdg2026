@@ -55,23 +55,27 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!tiltToFocusEnabled || !isHomeTab) return;
+    try {
 
-    Accelerometer.setUpdateInterval(500);
+      Accelerometer.setUpdateInterval(500);
 
-    const subscription = Accelerometer.addListener(({ x, y }) => {
-      const isLandscape = Math.abs(x) > 0.75 && Math.abs(y) < 0.5;
-      const isPortrait = Math.abs(y) > 0.75 && Math.abs(x) < 0.5;
+      const subscription = Accelerometer.addListener(({ x, y }) => {
+        const isLandscape = Math.abs(x) > 0.75 && Math.abs(y) < 0.5;
+        const isPortrait = Math.abs(y) > 0.75 && Math.abs(x) < 0.5;
 
-      if (isLandscape && lastOrientation.current !== 'landscape') {
-        lastOrientation.current = 'landscape';
-        const dir = x > 0 ? 'right' : 'left';
-        router.push({ pathname: '/focus', params: { dir } });
-      } else if (isPortrait && lastOrientation.current !== 'portrait') {
-        lastOrientation.current = 'portrait';
-      }
-    });
+        if (isLandscape && lastOrientation.current !== 'landscape') {
+          lastOrientation.current = 'landscape';
+          const dir = x > 0 ? 'right' : 'left';
+          router.push({ pathname: '/focus', params: { dir } });
+        } else if (isPortrait && lastOrientation.current !== 'portrait') {
+          lastOrientation.current = 'portrait';
+        }
+      });
 
-    return () => subscription.remove();
+      return () => subscription.remove();
+    } catch (e) {
+      return () => { };
+    }
   }, [pathname, router, tiltToFocusEnabled, isHomeTab]);
 
   return (
