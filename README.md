@@ -21,8 +21,7 @@ It is **not** a chatbot or AI tutor. The student is in control. The AI is the co
 ### Prerequisites
 
 - Node.js 18+
-- `npm` or `yarn`
-- [Expo Go](https://expo.dev/go) on your phone, or a simulator/emulator
+- `npm`
 
 ### Clone & install
 
@@ -45,15 +44,12 @@ cp .env.example .env.local
 | `EXPO_PUBLIC_GEMINI_API_KEY` | [Google Cloud Console](https://console.cloud.google.com/) → APIs → Generative Language API | ✅ Primary |
 | `EXPO_PUBLIC_OPEN_ROUTER_API_KEY` | [openrouter.ai/keys](https://openrouter.ai/keys) | ⬜ Fallback |
 
-> Variables must be prefixed `EXPO_PUBLIC_` to be accessible in the client bundle. If both keys are absent the app falls back to deterministic local mock data — the demo always works.
+> If no keys are provided, the app will still work with mock data — but the AI-generated roadmap and quiz will be generic and not personalised to the subject.
 
 ### Run
 
 ```bash
 npx expo start          # scan QR with Expo Go
-npx expo start --web    # browser
-npx expo start --ios    # iOS simulator
-npx expo start --android
 ```
 
 ---
@@ -114,74 +110,3 @@ api.generateAssessment()
   └─ 3. Mock data   (local, always available)
          → deterministic generators keyed by subject title
 ```
-
-Console logs `✅ / ⚠️ / 📦` so you can see which tier served each call.
-
----
-
-## Cognitive Design Choices
-
-### 1. Student control, AI as silent coach
-The design principle is explicit: *"It is not a chatbot or an AI tutor. The app needs to make the student feel 'in control'."* Every AI output — roadmap, quiz, daily objectives — is presented as the student's own plan to execute. The AI disappears after onboarding. There is no chat interface.
-
-### 2. Assessment-first personalisation
-Before generating the roadmap, the app runs a 12-question knowledge quiz. A student who already knows 70% of Calculus skips the first two levels and starts at Derivatives — not Limits. This avoids the one-size-fits-all trap that makes most study apps feel irrelevant after day one.
-
-### 3. Source-centric knowledge ranking
-Topics are derived from the student's actual materials, not a generic syllabus. Quiz questions and roadmap levels reference specific page ranges from the uploaded sources — so "study pages 45–80" means something the student already has in front of them.
-
-### 4. Levels as psychological anchors (goal-gradient effect)
-The roadmap uses discrete, completable levels with quiz gates rather than a continuous progress bar. Each level has its own deadline. This exploits the [goal-gradient effect](https://en.wikipedia.org/wiki/Goal-gradient_hypothesis): motivation accelerates as you approach a level completion. Failing a level pushes future deadlines forward — failure is recoverable, not catastrophic.
-
-### 5. Spaced repetition as a warm-up, not a feature
-The daily 3–5 question spaced-review session appears as the first item in today's objectives, not buried in a tab. Short by design (~5 minutes). The Leitner box algorithm (boxes 1–5, intervals 1/3/7/14/30 days) is entirely local — no network call, instant.
-
-### 6. Gamification that respects cognitive load
-Points, streaks, and badges exist but are secondary to the roadmap. The leaderboard from the original spec was deliberately removed — competitive pressure during exam prep is net-negative for most students. Streaks and badges reward consistency, not performance ranking.
-
-### 7. Focus mode as environmental design
-Rotating the phone to landscape triggers a minimal full-screen view: current topic title, source reference, and a Pomodoro timer. No navigation chrome, no points, no notifications. The environment itself enforces the session — a physical affordance, not a software lock.
-
----
-
-## Tech Stack
-
-| Layer | Choice | Rationale |
-|---|---|---|
-| Framework | Expo 54 / React Native 0.81 | iOS + Android + Web from one codebase |
-| Routing | Expo Router (file-based) | Typed routes, clean modal flows |
-| State | Zustand + AsyncStorage | Lightweight, persists across sessions |
-| AI primary | Google Gemini 2.0 Flash via `@google/generative-ai` SDK | Fast, cheap, native structured output |
-| AI fallback | OpenRouter → `google/gemini-2.0-flash-001` | Same model, different auth — maximises uptime |
-| Structured output | `responseSchema` + `responseMimeType: application/json` | Zero fragile parsing; Gemini returns type-safe JSON |
-| Animations | React Native Reanimated 4 | 60 fps on the UI thread |
-| Styling | NativeWind (Tailwind) + custom design tokens | Consistent dark-mode system |
-| Notifications | Expo Notifications | Cross-platform local push |
-
----
-
-## What We'd Do With Another Week
-
-### Real source ingestion
-The source picker accepts PDFs and URLs but doesn't extract text — AI content is generated from the subject title alone. Fix: pipe PDFs through Gemini's multimodal `inlineData`; scrape URLs via a lightweight server function. Quiz questions would then reference actual passages.
-
-### Streaming responses
-The processing screen blocks for 5–15 seconds. `streamGenerateContent` would let us stream topic sections as they're produced — watching the roadmap appear node by node is far more compelling for a demo.
-
-### Adaptive rescheduling via AI
-`adjustRoadmap` is currently dumb local logic (±2 days). Better: send the full context — quiz history, available hours, remaining deadline, topic dependency graph — and let Gemini reason about the optimal reschedule.
-
-### Multi-subject dashboard
-The store and types already support `subjects: Subject[]`. The UI only creates one. A subject switcher and unified daily objectives view is 2–3 days of UI work on top of infrastructure that's already there.
-
-### Push notification scheduling
-`notifications.ts` exists but is never called. Daily reminders, 24h deadline alerts, and streak-at-risk warnings are half a day to wire up — the Expo Notifications infrastructure is already installed.
-
-### Backend + authentication
-API keys live in the client bundle — fine for a demo, unacceptable for production. A lightweight backend (Cloudflare Workers or Next.js API routes) would proxy Gemini calls, enforce per-user rate limits, and persist progress server-side so data survives reinstalls.
-
----
-
-## Acknowledgements
-
-Built with [Expo](https://expo.dev) · Powered by [Google Gemini](https://ai.google.dev) · Presented at GDG 2026
