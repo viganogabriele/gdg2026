@@ -14,9 +14,9 @@ interface TimelineViewProps {
   onTakeQuiz: (level: StudyLevel) => void;
 }
 
-// Gradient: pink (#db57c3) → cyan (#36c6e2) → blue (#1156ae)
+// Gradient: violet (#9333ea) → cyan (#36c6e2) → blue (#1156ae)
 const GRADIENT_STOPS = [
-  { r: 0xdb, g: 0x57, b: 0xc3 },
+  { r: 0x93, g: 0x33, b: 0xea },
   { r: 0x36, g: 0xc6, b: 0xe2 },
   { r: 0x11, g: 0x56, b: 0xae },
 ];
@@ -54,7 +54,7 @@ export function TimelineView({ levels, onLevelPress, onTakeQuiz }: TimelineViewP
         <View className="h-[6px] bg-bg-tertiary rounded-[3px] mt-md">
           {overallProgress > 0 && (
             <LinearGradient
-              colors={['#db57c3', '#36c6e2', '#1156ae']}
+              colors={['#9333ea', '#36c6e2', '#1156ae']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={{
