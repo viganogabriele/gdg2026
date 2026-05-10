@@ -19,8 +19,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const STEPS: { label: string; icon: NucleoIconName }[] = [
   { label: 'Analyzing your sources...', icon: 'book-open' },
   { label: 'Mapping topic dependencies...', icon: 'folder' },
-  { label: 'Generating assessment questions...', icon: 'award' },
-  { label: 'Almost ready!', icon: 'sparkle' },
+  { label: 'Generating assessment questions...', icon: 'award-gold' },
+  { label: 'Almost ready!', icon: 'sparkle-yellow' },
 ];
 
 export default function ProcessingScreen() {

@@ -1,24 +1,23 @@
 /**
  * Zustand Store — Central state management with AsyncStorage persistence
  */
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BadgeDefinitions, Points } from '@/constants/gamification';
 import type {
-  Subject,
-  Source,
-  StudyLevel,
-  Quiz,
-  QuizQuestion,
-  UserStats,
-  DailyObjective,
-  SpacedRepetitionCard,
-  StudySession,
-  NotificationPreferences,
-  SourceSection,
   Badge,
+  DailyObjective,
+  NotificationPreferences,
+  Quiz,
+  Source,
+  SourceSection,
+  SpacedRepetitionCard,
+  StudyLevel,
+  StudySession,
+  Subject,
+  UserStats
 } from '@/types';
-import { Points, BadgeDefinitions } from '@/constants/gamification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 function uid(): string {
   return Math.random().toString(36).substring(2, 11);
 }
@@ -54,6 +53,7 @@ interface StudyState {
   activeQuiz: Quiz | null;
   currentDayIndex: number;
   dayAdvanceReady: boolean;
+  sessionFocusTime: number; // Time in seconds spent in focus mode this app session
 
   // Actions — Onboarding
   setOnboardingSubject: (title: string) => void;
@@ -87,6 +87,7 @@ interface StudyState {
   // Actions — Sessions
   startSession: (session: StudySession) => void;
   endSession: (sessionId: string) => void;
+  incrementSessionFocusTime: () => void;
 
   // Actions — Spaced Repetition
   addSpacedRepCards: (cards: SpacedRepetitionCard[]) => void;
@@ -123,6 +124,7 @@ const initialNotificationPrefs: NotificationPreferences = {
   deadlineWarnings: true,
   streakWarnings: true,
   challengeNotifications: true,
+  tiltToFocusEnabled: true,
 };
 
 // ─── Store Definition ───────────────────────────────────────────────
@@ -152,6 +154,7 @@ export const useStudyStore = create<StudyState>()(
       activeQuiz: null,
       currentDayIndex: 0,
       dayAdvanceReady: false,
+      sessionFocusTime: 0,
 
       // ─── Onboarding Actions ─────────────────────────────────────
       setOnboardingSubject: (title) =>
@@ -229,11 +232,11 @@ export const useStudyStore = create<StudyState>()(
           levels: state.levels.map((l) =>
             l.id === levelId
               ? {
-                  ...l,
-                  status: 'failed' as const,
-                  quizAttempts: l.quizAttempts + 1,
-                  lastQuizScore: score,
-                }
+                ...l,
+                status: 'failed' as const,
+                quizAttempts: l.quizAttempts + 1,
+                lastQuizScore: score,
+              }
               : l
           ),
         })),
@@ -275,6 +278,10 @@ export const useStudyStore = create<StudyState>()(
             totalPoints:
               state.stats.totalPoints +
               (completing ? Points.STUDY_SESSION_COMPLETE : -Points.STUDY_SESSION_COMPLETE),
+            totalStudyMinutes: Math.max(
+              0,
+              state.stats.totalStudyMinutes + (completing ? minutes : -minutes)
+            ),
           },
           levels: state.levels.map((l) => {
             if (l.id !== activeLevelId) return l;
@@ -382,7 +389,7 @@ export const useStudyStore = create<StudyState>()(
         const endedAt = new Date().toISOString();
         const duration = Math.round(
           (new Date(endedAt).getTime() - new Date(session.startedAt).getTime()) /
-            60000
+          60000
         );
 
         set((s) => ({
@@ -406,6 +413,8 @@ export const useStudyStore = create<StudyState>()(
         get().updateStreak();
         get().checkBadgeEligibility();
       },
+
+      incrementSessionFocusTime: () => set((state) => ({ sessionFocusTime: state.sessionFocusTime + 1 })),
 
       // ─── Spaced Repetition Actions ──────────────────────────────
       addSpacedRepCards: (cards) =>
@@ -564,6 +573,7 @@ export const useStudyStore = create<StudyState>()(
           activeQuiz: null,
           currentDayIndex: 0,
           dayAdvanceReady: false,
+          sessionFocusTime: 0,
         }),
     }),
     {

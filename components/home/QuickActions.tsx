@@ -39,7 +39,7 @@ export function QuickActions({
   return (
     <View className="flex-row gap-md">
       <ActionButton
-        iconName="rocket"
+        iconName="rocket-blue"
         title="Take Challenge"
         subtitle={challengeAvailable ? 'Test what you studied today' : 'Flag an objective to start'}
         onPress={onTakeChallenge}
@@ -48,7 +48,7 @@ export function QuickActions({
         boosted={challengeBoosted}
       />
       <ActionButton
-        iconName="sparkle"
+        iconName="sparkle-yellow"
         title="Quick Review"
         subtitle={hasDueReviews ? `${dueReviewCount} cards due` : 'No reviews due'}
         onPress={onQuickReview}
@@ -84,7 +84,7 @@ function ActionButton({
   const iconRotation = useSharedValue(0);
 
   useEffect(() => {
-    if (((iconName === 'rocket' && boosted) || iconName === 'sparkle') && !disabled) {
+    if ((iconName === 'rocket-blue' || iconName === 'sparkle-yellow') && !disabled) {
       iconScale.value = withRepeat(
         withSequence(
           withTiming(1.15, { duration: 600, easing: Easing.inOut(Easing.ease) }),
@@ -120,15 +120,9 @@ function ActionButton({
     transform: [{ scale: scale.value }],
   }));
 
-  const isRocket = iconName === 'rocket';
-  const isSparkle = iconName === 'sparkle';
-  const resolvedIconName = disabled
-    ? iconName
-    : isRocket
-      ? (boosted ? 'rocket-red' : iconName)
-      : isSparkle
-        ? 'sparkle-yellow'
-        : iconName;
+  const isRocket = iconName === 'rocket-blue';
+  const isSparkle = iconName === 'sparkle-yellow';
+  const resolvedIconName = (isRocket && boosted) ? 'rocket-red' as NucleoIconName : iconName;
 
   const shouldAnimate = ((isRocket && boosted) || isSparkle) && !disabled;
 
@@ -136,7 +130,7 @@ function ActionButton({
     <AnimatedTouchable
       className={`flex-1 bg-bg-secondary rounded-lg p-lg items-center border relative ${disabled ? 'opacity-50' : ''}`}
       style={[
-        { borderColor: disabled ? Colors.border.subtle : `${color}44` },
+        { borderColor: disabled ? Colors.border.subtle : `${color}99` },
         animatedStyle,
       ]}
       onPress={() => {

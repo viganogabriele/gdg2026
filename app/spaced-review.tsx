@@ -78,7 +78,7 @@ export default function SpacedReviewScreen() {
         <View className="flex-1 justify-center items-center p-xxl">
           <View className="mb-lg">
             <NucleoIcon
-              name={questions.length === 0 ? 'circle-check' : 'sparkle'}
+              name={questions.length === 0 ? 'circle-check' : 'sparkle-yellow'}
               size={64}
             />
           </View>
@@ -108,7 +108,7 @@ export default function SpacedReviewScreen() {
     <SafeAreaView className="flex-1 bg-bg-primary">
       <View className="flex-row justify-between items-center px-lg py-md">
         <View className="flex-row items-center gap-sm">
-          <NucleoIcon name="sparkle" size={20} />
+          <NucleoIcon name="sparkle-yellow" size={20} />
           <Text className="text-text-primary text-lg font-bold">Quick Review</Text>
         </View>
         <Button title="Skip" variant="ghost" onPress={() => router.back()} />

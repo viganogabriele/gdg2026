@@ -47,7 +47,7 @@ export default function ProfileScreen() {
         <View className="flex-row flex-wrap gap-md mb-xxl">
           <StatCard iconName="calendar" label="Study Time" value={formatHours(stats.totalStudyMinutes)} />
           <StatCard iconName="star-xp" label="Total XP" value={String(stats.totalPoints)} />
-          <StatCard iconName="folder" label="Levels Done" value={String(stats.levelsCompleted)} />
+          <StatCard iconName="award-gold" label="Levels Done" value={String(stats.levelsCompleted)} />
           <StatCard iconName="flame-fire" label="Best Streak" value={`${stats.longestStreak}d`} />
         </View>
 
@@ -67,19 +67,20 @@ export default function ProfileScreen() {
 
         {/* Badges */}
         <View className="flex-row items-center gap-sm mb-md mt-lg">
-          <NucleoIcon name="star-xp" size={18} />
+          <NucleoIcon name="award-gold" size={18} />
           <Text className="text-text-primary text-lg font-bold">Badges</Text>
         </View>
-        <View className="flex-row flex-wrap gap-md mb-lg">
+        <View className="flex-row flex-wrap mb-lg" style={{ gap: 12 }}>
           {BadgeDefinitions.map((def) => (
-            <BadgeDisplay
-              key={def.id}
-              icon={def.icon}
-              title={def.title}
-              description={def.description}
-              earned={earnedBadgeIds.has(def.id)}
-              size="md"
-            />
+            <View key={def.id} style={{ width: '30%', flexGrow: 1 }}>
+              <BadgeDisplay
+                icon={def.icon}
+                title={def.title}
+                description={def.description}
+                earned={earnedBadgeIds.has(def.id)}
+                size="md"
+              />
+            </View>
           ))}
         </View>
 
@@ -97,6 +98,8 @@ export default function ProfileScreen() {
             onChange={(v) => updatePrefs({ streakWarnings: v })} />
           <SettingRow label="Challenge Alerts" value={prefs.challengeNotifications}
             onChange={(v) => updatePrefs({ challengeNotifications: v })} />
+          <SettingRow label="Tilt to Focus" value={prefs.tiltToFocusEnabled}
+            onChange={(v) => updatePrefs({ tiltToFocusEnabled: v })} last />
         </Card>
 
         {/* Danger Zone */}
@@ -118,9 +121,9 @@ function StatCard({ iconName, label, value }: { iconName: NucleoIconName; label:
   );
 }
 
-function SettingRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+function SettingRow({ label, value, onChange, last }: { label: string; value: boolean; onChange: (v: boolean) => void; last?: boolean }) {
   return (
-    <View className="flex-row justify-between items-center py-md border-b border-border-subtle">
+    <View className={`flex-row justify-between items-center py-md ${last ? '' : 'border-b border-border-subtle'}`}>
       <Text className="text-text-primary text-md">{label}</Text>
       <Switch value={value} onValueChange={onChange}
         trackColor={{ false: Colors.bg.tertiary, true: Colors.accent.primary }}

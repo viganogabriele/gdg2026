@@ -11,7 +11,8 @@ import { View } from 'react-native';
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   const icons: Record<string, NucleoIconName> = {
     home: 'house',
-    roadmap: 'folder',
+    roadmap: 'calendar',
+    leaderboard: 'award-gold',
     profile: 'face-grin',
   };
   return (
@@ -71,6 +72,13 @@ export default function TabLayout() {
         options={{
           title: 'Roadmap',
           tabBarIcon: ({ focused }) => <TabIcon name="roadmap" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="leaderboard"
+        options={{
+          title: 'Ranking',
+          tabBarIcon: ({ focused }) => <TabIcon name="leaderboard" focused={focused} />,
         }}
       />
       <Tabs.Screen

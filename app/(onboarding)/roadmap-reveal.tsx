@@ -116,7 +116,7 @@ export default function RoadmapRevealScreen() {
         <Animated.View entering={FadeInDown.delay(400 + levels.length * 150)} className="mt-xxxl pb-xxl">
           <Button
             title="Start Studying!"
-            icon={<NucleoIcon name="rocket" size={18} />}
+            icon={<NucleoIcon name="rocket-blue" size={18} />}
             onPress={handleStart}
             fullWidth
             size="lg"

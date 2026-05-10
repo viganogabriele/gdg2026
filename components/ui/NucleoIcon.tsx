@@ -3,24 +3,25 @@ import React from 'react';
 import { StyleProp } from 'react-native';
 
 export const NUCLEO_ICONS = {
-  award: require('@/assets/svg/nucleo-glass/icon-award.svg'),
+  'award-bronze': require('@/assets/svg/nucleo-glass/icon-award-bronze.svg'),
+  'award-gold': require('@/assets/svg/nucleo-glass/icon-award-gold.svg'),
+  'award-silver': require('@/assets/svg/nucleo-glass/icon-award-silver.svg'),
   bell: require('@/assets/svg/nucleo-glass/icon-bell.svg'),
   'book-open': require('@/assets/svg/nucleo-glass/icon-book-open.svg'),
   calendar: require('@/assets/svg/nucleo-glass/icon-calendar.svg'),
   'circle-check': require('@/assets/svg/nucleo-glass/icon-circle-check.svg'),
   dial: require('@/assets/svg/nucleo-glass/icon-dial.svg'),
   'face-grin': require('@/assets/svg/nucleo-glass/icon-face-grin.svg'),
-  flame: require('@/assets/svg/nucleo-glass/icon-flame.svg'),
   'flame-fire': require('@/assets/svg/nucleo-glass/icon-flame-fire.svg'),
   folder: require('@/assets/svg/nucleo-glass/icon-folder.svg'),
   house: require('@/assets/svg/nucleo-glass/icon-house.svg'),
   link: require('@/assets/svg/nucleo-glass/icon-link.svg'),
   lock: require('@/assets/svg/nucleo-glass/icon-lock.svg'),
-  rocket: require('@/assets/svg/nucleo-glass/icon-rocket.svg'),
+  'rocket-blue': require('@/assets/svg/nucleo-glass/icon-rocket-blue.svg'),
   'rocket-red': require('@/assets/svg/nucleo-glass/icon-rocket-red.svg'),
-  sparkle: require('@/assets/svg/nucleo-glass/icon-sparkle.svg'),
+  'paper-plane': require('@/assets/svg/nucleo-glass/icon-paper-plane.svg'),
+  share: require('@/assets/svg/nucleo-glass/icon-share.svg'),
   'sparkle-yellow': require('@/assets/svg/nucleo-glass/icon-sparkle-yellow.svg'),
-  star: require('@/assets/svg/nucleo-glass/icon-star.svg'),
   'star-xp': require('@/assets/svg/nucleo-glass/icon-star-xp.svg'),
 } as const;
 
