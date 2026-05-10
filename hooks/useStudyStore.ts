@@ -3,6 +3,7 @@
  */
 import { BadgeDefinitions, Points } from '@/constants/gamification';
 import type { BraynrStudyProfile } from '@/services/braynrParser';
+import { estimateObjectiveMinutes } from '@/services/roadmapEstimates';
 import type {
   Badge,
   DailyObjective,
@@ -325,6 +326,11 @@ export const useStudyStore = create<StudyState>()(
         }
 
         const topic = activeLevel.topics[dayIndex];
+        const objectiveMinutes = estimateObjectiveMinutes(
+          activeLevel.requiredStudyMinutes,
+          Math.max(1, topic.arguments.length),
+          get().studyProfile?.avgSessionMinutes,
+        );
         const newObjectives: DailyObjective[] = topic.arguments.map((arg) => ({
           id: uid(),
           title: `${topic.title}: ${arg}`,
@@ -332,7 +338,7 @@ export const useStudyStore = create<StudyState>()(
           sourceRefs: topic.sourceRefs,
           type: 'study' as const,
           completed: false,
-          estimatedMinutes: 30,
+          estimatedMinutes: objectiveMinutes,
           levelId: activeLevel.id,
           topicId: topic.id,
         }));

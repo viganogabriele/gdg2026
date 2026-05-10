@@ -41,7 +41,7 @@ export function parseBraynrJson(raw: unknown): BraynrStudyProfile {
   const books: BraynrBook[] = json?.books ?? [];
 
   // ── Reading speed from keyword timestamps ─────────────────────────
-  let pagesPerHour = 6; // sensible default
+  let pagesPerHour = 10; // sensible default
   let totalReadingMinutes = 0;
 
   for (const book of books) {
@@ -118,4 +118,16 @@ export function minutesForPages(
   const difficultyMultiplier = 1 + profile.difficultyRatio * 0.5;
   const retentionPenalty = 1 + (1 - profile.retentionRate) * 0.3;
   return Math.round(readingMin * difficultyMultiplier * retentionPenalty);
+}
+
+export function adjustMinutesToStudyProfile(
+  baseMinutes: number,
+  profile: BraynrStudyProfile
+): number {
+  const baselinePagesPerHour = 10;
+  const paceMultiplier = Math.min(1.85, Math.max(0.75, baselinePagesPerHour / profile.pagesPerHour));
+  const difficultyMultiplier = 1 + profile.difficultyRatio * 0.5;
+  const retentionPenalty = 1 + (1 - profile.retentionRate) * 0.3;
+
+  return Math.round(baseMinutes * paceMultiplier * difficultyMultiplier * retentionPenalty);
 }

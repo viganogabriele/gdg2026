@@ -2,11 +2,13 @@
  * Mock data generator — realistic AI responses for all endpoints
  */
 import type { BraynrStudyProfile } from '@/services/braynrParser';
-import { minutesForPages } from '@/services/braynrParser';
+import { adjustMinutesToStudyProfile } from '@/services/braynrParser';
+import { estimateObjectiveMinutes } from '@/services/roadmapEstimates';
 import type {
     DailyObjective,
     LevelTopic,
     QuizQuestion,
+    Source,
     SourceSection,
     StudyLevel
 } from '@/types';
@@ -106,7 +108,6 @@ export function mockAnalyzeSources(subjectTitle: string): {
   const sections: SourceSection[] = topics.map((title, i) => ({
     id: uid(),
     title,
-    pageRange: [(i * 30) + 1, (i + 1) * 30] as [number, number],
     summary: `Covers the fundamentals of ${title.toLowerCase()} including key concepts, formulas, and applications.`,
   }));
 
@@ -230,9 +231,7 @@ export function mockGenerateRoadmap(
           {
             sourceId: 'source_1',
             sectionId: section.id,
-            label: section.pageRange
-              ? `Pages ${section.pageRange[0]}-${section.pageRange[1]}`
-              : section.title,
+            label: section.title,
           },
         ],
         completed: i < skipLevels,
@@ -249,9 +248,7 @@ export function mockGenerateRoadmap(
           {
             sourceId: 'source_1',
             sectionId: section.id,
-            label: section.pageRange
-              ? `Pages ${section.pageRange[0]}-${section.pageRange[1]}`
-              : section.title,
+            label: section.title,
           },
         ],
         completed: i < skipLevels,
@@ -269,7 +266,7 @@ export function mockGenerateRoadmap(
       completedAt: i < skipLevels ? now.toISOString() : undefined,
       quizAttempts: 0,
       requiredStudyMinutes: studyProfile
-        ? minutesForPages(section.pageRange ? section.pageRange[1] - section.pageRange[0] + 1 : 30, studyProfile)
+        ? adjustMinutesToStudyProfile(120 + Math.floor(Math.random() * 60), studyProfile)
         : 120 + Math.floor(Math.random() * 60),
       completedStudyMinutes: i < skipLevels ? 120 : 0,
     } as StudyLevel;
@@ -281,6 +278,12 @@ export function mockGenerateRoadmap(
   if (activeLevel) {
     const firstTopic = activeLevel.topics[0];
     const args = firstTopic?.arguments || ['Key concepts', 'Practice problems', 'Applications'];
+    const objectiveMinutes = estimateObjectiveMinutes(
+      activeLevel.requiredStudyMinutes,
+      Math.max(1, args.slice(0, 3).length),
+      studyProfile?.avgSessionMinutes,
+    );
+
     args.slice(0, 3).forEach((arg) => {
       dailyObjectives.push({
         id: uid(),
@@ -289,7 +292,7 @@ export function mockGenerateRoadmap(
         sourceRefs: firstTopic?.sourceRefs || [],
         type: 'study',
         completed: false,
-        estimatedMinutes: 30,
+        estimatedMinutes: objectiveMinutes,
         levelId: activeLevel.id,
         topicId: firstTopic?.id,
       });

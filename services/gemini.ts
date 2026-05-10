@@ -19,7 +19,8 @@ import {
     SchemaType,
 } from '@google/generative-ai';
 import type { BraynrStudyProfile } from '@/services/braynrParser';
-import { minutesForPages } from '@/services/braynrParser';
+import { adjustMinutesToStudyProfile } from '@/services/braynrParser';
+import { estimateObjectiveMinutes } from '@/services/roadmapEstimates';
 
 // ─── Configuration ──────────────────────────────────────────────────
 
@@ -172,7 +173,7 @@ export async function geminiAnalyzeSources(
 
 ${sourceDescriptions ? `Their study materials:\n${sourceDescriptions}\n` : ''}
 Break this subject into 5-7 ordered topic sections that build on each other, from fundamentals to advanced.
-For each section, provide a title, a short summary (1-2 sentences), and a page range estimate (as if the material is ~200 pages total).
+For each section, provide a title and a short summary (1-2 sentences).
 Also provide the dependency graph showing which topics depend on which.
 
 Return JSON matching this structure exactly:
@@ -181,7 +182,6 @@ Return JSON matching this structure exactly:
     {
       "id": "unique_id_string",
       "title": "Topic Title",
-      "pageRange": [1, 30],
       "summary": "Brief summary of what this section covers."
     }
   ],
@@ -201,7 +201,6 @@ Return JSON matching this structure exactly:
           properties: {
             id: { type: SchemaType.STRING },
             title: { type: SchemaType.STRING },
-            pageRange: { type: SchemaType.ARRAY, items: { type: SchemaType.INTEGER } },
             summary: { type: SchemaType.STRING },
           },
           required: ['id', 'title', 'summary'],
@@ -230,7 +229,7 @@ Return JSON matching this structure exactly:
   result.sections = result.sections.map((s) => ({
     ...s,
     id: s.id || uid(),
-    pageRange: s.pageRange || undefined,
+    pageRange: undefined,
   }));
 
   return result;
@@ -499,9 +498,7 @@ Return JSON:
         {
           sourceId: 'source_1',
           sectionId,
-          label: sections[i]?.pageRange
-            ? `Pages ${sections[i].pageRange![0]}-${sections[i].pageRange![1]}`
-            : sections[i]?.title || level.title,
+          label: sections[i]?.title || level.title,
         },
       ],
       completed: i < skipLevels || t.completed,
@@ -521,8 +518,8 @@ Return JSON:
           : 'locked',
       completedAt: i < skipLevels ? now.toISOString() : undefined,
       quizAttempts: 0,
-      requiredStudyMinutes: studyProfile && sections[i]?.pageRange
-        ? minutesForPages(sections[i].pageRange![1] - sections[i].pageRange![0] + 1, studyProfile)
+      requiredStudyMinutes: studyProfile
+        ? adjustMinutesToStudyProfile(level.requiredStudyMinutes || 120, studyProfile)
         : level.requiredStudyMinutes || 120,
       completedStudyMinutes: i < skipLevels ? level.requiredStudyMinutes : 0,
     } as StudyLevel;
@@ -530,6 +527,13 @@ Return JSON:
 
   const activeLevel = levels.find((l) => l.status === 'active');
   const firstTopic = activeLevel?.topics[0];
+  const objectiveMinutes = activeLevel
+    ? estimateObjectiveMinutes(
+        activeLevel.requiredStudyMinutes,
+        Math.max(1, raw.dailyObjectives.length),
+        studyProfile?.avgSessionMinutes,
+      )
+    : 30;
   const dailyObjectives: DailyObjective[] = raw.dailyObjectives.map((obj) => ({
     id: uid(),
     title: obj.title,
@@ -537,7 +541,7 @@ Return JSON:
     sourceRefs: firstTopic?.sourceRefs || [],
     type: (obj.type as 'study' | 'review' | 'quiz') || 'study',
     completed: false,
-    estimatedMinutes: obj.estimatedMinutes || 30,
+    estimatedMinutes: objectiveMinutes,
     levelId: activeLevel?.id,
     topicId: firstTopic?.id,
   }));
