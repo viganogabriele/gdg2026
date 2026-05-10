@@ -2,6 +2,7 @@
  * Zustand Store — Central state management with AsyncStorage persistence
  */
 import { BadgeDefinitions, Points } from '@/constants/gamification';
+import type { BraynrStudyProfile } from '@/services/braynrParser';
 import type {
     Badge,
     DailyObjective,
@@ -44,6 +45,10 @@ interface StudyState {
   // User
   stats: UserStats;
   notificationPrefs: NotificationPreferences;
+
+  // Study Profile (imported from Braynr)
+  studyProfile: BraynrStudyProfile | null;
+  braynrLastSyncedAt: string | null;
 
   // Active State
   activeSubjectId: string | null;
@@ -97,6 +102,9 @@ interface StudyState {
 
   // Actions — Reset
   resetStore: () => void;
+
+  // Actions — Braynr
+  setStudyProfile: (profile: BraynrStudyProfile) => void;
 }
 
 // ─── Initial State ──────────────────────────────────────────────────
@@ -146,6 +154,8 @@ export const useStudyStore = create<StudyState>()(
       activeSubjectId: null,
       activeQuiz: null,
       sessionFocusTime: 0,
+      studyProfile: null,
+      braynrLastSyncedAt: null,
 
       // ─── Onboarding Actions ─────────────────────────────────────
       setOnboardingSubject: (title) =>
@@ -502,6 +512,13 @@ export const useStudyStore = create<StudyState>()(
           notificationPrefs: { ...state.notificationPrefs, ...prefs },
         })),
 
+      // ─── Braynr ─────────────────────────────────────────────────
+      setStudyProfile: (profile) =>
+        set({
+          studyProfile: profile,
+          braynrLastSyncedAt: new Date().toISOString(),
+        }),
+
       // ─── Reset ──────────────────────────────────────────────────
       resetStore: () =>
         set({
@@ -525,6 +542,8 @@ export const useStudyStore = create<StudyState>()(
           activeSubjectId: null,
           activeQuiz: null,
           sessionFocusTime: 0,
+          studyProfile: null,
+          braynrLastSyncedAt: null,
         }),
     }),
     {
@@ -542,6 +561,8 @@ export const useStudyStore = create<StudyState>()(
         stats: state.stats,
         notificationPrefs: state.notificationPrefs,
         activeSubjectId: state.activeSubjectId,
+        studyProfile: state.studyProfile,
+        braynrLastSyncedAt: state.braynrLastSyncedAt,
       }),
     }
   )

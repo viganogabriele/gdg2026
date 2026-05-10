@@ -1,6 +1,8 @@
 /**
  * Mock data generator — realistic AI responses for all endpoints
  */
+import type { BraynrStudyProfile } from '@/services/braynrParser';
+import { minutesForPages } from '@/services/braynrParser';
 import type {
   QuizQuestion,
   StudyLevel,
@@ -196,7 +198,8 @@ export function mockGenerateRoadmap(
   subjectTitle: string,
   sections: SourceSection[],
   deadline: string,
-  assessmentScore: number
+  assessmentScore: number,
+  studyProfile?: BraynrStudyProfile | null
 ): { levels: StudyLevel[]; dailyObjectives: DailyObjective[] } {
   const deadlineDate = new Date(deadline);
   const now = new Date();
@@ -261,7 +264,9 @@ export function mockGenerateRoadmap(
       status: i < skipLevels ? 'completed' : i === skipLevels ? 'active' : 'locked',
       completedAt: i < skipLevels ? now.toISOString() : undefined,
       quizAttempts: 0,
-      requiredStudyMinutes: 120 + Math.floor(Math.random() * 60),
+      requiredStudyMinutes: studyProfile
+        ? minutesForPages(section.pageRange ? section.pageRange[1] - section.pageRange[0] + 1 : 30, studyProfile)
+        : 120 + Math.floor(Math.random() * 60),
       completedStudyMinutes: i < skipLevels ? 120 : 0,
     } as StudyLevel;
   });

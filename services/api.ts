@@ -99,16 +99,18 @@ export async function generateAssessment(
 export async function generateRoadmap(
   subject: Subject,
   sections: SourceSection[],
-  assessmentScore: number
+  assessmentScore: number,
+  studyProfile?: import('@/services/braynrParser').BraynrStudyProfile | null
 ): Promise<{ levels: StudyLevel[]; dailyObjectives: DailyObjective[] }> {
   return withFallback(
-    (provider) => geminiGenerateRoadmap(subject, sections, assessmentScore, provider),
+    (provider) => geminiGenerateRoadmap(subject, sections, assessmentScore, provider, studyProfile),
     () =>
       mockGenerateRoadmap(
         subject.title,
         sections,
         subject.deadline,
-        assessmentScore
+        assessmentScore,
+        studyProfile
       ),
     'generateRoadmap'
   );

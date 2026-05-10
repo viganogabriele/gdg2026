@@ -18,6 +18,8 @@ import {
   GoogleGenerativeAI,
   SchemaType,
 } from '@google/generative-ai';
+import type { BraynrStudyProfile } from '@/services/braynrParser';
+import { minutesForPages } from '@/services/braynrParser';
 
 // ─── Configuration ──────────────────────────────────────────────────
 
@@ -323,7 +325,8 @@ export async function geminiGenerateRoadmap(
   subject: Subject,
   sections: SourceSection[],
   assessmentScore: number,
-  provider: AIProvider = 'gemini'
+  provider: AIProvider = 'gemini',
+  studyProfile?: BraynrStudyProfile | null
 ): Promise<{ levels: StudyLevel[]; dailyObjectives: DailyObjective[] }> {
   const deadlineDate = new Date(subject.deadline);
   const now = new Date();
@@ -494,7 +497,9 @@ Return JSON:
           : 'locked',
       completedAt: i < skipLevels ? now.toISOString() : undefined,
       quizAttempts: 0,
-      requiredStudyMinutes: level.requiredStudyMinutes || 120,
+      requiredStudyMinutes: studyProfile && sections[i]?.pageRange
+        ? minutesForPages(sections[i].pageRange![1] - sections[i].pageRange![0] + 1, studyProfile)
+        : level.requiredStudyMinutes || 120,
       completedStudyMinutes: i < skipLevels ? level.requiredStudyMinutes : 0,
     } as StudyLevel;
   });

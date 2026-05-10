@@ -36,7 +36,8 @@ export default function RoadmapRevealScreen() {
         const result = await api.generateRoadmap(
           subject,
           store.onboardingData.sections,
-          store.onboardingData.assessmentScore
+          store.onboardingData.assessmentScore,
+          store.studyProfile
         );
 
         subject.totalLevels = result.levels.length;

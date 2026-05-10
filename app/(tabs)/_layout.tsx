@@ -14,6 +14,7 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
     roadmap: 'calendar',
     leaderboard: 'award-blue',
     profile: 'face-grin',
+    settings: 'dial',
   };
   return (
     <View
@@ -86,6 +87,13 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ focused }) => <TabIcon name="profile" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ focused }) => <TabIcon name="settings" focused={focused} />,
         }}
       />
     </Tabs>
