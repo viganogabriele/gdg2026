@@ -21,14 +21,14 @@ export function SessionComplete({
     <View className="absolute inset-0 bg-bg-overlay justify-center items-center p-xxl" style={StyleSheet.absoluteFillObject}>
       <View className="bg-bg-secondary rounded-xl p-xxxl w-full items-center border border-border-medium">
         <View className="mb-lg">
-          <NucleoIcon name="award" size={64} />
+          <NucleoIcon name="award-gold" size={64} />
         </View>
         <Text className="text-text-primary text-xxl font-bold mb-xxl">Session Complete!</Text>
 
         <View className="w-full gap-md mb-xxl">
           <StatItem iconName="calendar" label="Time Studied" value={`${durationMinutes} min`} />
-          <StatItem iconName="star" label="XP Earned" value={`+${pointsEarned}`} />
-          <StatItem iconName="flame" label="Streak" value={`${streakDay} days`} />
+          <StatItem iconName="star-xp" label="XP Earned" value={`+${pointsEarned}`} />
+          <StatItem iconName="flame-fire" label="Streak" value={`${streakDay} days`} />
         </View>
 
         <Button title="Done" onPress={onDismiss} fullWidth size="lg" />

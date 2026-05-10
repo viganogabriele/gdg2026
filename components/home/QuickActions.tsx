@@ -36,7 +36,7 @@ export function QuickActions({
   return (
     <View className="flex-row gap-md">
       <ActionButton
-        iconName="rocket"
+        iconName="rocket-blue"
         title="Take Challenge"
         subtitle={challengeAvailable ? 'Test your knowledge' : 'No challenge available'}
         onPress={onTakeChallenge}
@@ -44,7 +44,7 @@ export function QuickActions({
         color={Colors.accent.primary}
       />
       <ActionButton
-        iconName="sparkle"
+        iconName="sparkle-yellow"
         title="Quick Review"
         subtitle={hasDueReviews ? `${dueReviewCount} cards due` : 'No reviews due'}
         onPress={onQuickReview}
@@ -78,7 +78,7 @@ function ActionButton({
   const iconRotation = useSharedValue(0);
 
   useEffect(() => {
-    if ((iconName === 'rocket' || iconName === 'sparkle') && !disabled) {
+    if ((iconName === 'rocket-blue' || iconName === 'sparkle-yellow') && !disabled) {
       iconScale.value = withRepeat(
         withSequence(
           withTiming(1.15, { duration: 600, easing: Easing.inOut(Easing.ease) }),
@@ -110,8 +110,8 @@ function ActionButton({
     transform: [{ scale: scale.value }],
   }));
 
-  const isRocket = iconName === 'rocket';
-  const isSparkle = iconName === 'sparkle';
+  const isRocket = iconName === 'rocket-blue';
+  const isSparkle = iconName === 'sparkle-yellow';
   const resolvedIconName = disabled
     ? iconName
     : isRocket

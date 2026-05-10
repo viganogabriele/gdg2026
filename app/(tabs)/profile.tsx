@@ -47,7 +47,7 @@ export default function ProfileScreen() {
         <View className="flex-row flex-wrap gap-md mb-xxl">
           <StatCard iconName="calendar" label="Study Time" value={formatHours(stats.totalStudyMinutes)} />
           <StatCard iconName="star-xp" label="Total XP" value={String(stats.totalPoints)} />
-          <StatCard iconName="folder" label="Levels Done" value={String(stats.levelsCompleted)} />
+          <StatCard iconName="award-gold" label="Levels Done" value={String(stats.levelsCompleted)} />
           <StatCard iconName="flame-fire" label="Best Streak" value={`${stats.longestStreak}d`} />
         </View>
 
@@ -67,7 +67,7 @@ export default function ProfileScreen() {
 
         {/* Badges */}
         <View className="flex-row items-center gap-sm mb-md mt-lg">
-          <NucleoIcon name="star-xp" size={18} />
+          <NucleoIcon name="award-gold" size={18} />
           <Text className="text-text-primary text-lg font-bold">Badges</Text>
         </View>
         <View className="flex-row flex-wrap mb-lg" style={{ gap: 12 }}>

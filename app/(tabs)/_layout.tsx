@@ -11,7 +11,7 @@ import { View } from 'react-native';
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   const icons: Record<string, NucleoIconName> = {
     home: 'house',
-    roadmap: 'folder',
+    roadmap: 'calendar',
     profile: 'face-grin',
   };
   return (
