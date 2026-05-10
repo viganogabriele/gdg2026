@@ -1,16 +1,16 @@
 /**
  * Quick Actions — Challenge and Review action buttons
  */
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
+import * as Haptics from 'expo-haptics';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -20,6 +20,7 @@ interface QuickActionsProps {
   hasDueReviews: boolean;
   dueReviewCount: number;
   challengeAvailable: boolean;
+  challengeBoosted?: boolean;
 }
 
 export function QuickActions({
@@ -28,16 +29,18 @@ export function QuickActions({
   hasDueReviews,
   dueReviewCount,
   challengeAvailable,
+  challengeBoosted,
 }: QuickActionsProps) {
   return (
     <View className="flex-row gap-md">
       <ActionButton
         iconName="rocket"
         title="Take Challenge"
-        subtitle={challengeAvailable ? 'Test your knowledge' : 'No challenge available'}
+        subtitle={challengeAvailable ? 'Test what you studied today' : 'Flag an objective to start'}
         onPress={onTakeChallenge}
         disabled={!challengeAvailable}
         color={Colors.accent.primary}
+        boosted={challengeBoosted}
       />
       <ActionButton
         iconName="sparkle"
@@ -60,6 +63,7 @@ function ActionButton({
   disabled,
   color,
   badge,
+  boosted,
 }: {
   iconName: NucleoIconName;
   title: string;
@@ -68,6 +72,7 @@ function ActionButton({
   disabled?: boolean;
   color: string;
   badge?: number;
+  boosted?: boolean;
 }) {
   const scale = useSharedValue(1);
 
@@ -96,7 +101,7 @@ function ActionButton({
       activeOpacity={0.7}
     >
       <View className="mb-sm">
-        <NucleoIcon name={disabled ? iconName : iconName === 'rocket' ? 'rocket-blue' : iconName} size={28} />
+        <NucleoIcon name={boosted && iconName === 'rocket' ? 'rocket-red' : iconName} size={28} />
       </View>
       <Text className={`text-md font-semibold ${disabled ? 'text-text-muted' : 'text-text-primary'}`}>
         {title}
