@@ -25,6 +25,7 @@ interface QuickActionsProps {
   hasDueReviews: boolean;
   dueReviewCount: number;
   challengeAvailable: boolean;
+  challengeBoosted?: boolean;
 }
 
 export function QuickActions({
@@ -33,6 +34,7 @@ export function QuickActions({
   hasDueReviews,
   dueReviewCount,
   challengeAvailable,
+  challengeBoosted,
 }: QuickActionsProps) {
   return (
     <View className="flex-row gap-md">
@@ -43,7 +45,7 @@ export function QuickActions({
         onPress={onTakeChallenge}
         disabled={!challengeAvailable}
         color={Colors.accent.primary}
-
+        boosted={challengeBoosted}
       />
       <ActionButton
         iconName="sparkle-yellow"
@@ -66,6 +68,7 @@ function ActionButton({
   disabled,
   color,
   badge,
+  boosted,
 }: {
   iconName: NucleoIconName;
   title: string;
@@ -74,6 +77,7 @@ function ActionButton({
   disabled?: boolean;
   color: string;
   badge?: number;
+  boosted?: boolean;
 }) {
   const scale = useSharedValue(1);
   const iconScale = useSharedValue(1);
@@ -98,8 +102,12 @@ function ActionButton({
         -1,
         true
       );
+    } else {
+      // Reset animations if disabled or not boosted
+      iconScale.value = withTiming(1);
+      iconRotation.value = withTiming(0);
     }
-  }, [iconName, disabled]);
+  }, [iconName, disabled, boosted]);
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [
@@ -114,9 +122,9 @@ function ActionButton({
 
   const isRocket = iconName === 'rocket-blue';
   const isSparkle = iconName === 'sparkle-yellow';
-  const resolvedIconName = iconName;
+  const resolvedIconName = (isRocket && boosted) ? 'rocket-red' as NucleoIconName : iconName;
 
-  const shouldAnimate = (isRocket || isSparkle) && !disabled;
+  const shouldAnimate = ((isRocket && boosted) || isSparkle) && !disabled;
 
   return (
     <AnimatedTouchable

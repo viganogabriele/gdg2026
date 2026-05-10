@@ -24,22 +24,24 @@ interface LevelCardProps {
 export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardProps) {
   const [expanded, setExpanded] = useState(false);
   const expandHeight = useSharedValue(0);
-  const updateLevel = useStudyStore((s) => s.updateLevel);
+  const currentDayIndex = useStudyStore((s) => s.currentDayIndex);
+  const dailyObjectives = useStudyStore((s) => s.dailyObjectives);
+  const advanceToDay = useStudyStore((s) => s.advanceToDay);
+  const dayAdvanceReady = useStudyStore((s) => s.dayAdvanceReady);
+
+  const isActiveLevel = level.status === 'active' || level.status === 'failed';
+  const allCurrentDayDone =
+    isActiveLevel &&
+    dailyObjectives.length > 0 &&
+    dailyObjectives.every((o) => o.completed);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
     expandHeight.value = withTiming(expanded ? 0 : 1, { duration: 300 });
   };
 
-  const handleToggleTopic = (topicId: string) => {
-    const newTopics = level.topics.map((t) =>
-      (t.id === topicId && level.status != 'locked') ? { ...t, completed: !t.completed } : t
-    );
-    updateLevel(level.id, { topics: newTopics });
-  };
-
   const expandStyle = useAnimatedStyle(() => ({
-    maxHeight: expandHeight.value * 300,
+    maxHeight: expandHeight.value * (level.topics.length * 120 + 80),
     opacity: expandHeight.value,
   }));
 
@@ -84,6 +86,7 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
           <View className="flex-row items-center gap-sm mt-[4px]">
             <Text className="text-xs font-medium" style={{ color: statusConfig.color }}>
               {statusConfig.label}
+              {isActiveLevel && ` — Day ${currentDayIndex + 1}/${level.topics.length}`}
             </Text>
             {level.status !== 'completed' && level.status !== 'locked' && (
               <Text className="text-text-muted text-xs ml-auto">
@@ -109,38 +112,53 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
 
       {/* Expanded Content */}
       <Animated.View className="overflow-hidden mt-md" style={expandStyle}>
-        {level.topics.map((topic) => (
-          <TouchableOpacity
-            key={topic.id}
-            className="flex-row gap-sm mb-md"
-            onPress={() => handleToggleTopic(topic.id)}
-            activeOpacity={level.status === 'locked' ? 1 : 0.7}
-          >
-            <Text className="text-accent-primary text-md font-bold w-[20px] text-center">
-              {topic.completed ? '✓' : '○'}
-            </Text>
-            <View className="flex-1">
-              <Text
-                className={`text-sm font-medium mb-[4px] ${topic.completed ? 'line-through text-text-muted' : 'text-text-primary'}`}
-              >
-                {topic.title}
+        {level.topics.map((topic, topicIndex) => {
+          const isPastDay = isActiveLevel && topicIndex < currentDayIndex;
+          const isCurrentDay = isActiveLevel && topicIndex === currentDayIndex;
+          const isNextDay = isActiveLevel && topicIndex === currentDayIndex + 1;
+          const canAdvance = isNextDay && dayAdvanceReady;
+          const currentDayStrikethrough = isCurrentDay && allCurrentDayDone;
+
+          return (
+            <TouchableOpacity
+              key={topic.id}
+              className={`flex-row gap-sm mb-md p-sm rounded-md ${isCurrentDay ? 'bg-bg-tertiary' : ''}`}
+              style={canAdvance ? { borderWidth: 1, borderColor: `${levelColor}66`, borderStyle: 'dashed' } : undefined}
+              onPress={canAdvance ? () => advanceToDay(topicIndex) : undefined}
+              disabled={!canAdvance}
+              activeOpacity={canAdvance ? 0.6 : 1}
+            >
+              <Text className="text-md font-bold w-[20px] text-center" style={{ color: (isPastDay || topic.completed) ? levelColor : isCurrentDay ? levelColor : Colors.text.muted }}>
+                {(isPastDay || topic.completed) ? '✓' : isCurrentDay ? '▶' : '○'}
               </Text>
-              {topic.arguments.map((arg, i) => (
-                <Text key={i} className="text-text-secondary text-xs ml-sm mb-[2px]">
-                  • {arg}
+              <View className="flex-1">
+                <Text
+                  className={`text-sm font-medium mb-[4px] ${(isPastDay || topic.completed) ? 'line-through text-text-muted' : isCurrentDay ? 'text-text-primary' : 'text-text-muted'}`}
+                >
+                  {topic.title}
                 </Text>
-              ))}
-              {topic.sourceRefs.map((ref, i) => (
-                <View key={i} className="flex-row items-center gap-[4px] mt-[4px]">
-                  <NucleoIcon name="link" size={12} />
-                  <Text className="text-text-muted text-xs">
-                    {ref.label}
+                {(isCurrentDay || isPastDay || topic.completed) && topic.arguments.map((arg, i) => (
+                  <Text key={i} className="text-text-secondary text-xs ml-sm mb-[2px]">
+                    • {arg}
                   </Text>
-                </View>
-              ))}
-            </View>
-          </TouchableOpacity>
-        ))}
+                ))}
+                {canAdvance && (
+                  <Text className="text-xs font-semibold mt-[4px]" style={{ color: levelColor }}>
+                    Tap to start this day →
+                  </Text>
+                )}
+                {topic.sourceRefs.map((ref, i) => (
+                  <View key={i} className="flex-row items-center gap-[4px] mt-[4px]">
+                    <NucleoIcon name="link" size={12} />
+                    <Text className="text-text-muted text-xs">
+                      {ref.label}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
 
         {/* Actions */}
         {(level.status === 'active' || level.status === 'failed') && (

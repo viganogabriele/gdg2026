@@ -4,21 +4,24 @@
 import { BadgeDefinitions, Points } from '@/constants/gamification';
 import type { BraynrStudyProfile } from '@/services/braynrParser';
 import type {
-    Badge,
-    DailyObjective,
-    NotificationPreferences,
-    Quiz,
-    Source,
-    SourceSection,
-    SpacedRepetitionCard,
-    StudyLevel,
-    StudySession,
-    Subject,
-    UserStats
+  Badge,
+  DailyObjective,
+  NotificationPreferences,
+  Quiz,
+  Source,
+  SourceSection,
+  SpacedRepetitionCard,
+  StudyLevel,
+  StudySession,
+  Subject,
+  UserStats
 } from '@/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+function uid(): string {
+  return Math.random().toString(36).substring(2, 11);
+}
 
 // ─── Store State ────────────────────────────────────────────────────
 
@@ -53,6 +56,8 @@ interface StudyState {
   // Active State
   activeSubjectId: string | null;
   activeQuiz: Quiz | null;
+  currentDayIndex: number;
+  dayAdvanceReady: boolean;
   sessionFocusTime: number; // Time in seconds spent in focus mode this app session
 
   // Actions — Onboarding
@@ -76,6 +81,8 @@ interface StudyState {
   // Actions — Objectives
   setDailyObjectives: (objectives: DailyObjective[]) => void;
   completeObjective: (objectiveId: string) => void;
+  advanceToDay: (dayIndex: number) => void;
+  setDayAdvanceReady: (ready: boolean) => void;
 
   // Actions — Quizzes
   startQuiz: (quiz: Quiz) => void;
@@ -153,6 +160,8 @@ export const useStudyStore = create<StudyState>()(
       notificationPrefs: { ...initialNotificationPrefs },
       activeSubjectId: null,
       activeQuiz: null,
+      currentDayIndex: 0,
+      dayAdvanceReady: false,
       sessionFocusTime: 0,
       studyProfile: null,
       braynrLastSyncedAt: null,
@@ -233,11 +242,11 @@ export const useStudyStore = create<StudyState>()(
           levels: state.levels.map((l) =>
             l.id === levelId
               ? {
-                  ...l,
-                  status: 'failed' as const,
-                  quizAttempts: l.quizAttempts + 1,
-                  lastQuizScore: score,
-                }
+                ...l,
+                status: 'failed' as const,
+                quizAttempts: l.quizAttempts + 1,
+                lastQuizScore: score,
+              }
               : l
           ),
         })),
@@ -284,20 +293,58 @@ export const useStudyStore = create<StudyState>()(
               state.stats.totalStudyMinutes + (completing ? minutes : -minutes)
             ),
           },
-          levels: state.levels.map((l) =>
-            l.id === activeLevelId
-              ? {
-                  ...l,
-                  completedStudyMinutes: Math.max(
-                    0,
-                    l.completedStudyMinutes + (completing ? minutes : -minutes)
-                  ),
-                }
-              : l
-          ),
+          levels: state.levels.map((l) => {
+            if (l.id !== activeLevelId) return l;
+            return {
+              ...l,
+              completedStudyMinutes: Math.max(
+                0,
+                l.completedStudyMinutes + (completing ? minutes : -minutes)
+              ),
+            };
+          }),
         }));
         if (completing) get().updateStreak();
       },
+
+      advanceToDay: (dayIndex: number) => {
+        const state = get();
+        const activeLevel = state.levels.find(l => l.status === 'active');
+        if (!activeLevel || dayIndex >= activeLevel.topics.length) return;
+
+        // Mark the previous day's topic as completed
+        const prevTopicId = activeLevel.topics[state.currentDayIndex]?.id;
+        if (prevTopicId) {
+          set((s) => ({
+            levels: s.levels.map((l) =>
+              l.id === activeLevel.id
+                ? { ...l, topics: l.topics.map(t => t.id === prevTopicId ? { ...t, completed: true } : t) }
+                : l
+            ),
+          }));
+        }
+
+        const topic = activeLevel.topics[dayIndex];
+        const newObjectives: DailyObjective[] = topic.arguments.map((arg) => ({
+          id: uid(),
+          title: `${topic.title}: ${arg}`,
+          description: `Focus on: ${arg}`,
+          sourceRefs: topic.sourceRefs,
+          type: 'study' as const,
+          completed: false,
+          estimatedMinutes: 30,
+          levelId: activeLevel.id,
+          topicId: topic.id,
+        }));
+
+        set({
+          currentDayIndex: dayIndex,
+          dailyObjectives: newObjectives,
+          dayAdvanceReady: false,
+        });
+      },
+
+      setDayAdvanceReady: (ready: boolean) => set({ dayAdvanceReady: ready }),
 
       // ─── Quiz Actions ──────────────────────────────────────────
       startQuiz: (quiz) => set({ activeQuiz: quiz }),
@@ -352,7 +399,7 @@ export const useStudyStore = create<StudyState>()(
         const endedAt = new Date().toISOString();
         const duration = Math.round(
           (new Date(endedAt).getTime() - new Date(session.startedAt).getTime()) /
-            60000
+          60000
         );
 
         set((s) => ({
@@ -541,6 +588,8 @@ export const useStudyStore = create<StudyState>()(
           notificationPrefs: { ...initialNotificationPrefs },
           activeSubjectId: null,
           activeQuiz: null,
+          currentDayIndex: 0,
+          dayAdvanceReady: false,
           sessionFocusTime: 0,
           studyProfile: null,
           braynrLastSyncedAt: null,
@@ -563,6 +612,8 @@ export const useStudyStore = create<StudyState>()(
         activeSubjectId: state.activeSubjectId,
         studyProfile: state.studyProfile,
         braynrLastSyncedAt: state.braynrLastSyncedAt,
+        currentDayIndex: state.currentDayIndex,
+        dayAdvanceReady: state.dayAdvanceReady,
       }),
     }
   )

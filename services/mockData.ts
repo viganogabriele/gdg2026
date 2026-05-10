@@ -275,37 +275,21 @@ export function mockGenerateRoadmap(
   const dailyObjectives: DailyObjective[] = [];
 
   if (activeLevel) {
-    dailyObjectives.push(
-      {
+    const firstTopic = activeLevel.topics[0];
+    const args = firstTopic?.arguments || ['Key concepts', 'Practice problems', 'Applications'];
+    args.slice(0, 3).forEach((arg) => {
+      dailyObjectives.push({
         id: uid(),
-        title: `Study: ${activeLevel.title}`,
-        description: `Review core concepts of ${activeLevel.title}. Focus on understanding the fundamental principles.`,
-        sourceRefs: activeLevel.topics[0]?.sourceRefs || [],
-        type: 'study',
-        completed: false,
-        estimatedMinutes: 45,
-        levelId: activeLevel.id,
-      },
-      {
-        id: uid(),
-        title: `Practice: ${activeLevel.title}`,
-        description: `Work through practice problems related to ${activeLevel.title}.`,
-        sourceRefs: activeLevel.topics[1]?.sourceRefs || [],
+        title: `${firstTopic?.title || activeLevel.title}: ${arg}`,
+        description: `Focus on: ${arg}`,
+        sourceRefs: firstTopic?.sourceRefs || [],
         type: 'study',
         completed: false,
         estimatedMinutes: 30,
         levelId: activeLevel.id,
-      },
-      {
-        id: uid(),
-        title: 'Spaced Review',
-        description: 'Quick review of previously studied topics to reinforce memory.',
-        sourceRefs: [],
-        type: 'review',
-        completed: false,
-        estimatedMinutes: 10,
-      }
-    );
+        topicId: firstTopic?.id,
+      });
+    });
   }
 
   return { levels, dailyObjectives };
@@ -334,6 +318,35 @@ export function mockGenerateLevelQuiz(
       explanation: `${topic.title} builds on foundational concepts and connects to practical applications.`,
       topicId: topic.id,
       sourceRef: topic.sourceRefs[0],
+    });
+  }
+
+  return questions;
+}
+
+// ─── Daily Challenge Quiz Mock ──────────────────────────────────────
+export function mockGenerateDailyChallengeQuiz(
+  flaggedObjectives: DailyObjective[],
+  sources: Source[],
+  count: number = 8
+): QuizQuestion[] {
+  const questions: QuizQuestion[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const objective = flaggedObjectives[i % Math.max(1, flaggedObjectives.length)];
+    const source = sources[0];
+
+    questions.push({
+      id: uid(),
+      text: `Daily Challenge: Regarding the objective "${objective?.title || 'General Study'}", which is correct?`,
+      options: [
+        `This builds on the material from "${source?.title || 'your sources'}"`,
+        `This is unrelated to the active topic`,
+        `Memorization is sufficient for this concept`,
+        `Applications are theoretical only`,
+      ],
+      correctIndex: 0,
+      explanation: `Connecting daily objectives to sources reinforces learning.`,
     });
   }
 
