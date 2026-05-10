@@ -21,7 +21,7 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
 
   const [isRunning, setIsRunning] = useState(true);
   const [isBreak, setIsBreak] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(PomodoroDefaults.WORK_MINUTES * 60);
+  const [secondsLeft, setSecondsLeft] = useState(PomodoroDefaults.WORK_MINUTES * 60 - (sessionFocusTime % (PomodoroDefaults.WORK_MINUTES * 60)));
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
   const totalStudied = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -85,7 +85,7 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
     <View className="flex-1 items-center justify-center w-full h-full p-3xl">
       <View className="flex-row items-center gap-xs mb-md">
         <NucleoIcon
-          name={isBreak ? 'star' : 'book-open'}
+          name={isBreak ? 'star-xp' : 'book-open'}
           size={20}
         />
         <Text className="text-xl text-text-primary font-semibold">

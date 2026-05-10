@@ -68,37 +68,6 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Focus Mode Manual Button */}
-        <View className="mt-md">
-          <TouchableOpacity
-            className="bg-bg-secondary border border-border-subtle rounded-xl p-md flex-row items-center justify-between"
-            onPress={() => router.push('/focus')}
-            activeOpacity={0.7}
-          >
-            <View className="flex-row items-center gap-md">
-              <View className="bg-accent-primary/20 p-sm rounded-lg">
-                <IconSymbol
-                  name="eye"
-                  size={20}
-                  weight="medium"
-                  color={Colors.text.secondary}
-                />
-
-              </View>
-              <View>
-                <Text className="text-text-primary text-md font-bold">Focus Mode</Text>
-                <Text className="text-text-muted text-sm">Rotate phone to auto-start</Text>
-              </View>
-            </View>
-            <IconSymbol
-              name="chevron.right"
-              size={16}
-              weight="medium"
-              color={Colors.text.secondary}
-            />
-          </TouchableOpacity>
-        </View>
-
         {/* Level Indicator */}
         <LevelIndicator
           currentLevel={currentLevelNum}
@@ -127,6 +96,36 @@ export default function HomeScreen() {
             challengeAvailable={challengeAvailable}
 
           />
+        </View>
+
+        {/* Focus Mode Manual Button */}
+        <View className="mt-xxl">
+          <TouchableOpacity
+            className="bg-bg-secondary border border-border-subtle rounded-xl p-md flex-row items-center justify-between"
+            onPress={() => router.push('/focus')}
+            activeOpacity={0.7}
+          >
+            <View className="flex-row items-center gap-md">
+              <View className="bg-accent-primary/20 p-sm rounded-lg">
+                <IconSymbol
+                  name="eye"
+                  size={20}
+                  weight="medium"
+                  color={Colors.text.secondary}
+                />
+              </View>
+              <View>
+                <Text className="text-text-primary text-md font-bold">Focus Mode</Text>
+                <Text className="text-text-muted text-sm">Rotate phone to auto-start</Text>
+              </View>
+            </View>
+            <IconSymbol
+              name="chevron.right"
+              size={16}
+              weight="medium"
+              color={Colors.text.secondary}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Daily Objectives */}

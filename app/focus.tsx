@@ -68,7 +68,7 @@ export default function FocusScreen() {
         className="bg-bg-primary"
       >
         {/* Header / Close */}
-        <TouchableOpacity
+        {!sessionComplete && <TouchableOpacity
           onPress={() => router.back()}
           className="absolute top-xxl right-xl z-10 p-sm rounded-full"
           style={{ backgroundColor: Colors.accent.danger }}
@@ -79,7 +79,7 @@ export default function FocusScreen() {
             weight="medium"
             color={Colors.bg.primary}
           />
-        </TouchableOpacity>
+        </TouchableOpacity>}
 
         <View className="flex-1 flex-row pt-xxl">
           {/* Left Column: Topic Info */}

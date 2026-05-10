@@ -97,7 +97,9 @@ export default function ProfileScreen() {
           <SettingRow label="Streak Warnings" value={prefs.streakWarnings}
             onChange={(v) => updatePrefs({ streakWarnings: v })} />
           <SettingRow label="Challenge Alerts" value={prefs.challengeNotifications}
-            onChange={(v) => updatePrefs({ challengeNotifications: v })} last />
+            onChange={(v) => updatePrefs({ challengeNotifications: v })} />
+          <SettingRow label="Tilt to Focus" value={prefs.tiltToFocusEnabled}
+            onChange={(v) => updatePrefs({ tiltToFocusEnabled: v })} last />
         </Card>
 
         {/* Danger Zone */}

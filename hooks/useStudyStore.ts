@@ -1,24 +1,23 @@
 /**
  * Zustand Store — Central state management with AsyncStorage persistence
  */
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BadgeDefinitions, Points } from '@/constants/gamification';
 import type {
-  Subject,
-  Source,
-  StudyLevel,
-  Quiz,
-  QuizQuestion,
-  UserStats,
-  DailyObjective,
-  SpacedRepetitionCard,
-  StudySession,
-  NotificationPreferences,
-  SourceSection,
-  Badge,
+    Badge,
+    DailyObjective,
+    NotificationPreferences,
+    Quiz,
+    Source,
+    SourceSection,
+    SpacedRepetitionCard,
+    StudyLevel,
+    StudySession,
+    Subject,
+    UserStats
 } from '@/types';
-import { Points, BadgeDefinitions } from '@/constants/gamification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 // ─── Store State ────────────────────────────────────────────────────
 
@@ -118,6 +117,7 @@ const initialNotificationPrefs: NotificationPreferences = {
   deadlineWarnings: true,
   streakWarnings: true,
   challengeNotifications: true,
+  tiltToFocusEnabled: true,
 };
 
 // ─── Store Definition ───────────────────────────────────────────────
