@@ -137,6 +137,7 @@ export interface NotificationPreferences {
   deadlineWarnings: boolean;
   streakWarnings: boolean;
   challengeNotifications: boolean;
+  tiltToFocusEnabled: boolean;
 }
 
 // API request/response types

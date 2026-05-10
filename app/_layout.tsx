@@ -50,7 +50,11 @@ export default function RootLayout() {
     }, 10);
   }, [onboardingComplete, segments, router]);
 
+  const tiltToFocusEnabled = useStudyStore((s) => s.notificationPrefs.tiltToFocusEnabled);
+  const isHomeTab = pathname === '/' || pathname === '/(tabs)' || pathname === '/(tabs)/index';
+
   useEffect(() => {
+    if (!tiltToFocusEnabled || !isHomeTab) return;
 
     Accelerometer.setUpdateInterval(500);
 
@@ -60,20 +64,15 @@ export default function RootLayout() {
 
       if (isLandscape && lastOrientation.current !== 'landscape') {
         lastOrientation.current = 'landscape';
-        if (pathname !== '/focus') {
-          const dir = x > 0 ? 'right' : 'left';
-          router.push({ pathname: '/focus', params: { dir } });
-        }
+        const dir = x > 0 ? 'right' : 'left';
+        router.push({ pathname: '/focus', params: { dir } });
       } else if (isPortrait && lastOrientation.current !== 'portrait') {
         lastOrientation.current = 'portrait';
-        if (pathname === '/focus') {
-          router.back();
-        }
       }
     });
 
     return () => subscription.remove();
-  }, [pathname, router]);
+  }, [pathname, router, tiltToFocusEnabled, isHomeTab]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
