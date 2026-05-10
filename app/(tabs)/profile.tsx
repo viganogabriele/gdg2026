@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function ProfileScreen() {
   const stats = useStudyStore((s) => s.stats);
   const subjects = useStudyStore((s) => s.subjects);
+  const roadmaps = useStudyStore((s) => s.roadmaps);
 
   const earnedBadgeIds = new Set(stats.badges.map((b) => b.id));
 
@@ -38,12 +39,17 @@ export default function ProfileScreen() {
           <Card style={{ marginBottom: 24 }}>
             <View className="flex-row items-center gap-sm mb-sm">
               <NucleoIcon name="book-open" size={18} />
-              <Text className="text-text-primary text-lg font-bold">Current Subject</Text>
+              <Text className="text-text-primary text-lg font-bold">Active Subject</Text>
             </View>
             <Text className="text-text-primary text-lg font-semibold mt-sm">{subjects[0].title}</Text>
             <Text className="text-text-muted text-sm mt-xs">
               Deadline: {new Date(subjects[0].deadline).toLocaleDateString()}
             </Text>
+            {roadmaps.length > 1 && (
+              <Text className="text-text-muted text-xs mt-sm">
+                {roadmaps.length} subjects total
+              </Text>
+            )}
           </Card>
         )}
 

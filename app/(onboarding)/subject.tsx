@@ -10,12 +10,19 @@ import { useStudyStore } from '@/hooks/useStudyStore';
 export default function SubjectScreen() {
   const setOnboardingSubject = useStudyStore((s) => s.setOnboardingSubject);
   const existing = useStudyStore((s) => s.onboardingData.subjectTitle);
+  const isAddingRoadmap = useStudyStore((s) => s.isAddingRoadmap);
+  const cancelAddRoadmap = useStudyStore((s) => s.cancelAddRoadmap);
   const [subject, setSubject] = useState(existing);
 
   const handleContinue = () => {
     if (!subject.trim()) return;
     setOnboardingSubject(subject.trim());
     router.push('/(onboarding)/sources');
+  };
+
+  const handleCancel = () => {
+    cancelAddRoadmap();
+    router.replace('/(tabs)');
   };
 
   return (
@@ -48,7 +55,7 @@ export default function SubjectScreen() {
             />
           </View>
 
-          <View style={{ paddingBottom: 32 }}>
+          <View style={{ paddingBottom: 32, gap: 8 }}>
             <Button
               title="Continue"
               onPress={handleContinue}
@@ -56,6 +63,14 @@ export default function SubjectScreen() {
               fullWidth
               size="lg"
             />
+            {isAddingRoadmap && (
+              <Button
+                title="Cancel"
+                variant="ghost"
+                onPress={handleCancel}
+                fullWidth
+              />
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

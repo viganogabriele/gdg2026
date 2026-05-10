@@ -1,9 +1,7 @@
 TODO:
 
 Feature finali:
-2. Aggiungere più materie
 3. Aggiungere materiali nel tempo modificabili come la deadline
-4. Se riusciamo guardare il web da desktop
 
 Presentazione finale:
 1. Scrivere elevation pitch

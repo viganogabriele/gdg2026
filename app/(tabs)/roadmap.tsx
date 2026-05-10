@@ -1,9 +1,10 @@
 /**
- * Study Roadmap Screen — Timeline view of all levels
+ * Study Roadmap Screen — Timeline view of all levels with subject selector
  */
 import React from 'react';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { RoadmapSelector } from '@/components/roadmap/RoadmapSelector';
 import { TimelineView } from '@/components/roadmap/TimelineView';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import type { StudyLevel } from '@/types';
