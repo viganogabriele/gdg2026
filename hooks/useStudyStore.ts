@@ -266,6 +266,10 @@ export const useStudyStore = create<StudyState>()(
             totalPoints:
               state.stats.totalPoints +
               (completing ? Points.STUDY_SESSION_COMPLETE : -Points.STUDY_SESSION_COMPLETE),
+            totalStudyMinutes: Math.max(
+              0,
+              state.stats.totalStudyMinutes + (completing ? minutes : -minutes)
+            ),
           },
           levels: state.levels.map((l) =>
             l.id === activeLevelId
