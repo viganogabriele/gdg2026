@@ -21,6 +21,10 @@ const MAPPING = {
   'eye': 'visibility',
   'trash.fill': 'delete-outline',
   'xmark': 'close',
+  'play.fill': 'play-arrow',
+  'pause.fill': 'pause',
+  'checkmark': 'check',
+  'forward.fill': 'fast-forward',
 } as IconMapping;
 
 /**
