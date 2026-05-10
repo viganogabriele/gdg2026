@@ -1,12 +1,12 @@
 /**
  * Tab Layout — Home, Roadmap, Profile with custom styled tab bar
  */
+import { HapticTab } from '@/components/haptic-tab';
+import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
+import { Colors } from '@/constants/theme';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { View, Platform } from 'react-native';
-import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
-import { HapticTab } from '@/components/haptic-tab';
-import { Colors } from '@/constants/theme';
+import { View } from 'react-native';
 
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   const icons: Record<string, NucleoIconName> = {
@@ -15,7 +15,10 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
     profile: 'face-grin',
   };
   return (
-    <View className={`items-center justify-center w-[40px] h-[32px] rounded-[16px] ${focused ? 'bg-[rgba(108,92,231,0.15)]' : ''}`}>
+    <View
+      className={`h-[36px] w-[44px] items-center justify-center self-center rounded-[18px] ${focused ? 'bg-[rgba(108,92,231,0.15)]' : ''
+        }`}
+    >
       <NucleoIcon
         name={icons[name] || 'folder'}
         size={focused ? 22 : 20}
@@ -37,13 +40,22 @@ export default function TabLayout() {
           backgroundColor: Colors.bg.secondary,
           borderTopColor: Colors.border.subtle,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 64,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
-          paddingTop: 8,
+          height: 82,
+          paddingTop: 6,
+          paddingBottom: 16,
         },
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '500',
+        },
+        tabBarItemStyle: {
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingVertical: 4,
+        },
+        tabBarIconStyle: {
+          marginBottom: 2,
+          alignSelf: 'center',
         },
       }}
     >
