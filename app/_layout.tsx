@@ -4,9 +4,10 @@
 import { Colors } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, usePathname, useRouter, useSegments } from 'expo-router';
+import { Accelerometer } from 'expo-sensors';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import '../styles/global.css';
@@ -31,6 +32,8 @@ export default function RootLayout() {
   const onboardingComplete = useStudyStore((s) => s.onboardingComplete);
   const segments = useSegments();
   const router = useRouter();
+  const pathname = usePathname();
+  const lastOrientation = useRef<'portrait' | 'landscape'>('portrait');
 
   useEffect(() => {
     // avoid navigating before the router/segments are ready
@@ -46,6 +49,31 @@ export default function RootLayout() {
       }
     }, 10);
   }, [onboardingComplete, segments, router]);
+
+  useEffect(() => {
+
+    Accelerometer.setUpdateInterval(500);
+
+    const subscription = Accelerometer.addListener(({ x, y }) => {
+      const isLandscape = Math.abs(x) > 0.75 && Math.abs(y) < 0.5;
+      const isPortrait = Math.abs(y) > 0.75 && Math.abs(x) < 0.5;
+
+      if (isLandscape && lastOrientation.current !== 'landscape') {
+        lastOrientation.current = 'landscape';
+        if (pathname !== '/focus') {
+          const dir = x > 0 ? 'right' : 'left';
+          router.push({ pathname: '/focus', params: { dir } });
+        }
+      } else if (isPortrait && lastOrientation.current !== 'portrait') {
+        lastOrientation.current = 'portrait';
+        if (pathname === '/focus') {
+          router.back();
+        }
+      }
+    });
+
+    return () => subscription.remove();
+  }, [pathname, router]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

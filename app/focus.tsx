@@ -1,18 +1,18 @@
 /**
  * Focus Mode — Pomodoro timer with current topic and source refs
  */
-import React, { useState } from 'react';
-import { View, Text } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { PomodoroTimer } from '@/components/focus/PomodoroTimer';
 import { SessionComplete } from '@/components/focus/SessionComplete';
-import { Button } from '@/components/ui/Button';
-import { useStudyStore } from '@/hooks/useStudyStore';
-import { useGamePoints } from '@/hooks/useGamePoints';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
+import { useGamePoints } from '@/hooks/useGamePoints';
+import { useStudyStore } from '@/hooks/useStudyStore';
 import type { StudySession } from '@/types';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useState } from 'react';
+import { Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function FocusScreen() {
   const store = useStudyStore();
@@ -30,6 +30,11 @@ export default function FocusScreen() {
   const targetSessions = activeObjective
     ? Math.ceil(activeObjective.estimatedMinutes / 25)
     : undefined;
+  const { width, height } = useWindowDimensions();
+  const saInsets = useSafeAreaInsets();
+  const params = useLocalSearchParams<{ dir?: string }>();
+  // Default to 90deg (Landscape Right) if not specified
+  const rotation = params.dir === 'left' ? '90deg' : '-90deg';
 
   const handleSessionComplete = (durationMinutes: number) => {
     // Create session record
@@ -50,43 +55,77 @@ export default function FocusScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg-primary">
-      {/* Header */}
-      <View className="flex-row justify-end p-md">
-        <Button title="✕ Close" variant="ghost" onPress={() => router.back()} />
-      </View>
+    <SafeAreaView className="flex-1 bg-bg-primary overflow-hidden">
+      <View
+        style={{
+          width: height - saInsets.top - saInsets.bottom,
+          height: width - saInsets.left - saInsets.right,
+          position: 'absolute',
+          top: (height - width) / 2,
+          left: (width - height) / 2 + (rotation === '90deg' ? saInsets.top : saInsets.bottom),
+          transform: [{ rotate: rotation }],
+        }}
+        className="bg-bg-primary"
+      >
+        {/* Header / Close */}
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="absolute top-xxl right-xl z-10 p-sm rounded-full"
+          style={{ backgroundColor: Colors.accent.danger }}
+        >
+          <IconSymbol
+            name="xmark"
+            size={24}
+            weight="medium"
+            color={Colors.bg.primary}
+          />
+        </TouchableOpacity>
 
-      {/* Current Topic Info */}
-      {activeLevel && (
-        <View className="items-center px-xxl mb-lg">
-          <Text className="text-accent-primary text-sm font-bold tracking-[1px]">Level {activeLevel.levelNumber}</Text>
-          <Text className="text-text-primary text-xl font-bold mt-xs">{activeLevel.title}</Text>
-          {currentTopic && (
-            <View className="bg-bg-secondary rounded-md p-md mt-md border border-border-subtle w-full">
-              <Text className="text-text-primary text-md font-medium">{currentTopic.title}</Text>
-              {currentTopic.sourceRefs.map((ref, i) => (
-                <View key={i} className="flex-row items-center gap-[4px] mt-xs">
-                  <NucleoIcon name="link" size={12} />
-                  <Text className="text-accent-secondary text-xs">{ref.label}</Text>
-                </View>
-              ))}
-            </View>
-          )}
+        <View className="flex-1 flex-row pt-xxl">
+          {/* Left Column: Topic Info */}
+          <View className="flex-1 justify-center px-xxl pl-xxxl">
+            {activeLevel && (
+              <View>
+                <Text className="text-accent-primary text-sm font-bold tracking-[1px] uppercase mb-xs">
+                  Level {activeLevel.levelNumber}
+                </Text>
+                <Text className="text-text-primary text-display font-extrabold mb-lg leading-tight">
+                  {activeLevel.title}
+                </Text>
+
+                {currentTopic && (
+                  <View className="bg-bg-secondary rounded-xl p-xl border border-border-subtle mt-md">
+                    <Text className="text-accent-xp text-xs font-bold uppercase mb-xs tracking-wider">Current Topic</Text>
+                    <Text className="text-text-primary text-xl font-bold mb-md">{currentTopic.title}</Text>
+
+                    {currentTopic.sourceRefs.map((ref, i) => (
+                      <View key={i} className="flex-row items-center gap-sm mt-sm">
+                        <NucleoIcon name="link" size={14} />
+                        <Text className="text-accent-secondary text-md font-medium">{ref.label}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+
+          {/* Right Column: Timer */}
+          <View className="flex-1 justify-center items-center">
+            <PomodoroTimer onSessionComplete={handleSessionComplete} targetSessions={targetSessions} />
+          </View>
         </View>
-      )}
 
-      {/* Timer */}
-      <PomodoroTimer onSessionComplete={handleSessionComplete} targetSessions={targetSessions} />
-
-      {/* Session Complete Overlay */}
-      {sessionComplete && (
-        <SessionComplete
-          durationMinutes={25}
-          pointsEarned={pointsEarned}
-          streakDay={stats.currentStreak}
-          onDismiss={() => router.back()}
-        />
-      )}
-    </SafeAreaView>
+        {/* Session Complete Overlay */}
+        {sessionComplete && (
+          <SessionComplete
+            durationMinutes={25}
+            pointsEarned={pointsEarned}
+            streakDay={stats.currentStreak}
+            onDismiss={() => router.back()}
+          />
+        )}
+      </View>
+    </SafeAreaView >
   );
 }
