@@ -4,8 +4,8 @@
 import { DailyObjectives } from '@/components/home/DailyObjectives';
 import { LevelIndicator } from '@/components/home/LevelIndicator';
 import { QuickActions } from '@/components/home/QuickActions';
-import { RoadmapSelector } from '@/components/roadmap/RoadmapSelector';
 import { StreakCounter } from '@/components/home/StreakCounter';
+import { RoadmapSelector } from '@/components/roadmap/RoadmapSelector';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
@@ -104,11 +104,11 @@ export default function HomeScreen() {
             onPress={() => router.push('/focus')}
             activeOpacity={0.7}
           >
-            <View className="flex-row items-center gap-md">
-              <View className="bg-accent-primary/20 p-sm rounded-lg">
+            <View className="flex-row items-center gap-sm">
+              <View className="p-sm rounded-lg">
                 <NucleoIcon
                   name="eye"
-                  size={20}
+                  size={32}
                 />
               </View>
               <View>
