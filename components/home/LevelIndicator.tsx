@@ -27,6 +27,7 @@ interface LevelIndicatorProps {
   requiredMinutes: number;
   deadline: string;
   totalDays: number;
+  totalPoints: number;
 }
 
 export function LevelIndicator({
@@ -37,11 +38,11 @@ export function LevelIndicator({
   requiredMinutes,
   deadline,
   totalDays,
+  totalPoints,
 }: LevelIndicatorProps) {
   const daysLeft = Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
   const daysElapsed = Math.min(totalDays - daysLeft + 1, totalDays);
   const xpProgress = Math.max(0, daysElapsed / totalDays);
-  const xpEarned = Math.round(xpProgress * 100);
 
   const anim = useSharedValue(0);
 
@@ -103,7 +104,7 @@ export function LevelIndicator({
       {/* XP label */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 }}>
         <NucleoIcon name="star-xp" size={16} />
-        <Text style={{ color: Colors.accent.xp, fontSize: 16, fontWeight: '700' }}>{xpEarned} / 100 XP</Text>
+        <Text style={{ color: Colors.accent.xp, fontSize: 16, fontWeight: '700' }}>{totalPoints} XP</Text>
       </View>
 
       <Text style={{ color: Colors.text.primary, fontSize: 18, fontWeight: '700', marginTop: 8 }} numberOfLines={1}>

@@ -29,7 +29,7 @@ export function DailyObjectives({
       <Text className="text-text-primary text-lg font-bold mb-xs">Don't know what to study?</Text>
       {objectives.map((obj) => (
         <TouchableOpacity key={obj.id} onPress={() => onPress(obj)} activeOpacity={0.7} className="mb-xs">
-          <Card className={obj.completed ? 'opacity-60' : ''}>
+          <Card className={obj.completed ? 'opacity-60' : ''} style={{ borderColor: '#1156ae99' }}>
             <View className="flex-row items-start gap-md">
               <TouchableOpacity
                 className={`w-[24px] h-[24px] rounded-md border-2 border-accent-primary items-center justify-center mt-[2px] ${obj.completed ? 'bg-accent-primary' : ''}`}
