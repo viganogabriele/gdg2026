@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(which firefox *)",
+      "Read(//usr/bin/**)"
+    ]
+  }
+}

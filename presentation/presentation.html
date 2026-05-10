@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyQuest — DedSec Pitch</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <style>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyQuest — DedSec Pitch</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet">
+    <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -349,6 +351,76 @@
     .rm-badge { font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);background:rgba(54,198,226,.12);border:1px solid rgba(54,198,226,.3);border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:middle; }
 
     /* ═══════════════════════════════════════════════════════
+       PHONE MOCKUP
+    ═══════════════════════════════════════════════════════ */
+    .phone-wrap {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      perspective: 900px;
+      filter: drop-shadow(0 50px 90px rgba(0,0,0,.8)) drop-shadow(0 0 70px rgba(17,86,174,.3));
+      margin-right: -40px;
+    }
+    .phone-mock {
+      width: 210px;
+      height: 450px;
+      border-radius: 44px;
+      background: #06101a;
+      border: 2px solid rgba(255,255,255,0.13);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.05),
+        0 0 0 1px rgba(0,0,0,0.6);
+      transform: rotate(-14deg) rotateY(8deg);
+    }
+    /* Dynamic Island */
+    .phone-mock::before {
+      content: '';
+      position: absolute; top: 13px; left: 50%;
+      transform: translateX(-50%);
+      width: 72px; height: 22px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 10;
+    }
+    /* Power button */
+    .phone-mock::after {
+      content: '';
+      position: absolute; right: -3px; top: 90px;
+      width: 3px; height: 46px;
+      background: rgba(255,255,255,0.14);
+      border-radius: 2px;
+    }
+    .phone-vol1 {
+      position: absolute; left: -3px; top: 80px;
+      width: 3px; height: 32px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 2px;
+    }
+    .phone-vol2 {
+      position: absolute; left: -3px; top: 122px;
+      width: 3px; height: 32px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 2px;
+    }
+    .phone-screen {
+      position: absolute; inset: 0;
+      border-radius: 40px;
+      overflow: hidden;
+    }
+    .phone-screen video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    /* glow halo behind phone */
+    .phone-glow {
+      position: absolute; inset: -30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(17,86,174,.22) 0%, transparent 70%);
+      pointer-events: none; z-index: -1;
+    }
+
+    /* ═══════════════════════════════════════════════════════
        S5 – FEATURES
     ═══════════════════════════════════════════════════════ */
     .feat-card {
@@ -506,406 +578,528 @@
 
     .s7-stack { display:flex;flex-wrap:wrap;gap:8px; }
   </style>
-</head>
-<body>
+  </head>
+  <body>
 
-<div class="chrome" id="team-badge">DedSec</div>
-<div class="chrome" id="slide-counter"><span id="cur">1</span> <span style="color:#1a3450">/</span> <span id="tot">7</span></div>
-<div class="chrome" id="progress-bar-track"><div id="progress-bar-fill"></div></div>
-<div class="chrome" id="dots"></div>
-<button class="nav-btn" id="btn-prev">←</button>
-<button class="nav-btn" id="btn-next">→</button>
+    <div class="chrome" id="team-badge">DedSec</div>
+    <div class="chrome" id="slide-counter"><span id="cur">1</span> <span
+        style="color:#1a3450">/</span> <span id="tot">7</span></div>
+    <div class="chrome" id="progress-bar-track"><div
+        id="progress-bar-fill"></div></div>
+    <div class="chrome" id="dots"></div>
+    <button class="nav-btn" id="btn-prev">←</button>
+    <button class="nav-btn" id="btn-next">→</button>
 
-
-<!-- ══════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════
      S1 · HERO
 ══════════════════════════════════════════════════════════ -->
-<div class="slide" id="s1">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
+    <div class="slide" id="s1">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
 
-  <div class="stagger" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:30px;text-align:center;max-width:980px;width:100%;">
+      <div class="stagger"
+        style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:30px;text-align:center;max-width:980px;width:100%;">
 
-    <div>
-      <div class="eyebrow" style="justify-content:center;">DedSec &nbsp;·&nbsp; GDG DevFest 2026</div>
+        <div>
+          <div class="eyebrow" style="justify-content:center;">DedSec
+            &nbsp;·&nbsp; GDG DevFest 2026</div>
+        </div>
+
+        <div>
+          <h1 class="t-hero"><span class="grad">Study</span><span
+              style="color:var(--text)">Quest</span></h1>
+          <p
+            style="font-size:clamp(17px,2.1vw,25px);color:var(--muted2);font-style:italic;font-weight:300;margin-top:20px;line-height:1.5;letter-spacing:-.01em;">
+            From <strong
+              style="color:var(--text);font-style:normal;font-weight:900;">lost</strong>
+            to
+            <strong
+              style="color:var(--cyan);font-style:normal;font-weight:900;">leveled
+              up.</strong>
+            Your AI-powered study companion.
+          </p>
+        </div>
+
+        <div
+          style="width:100%;max-width:580px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);"></div>
+
+        <div
+          style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+          <span class="pill"
+            style="background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.28);color:#64b4ff;">
+            <img src="../assets/svg/nucleo-glass/icon-rocket-blue.svg"
+              width="18" height="18"> AI Roadmap</span>
+          <span class="pill"
+            style="background:rgba(255,210,0,.1);border:1px solid rgba(255,210,0,.28);color:#ffd200;">
+            <img src="../assets/svg/nucleo-glass/icon-award-gold.svg" width="18"
+              height="18"> Gamification</span>
+          <span class="pill"
+            style="background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.28);color:#ffaa00;">
+            <img src="../assets/svg/nucleo-glass/icon-sparkle-yellow.svg"
+              width="18" height="18"> Spaced Repetition</span>
+        </div>
+
+      </div>
     </div>
 
-    <div>
-      <h1 class="t-hero"><span class="grad">Study</span><span style="color:var(--text)">Quest</span></h1>
-      <p style="font-size:clamp(17px,2.1vw,25px);color:var(--muted2);font-style:italic;font-weight:300;margin-top:20px;line-height:1.5;letter-spacing:-.01em;">
-        From <strong style="color:var(--text);font-style:normal;font-weight:900;">lost</strong> to
-        <strong style="color:var(--cyan);font-style:normal;font-weight:900;">leveled up.</strong>
-        Your AI-powered study companion.
-      </p>
-    </div>
-
-    <div style="width:100%;max-width:580px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);"></div>
-
-    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-      <span class="pill" style="background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.28);color:#64b4ff;">
-        <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="18" height="18"> AI Roadmap</span>
-      <span class="pill" style="background:rgba(255,210,0,.1);border:1px solid rgba(255,210,0,.28);color:#ffd200;">
-        <img src="assets/svg/nucleo-glass/icon-award-gold.svg" width="18" height="18"> Gamification</span>
-      <span class="pill" style="background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.28);color:#ffaa00;">
-        <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="18" height="18"> Spaced Repetition</span>
-    </div>
-
-
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════
      S2 · PROBLEM
 ══════════════════════════════════════════════════════════ -->
-<div class="slide" id="s2">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
+    <div class="slide" id="s2">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
 
-  <div style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
+      <div
+        style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
 
-    <div class="stagger" style="flex:0 0 230px;display:flex;flex-direction:column;gap:20px;">
-      <div><div class="eyebrow">The Problem</div></div>
-      <div><h2 class="t-xl">We're<br>students<br><span class="grad">too.</span></h2></div>
-      <div><p class="t-md" style="font-size:14px;max-width:210px;">We built this because we felt the pain first-hand.</p></div>
+        <div class="stagger"
+          style="flex:0 0 230px;display:flex;flex-direction:column;gap:20px;">
+          <div><div class="eyebrow">The Problem</div></div>
+          <div><h2 class="t-xl">We're<br>students<br><span
+                class="grad">too.</span></h2></div>
+          <div><p class="t-md" style="font-size:14px;max-width:210px;">We built
+              this because we felt the pain first-hand.</p></div>
+        </div>
+
+        <div class="stagger"
+          style="flex:1;display:flex;flex-direction:column;gap:12px;">
+          <div class="prob-card c1">
+            <div class="prob-icon"><img
+                src="../assets/svg/nucleo-glass/icon-book-open.svg" width="24"
+                height="24"></div>
+            <div>
+              <div class="prob-num">01</div>
+              <div class="prob-title">"Where do I even start?"</div>
+              <div class="prob-desc">A new subject feels overwhelming. No clear
+                entry point, no structure, no plan.</div>
+            </div>
+          </div>
+          <div class="prob-card c2">
+            <div class="prob-icon"><img
+                src="../assets/svg/nucleo-glass/icon-calendar.svg" width="24"
+                height="24"></div>
+            <div>
+              <div class="prob-num">02</div>
+              <div class="prob-title">"What should I study today?"</div>
+              <div class="prob-desc">Even when motivated, deciding what to do
+                next wastes precious time.</div>
+            </div>
+          </div>
+          <div class="prob-card c3">
+            <div class="prob-icon"><img
+                src="../assets/svg/nucleo-glass/icon-bell.svg" width="24"
+                height="24"></div>
+            <div>
+              <div class="prob-num">03</div>
+              <div class="prob-title"
+                style="color:#f87171;">"I'll start tomorrow..."</div>
+              <div class="prob-desc">Procrastination wins. Every. Single.
+                Time.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <div class="stagger" style="flex:1;display:flex;flex-direction:column;gap:12px;">
-      <div class="prob-card c1">
-        <div class="prob-icon"><img src="assets/svg/nucleo-glass/icon-book-open.svg" width="24" height="24"></div>
-        <div>
-          <div class="prob-num">01</div>
-          <div class="prob-title">"Where do I even start?"</div>
-          <div class="prob-desc">A new subject feels overwhelming. No clear entry point, no structure, no plan.</div>
-        </div>
-      </div>
-      <div class="prob-card c2">
-        <div class="prob-icon"><img src="assets/svg/nucleo-glass/icon-calendar.svg" width="24" height="24"></div>
-        <div>
-          <div class="prob-num">02</div>
-          <div class="prob-title">"What should I study today?"</div>
-          <div class="prob-desc">Even when motivated, deciding what to do next wastes precious time.</div>
-        </div>
-      </div>
-      <div class="prob-card c3">
-        <div class="prob-icon"><img src="assets/svg/nucleo-glass/icon-bell.svg" width="24" height="24"></div>
-        <div>
-          <div class="prob-num">03</div>
-          <div class="prob-title" style="color:#f87171;">"I'll start tomorrow..."</div>
-          <div class="prob-desc">Procrastination wins. Every. Single. Time.</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════
      S3 · SOLUTION
 ══════════════════════════════════════════════════════════ -->
-<div class="slide" id="s3">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
+    <div class="slide" id="s3">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
 
-  <div style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
+      <div
+        style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
 
-    <div class="stagger" style="flex:1;">
-      <div><div class="eyebrow">The Solution</div></div>
-      <div>
-        <h2 class="t-xl" style="margin-top:18px;">An AI agent<br>that builds<br><span class="grad">your roadmap.</span></h2>
-      </div>
-      <div>
-        <p class="t-md" style="margin-top:18px;max-width:360px;">Tell it your subject, sources and deadline. It generates a personalized day-by-day plan in seconds, always adapting.</p>
-      </div>
-      <div style="margin-top:20px;display:flex;gap:9px;flex-wrap:wrap;">
-        <span class="pill" style="background:rgba(54,198,226,.08);border:1px solid rgba(54,198,226,.2);color:var(--cyan);font-size:12px;padding:7px 14px;">
-          <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="14" height="14"> Gemini 2.0</span>
-        <span class="pill" style="background:rgba(147,51,234,.08);border:1px solid rgba(147,51,234,.2);color:var(--purple2);font-size:12px;padding:7px 14px;">
-          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="14" height="14"> Adaptive AI</span>
-        <span class="pill" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green);font-size:12px;padding:7px 14px;">
-          <img src="assets/svg/nucleo-glass/icon-circle-check.svg" width="14" height="14"> Personalized</span>
+        <div class="stagger" style="flex:1;">
+          <div><div class="eyebrow">The Solution</div></div>
+          <div>
+            <h2 class="t-xl" style="margin-top:18px;">An AI agent<br>that
+              builds<br><span class="grad">your roadmap.</span></h2>
+          </div>
+          <div>
+            <p class="t-md" style="margin-top:18px;max-width:360px;">Tell it
+              your subject, sources and deadline. It generates a personalized
+              day-by-day plan in seconds, always adapting.</p>
+          </div>
+          <div style="margin-top:20px;display:flex;gap:9px;flex-wrap:wrap;">
+            <span class="pill"
+              style="background:rgba(54,198,226,.08);border:1px solid rgba(54,198,226,.2);color:var(--cyan);font-size:12px;padding:7px 14px;">
+              <img src="../assets/svg/nucleo-glass/icon-rocket-blue.svg"
+                width="14" height="14"> Gemini 2.0</span>
+            <span class="pill"
+              style="background:rgba(147,51,234,.08);border:1px solid rgba(147,51,234,.2);color:var(--purple2);font-size:12px;padding:7px 14px;">
+              <img src="../assets/svg/nucleo-glass/icon-sparkle-yellow.svg"
+                width="14" height="14"> Adaptive AI</span>
+            <span class="pill"
+              style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green);font-size:12px;padding:7px 14px;">
+              <img src="../assets/svg/nucleo-glass/icon-circle-check.svg"
+                width="14" height="14"> Personalized</span>
+          </div>
+        </div>
+
+        <div class="stagger" style="flex:0 0 305px;">
+          <div class="glass" style="padding:22px 20px;">
+            <div
+              style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+              <div
+                style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);">Your
+                roadmap</div>
+              <div
+                style="font-size:9px;font-weight:800;color:var(--cyan);background:rgba(54,198,226,.1);border:1px solid rgba(54,198,226,.25);border-radius:8px;padding:3px 10px;letter-spacing:.06em;">Day
+                3 of 12</div>
+            </div>
+            <div class="rm-track">
+              <div class="rm-row">
+                <div class="rm-dot done"><img
+                    src="../assets/svg/nucleo-glass/icon-circle-check.svg"
+                    width="20" height="20"></div>
+                <div><div class="rm-day">Day 1</div><div
+                    class="rm-title">Introduction</div></div>
+              </div>
+              <div class="rm-row">
+                <div class="rm-dot done"><img
+                    src="../assets/svg/nucleo-glass/icon-circle-check.svg"
+                    width="20" height="20"></div>
+                <div><div class="rm-day">Day 2</div><div class="rm-title">Core
+                    Concepts</div></div>
+              </div>
+              <div class="rm-row">
+                <div class="rm-dot today"><img
+                    src="../assets/svg/nucleo-glass/icon-flame-fire.svg"
+                    width="20" height="20"></div>
+                <div><div class="rm-day">Day 3 · Today</div><div
+                    class="rm-title today-t">Deep Dive <span
+                      class="rm-badge">NOW</span></div></div>
+              </div>
+              <div class="rm-row" style="opacity:.32;">
+                <div class="rm-dot"><img
+                    src="../assets/svg/nucleo-glass/icon-lock.svg" width="16"
+                    height="16"></div>
+                <div><div class="rm-day">Day 4</div><div
+                    class="rm-title">Practice Sets</div></div>
+              </div>
+              <div class="rm-row" style="opacity:.32;">
+                <div class="rm-dot"><img
+                    src="../assets/svg/nucleo-glass/icon-lock.svg" width="16"
+                    height="16"></div>
+                <div><div class="rm-day">Day 5</div><div class="rm-title">Review
+                    & Quiz</div></div>
+              </div>
+              <div class="rm-row" style="opacity:.32;">
+                <div class="rm-dot"><img
+                    src="../assets/svg/nucleo-glass/icon-award-gold.svg"
+                    width="20" height="20"></div>
+                <div><div class="rm-day">Exam Day</div><div
+                    class="rm-title">You're ready.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <div class="stagger" style="flex:0 0 305px;">
-      <div class="glass" style="padding:22px 20px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);">Your roadmap</div>
-          <div style="font-size:9px;font-weight:800;color:var(--cyan);background:rgba(54,198,226,.1);border:1px solid rgba(54,198,226,.25);border-radius:8px;padding:3px 10px;letter-spacing:.06em;">Day 3 of 12</div>
-        </div>
-        <div class="rm-track">
-          <div class="rm-row">
-            <div class="rm-dot done"><img src="assets/svg/nucleo-glass/icon-circle-check.svg" width="20" height="20"></div>
-            <div><div class="rm-day">Day 1</div><div class="rm-title">Introduction</div></div>
-          </div>
-          <div class="rm-row">
-            <div class="rm-dot done"><img src="assets/svg/nucleo-glass/icon-circle-check.svg" width="20" height="20"></div>
-            <div><div class="rm-day">Day 2</div><div class="rm-title">Core Concepts</div></div>
-          </div>
-          <div class="rm-row">
-            <div class="rm-dot today"><img src="assets/svg/nucleo-glass/icon-flame-fire.svg" width="20" height="20"></div>
-            <div><div class="rm-day">Day 3 · Today</div><div class="rm-title today-t">Deep Dive <span class="rm-badge">NOW</span></div></div>
-          </div>
-          <div class="rm-row" style="opacity:.32;">
-            <div class="rm-dot"><img src="assets/svg/nucleo-glass/icon-lock.svg" width="16" height="16"></div>
-            <div><div class="rm-day">Day 4</div><div class="rm-title">Practice Sets</div></div>
-          </div>
-          <div class="rm-row" style="opacity:.32;">
-            <div class="rm-dot"><img src="assets/svg/nucleo-glass/icon-lock.svg" width="16" height="16"></div>
-            <div><div class="rm-day">Day 5</div><div class="rm-title">Review & Quiz</div></div>
-          </div>
-          <div class="rm-row" style="opacity:.32;">
-            <div class="rm-dot"><img src="assets/svg/nucleo-glass/icon-award-gold.svg" width="20" height="20"></div>
-            <div><div class="rm-day">Exam Day</div><div class="rm-title">You're ready.</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════
      S4 · VIDEO DEMO
 ══════════════════════════════════════════════════════════ -->
-<div class="slide" id="s4" style="padding:40px 56px;">
-  <div class="stagger" style="position:relative;z-index:1;width:100%;max-width:1000px;display:flex;flex-direction:column;gap:18px;align-items:center;">
-    <div style="text-align:center;">
-      <div class="eyebrow" style="justify-content:center;">See it in action</div>
-      <h2 class="t-lg" style="margin-top:10px;">StudyQuest · Live Demo</h2>
-    </div>
-    <div style="width:100%;border-radius:20px;overflow:hidden;
+    <div class="slide" id="s4" style="padding:40px 56px;">
+      <div class="stagger"
+        style="position:relative;z-index:1;width:100%;max-width:1000px;display:flex;flex-direction:column;gap:18px;align-items:center;">
+        <div style="text-align:center;">
+          <div class="eyebrow" style="justify-content:center;">See it in
+            action</div>
+          <h2 class="t-lg" style="margin-top:10px;">StudyQuest · Live Demo</h2>
+        </div>
+        <div style="width:100%;border-radius:20px;overflow:hidden;
       border:1px solid rgba(17,86,174,.26);
       box-shadow:
         0 0 120px rgba(17,86,174,.22),
         0 0 220px rgba(147,51,234,.1),
         0 32px 80px rgba(0,0,0,.7);
       background:#000;position:relative;">
-      <div style="position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:20px;
+          <div
+            style="position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:20px;
         box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);"></div>
-      <video id="demo-video" src="video.mp4" muted playsinline loop controls style="width:100%;display:block;"></video>
+          <video id="demo-video" src="video.mp4" muted playsinline loop controls
+            style="width:100%;display:block;"></video>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-
-<!-- ══════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════
      S5 · FEATURES
 ══════════════════════════════════════════════════════════ -->
-<div class="slide" id="s5">
-  <div style="position:relative;z-index:1;max-width:940px;width:100%;display:flex;flex-direction:column;gap:28px;">
+    <div class="slide" id="s5">
 
-    <div class="stagger">
-      <div>
-        <div class="eyebrow">What it does</div>
-        <h2 class="t-xl" style="margin-top:12px;">Everything you <span class="grad">need.</span><br>
-          <span style="color:var(--muted);font-weight:300;font-size:.56em;letter-spacing:-.01em;">Nothing you don't.</span>
-        </h2>
+      <!-- Phone: absolute, pinned to right edge of slide
+      <div class="phone-wrap"
+        style="position:absolute;right:0px;top:50%;transform:translateY(-20%);z-index:2;">
+        <div class="phone-glow"></div>
+        <div class="phone-mock">
+          <div class="phone-vol1"></div>
+          <div class="phone-vol2"></div>
+          <div class="phone-screen">
+            <video src="timer.MP4" muted playsinline loop
+              style="width:100%;height:100%;object-fit:cover;"></video>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- Content: left-aligned, leaves room for phone -->
+      <div
+        style="position:relative;z-index:1;width:100%;max-width:620px;display:flex;flex-direction:column;gap:24px;align-self:center;margin-left:0;">
+        <div class="stagger">
+          <div>
+            <div class="eyebrow">What it does</div>
+            <h2 class="t-xl" style="margin-top:12px;">Everything you <span
+                class="grad">need.</span><br>
+              <span
+                style="color:var(--muted);font-weight:300;font-size:.56em;letter-spacing:-.01em;">Nothing
+                you don't.</span>
+            </h2>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"
+          class="grid-in">
+          <div class="feat-card f1">
+            <div class="feat-icon" style="background:rgba(255,210,0,.1);">
+              <img src="../assets/svg/nucleo-glass/icon-award-gold.svg"
+                width="28" height="28">
+            </div>
+            <div>
+              <div class="feat-title">Gamification</div>
+              <div class="feat-desc">XP, streaks, badges, leaderboard. Studying
+                feels like a game you want to play.</div>
+            </div>
+          </div>
+          <div class="feat-card f2">
+            <div class="feat-icon" style="background:rgba(54,198,226,.1);">
+              <img src="../assets/svg/nucleo-glass/icon-sparkle-yellow.svg"
+                width="28" height="28">
+            </div>
+            <div>
+              <div class="feat-title">Spaced Repetition</div>
+              <div class="feat-desc">SM-2 schedules your reviews at the perfect
+                moment. Long-term memory, guaranteed.</div>
+            </div>
+          </div>
+          <div class="feat-card f3">
+            <div class="feat-icon" style="background:rgba(34,197,94,.1);">
+              <img src="../assets/svg/nucleo-glass/icon-eye.svg" width="28"
+                height="28">
+            </div>
+            <div>
+              <div class="feat-title">Focus Mode</div>
+              <div class="feat-desc">Built-in Pomodoro timer. Rotate your phone
+                to start. No friction, pure flow.</div>
+            </div>
+          </div>
+          <div class="feat-card f4">
+            <div class="feat-icon" style="background:rgba(147,51,234,.1);">
+              <img src="../assets/svg/nucleo-glass/icon-link.svg" width="28"
+                height="28">
+            </div>
+            <div>
+              <div class="feat-title">Braynr Sync</div>
+              <div class="feat-desc">AI recalculates your roadmap based on your
+                real retention data.</div>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" class="grid-in">
-      <div class="feat-card f1">
-        <div class="feat-icon" style="background:rgba(255,210,0,.1);">
-          <img src="assets/svg/nucleo-glass/icon-award-gold.svg" width="30" height="30">
-        </div>
-        <div>
-          <div class="feat-title">Gamification</div>
-          <div class="feat-desc">XP, streaks, badges, leaderboard. Studying feels like a game you actually want to play.</div>
-        </div>
-      </div>
-      <div class="feat-card f2">
-        <div class="feat-icon" style="background:rgba(54,198,226,.1);">
-          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="30" height="30">
-        </div>
-        <div>
-          <div class="feat-title">Spaced Repetition</div>
-          <div class="feat-desc">SM-2 algorithm schedules your reviews at the perfect moment. Long-term memory, guaranteed.</div>
-        </div>
-      </div>
-      <div class="feat-card f3">
-        <div class="feat-icon" style="background:rgba(34,197,94,.1);">
-          <img src="assets/svg/nucleo-glass/icon-eye.svg" width="30" height="30">
-        </div>
-        <div>
-          <div class="feat-title">Focus Mode</div>
-          <div class="feat-desc">Built-in Pomodoro timer. Rotate your phone to start. No friction, pure flow.</div>
-        </div>
-      </div>
-      <div class="feat-card f4">
-        <div class="feat-icon" style="background:rgba(147,51,234,.1);">
-          <img src="assets/svg/nucleo-glass/icon-link.svg" width="30" height="30">
-        </div>
-        <div>
-          <div class="feat-title">Braynr Sync</div>
-          <div class="feat-desc">Connect your Braynr stats. The AI recalculates your roadmap based on your real retention data.</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════
      S6 · AI ENGINE
 ══════════════════════════════════════════════════════════ -->
-<div class="slide" id="s6">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
+    <div class="slide" id="s6">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
 
-  <div style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
+      <div
+        style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
 
-    <!-- LEFT: text + insight rows -->
-    <div class="stagger" style="flex:1;display:flex;flex-direction:column;gap:24px;">
-      <div>
-        <div class="eyebrow">Powered by AI</div>
-        <h2 class="t-xl" style="margin-top:14px;">Gemini at the core.<br><span class="grad">Always adapting.</span></h2>
-        <p class="t-md" style="margin-top:16px;max-width:400px;">The AI watches your performance and recalibrates your roadmap in real time, every session.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:9px;">
-        <div class="ai-insight-row">
-          <img src="assets/svg/nucleo-glass/icon-flame-fire.svg" width="22" height="22">
-          Personalized from day one
+        <!-- LEFT: text + insight rows -->
+        <div class="stagger"
+          style="flex:1;display:flex;flex-direction:column;gap:24px;">
+          <div>
+            <div class="eyebrow">Powered by AI</div>
+            <h2 class="t-xl" style="margin-top:14px;">Gemini at the
+              core.<br><span class="grad">Always adapting.</span></h2>
+            <p class="t-md" style="margin-top:16px;max-width:400px;">The AI
+              watches your performance and recalibrates your roadmap in real
+              time, every session.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <div class="ai-insight-row">
+              <img src="../assets/svg/nucleo-glass/icon-flame-fire.svg"
+                width="22" height="22">
+              Personalized from day one
+            </div>
+            <div class="ai-insight-row">
+              <img src="../assets/svg/nucleo-glass/icon-sparkle-yellow.svg"
+                width="22" height="22">
+              Re-generates when you fail
+            </div>
+            <div class="ai-insight-row">
+              <img src="../assets/svg/nucleo-glass/icon-star-xp.svg" width="22"
+                height="22">
+              Braynr-enhanced timing
+            </div>
+          </div>
         </div>
-        <div class="ai-insight-row">
-          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="22" height="22">
-          Re-generates when you fail
+
+        <!-- RIGHT: hub diagram -->
+        <div class="stagger" style="flex:0 0 380px;">
+          <div class="ai-hub-wrap">
+
+            <!-- SVG connecting lines -->
+            <svg class="ai-hub-svg" viewBox="0 0 380 340"
+              xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <lineargradient id="lga" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#9333ea" stop-opacity=".55" />
+                  <stop offset="100%" stop-color="#36c6e2" stop-opacity=".55" />
+                </lineargradient>
+                <lineargradient id="lgb" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#36c6e2" stop-opacity=".55" />
+                  <stop offset="100%" stop-color="#9333ea" stop-opacity=".55" />
+                </lineargradient>
+              </defs>
+              <!-- center is at 190, 170 -->
+              <!-- TL node center ~68,36  TR ~312,36  BL ~68,310  BR ~312,310 -->
+              <line x1="190" y1="170" x2="100" y2="52" stroke="url(#lga)"
+                stroke-width="1.5" stroke-dasharray="5 5"
+                style="animation:dashMarch 1.4s linear infinite" />
+              <line x1="190" y1="170" x2="280" y2="52" stroke="url(#lgb)"
+                stroke-width="1.5" stroke-dasharray="5 5"
+                style="animation:dashMarch 1.4s linear infinite 0.35s" />
+              <line x1="190" y1="170" x2="100" y2="304" stroke="url(#lgb)"
+                stroke-width="1.5" stroke-dasharray="5 5"
+                style="animation:dashMarch 1.4s linear infinite 0.7s" />
+              <line x1="190" y1="170" x2="280" y2="304" stroke="url(#lga)"
+                stroke-width="1.5" stroke-dasharray="5 5"
+                style="animation:dashMarch 1.4s linear infinite 1.05s" />
+              <!-- glow dots at endpoints -->
+              <circle cx="100" cy="52" r="3" fill="#9333ea" opacity=".7" />
+              <circle cx="280" cy="52" r="3" fill="#36c6e2" opacity=".7" />
+              <circle cx="100" cy="304" r="3" fill="#36c6e2" opacity=".7" />
+              <circle cx="280" cy="304" r="3" fill="#9333ea" opacity=".7" />
+              <circle cx="190" cy="170" r="5" fill="#1a72e0" opacity=".5" />
+            </svg>
+
+            <!-- Center: Gemini -->
+            <div class="ai-hub-center">
+              <img src="../assets/svg/nucleo-glass/icon-rocket-blue.svg"
+                width="30" height="30">
+              <span>Gemini 3.1</span>
+            </div>
+
+            <!-- TL: sources -->
+            <div class="ai-hub-node"
+              style="top:16px;left:0;border-color:rgba(147,51,234,.3);background:rgba(147,51,234,.08);">
+              <img src="../assets/svg/nucleo-glass/icon-book-open.svg"
+                width="18" height="18"> Your sources
+            </div>
+            <!-- TR: profile -->
+            <div class="ai-hub-node"
+              style="top:16px;right:0;border-color:rgba(54,198,226,.3);background:rgba(54,198,226,.07);">
+              <img src="../assets/svg/nucleo-glass/icon-link.svg" width="18"
+                height="18"> Braynr data
+            </div>
+            <!-- BL: roadmap -->
+            <div class="ai-hub-node"
+              style="bottom:16px;left:0;border-color:rgba(54,198,226,.3);background:rgba(54,198,226,.07);">
+              <img src="../assets/svg/nucleo-glass/icon-folder.svg" width="18"
+                height="18"> Roadmap
+            </div>
+            <!-- BR: results -->
+            <div class="ai-hub-node"
+              style="bottom:16px;right:0;border-color:rgba(255,210,0,.28);background:rgba(255,210,0,.05);">
+              <img src="../assets/svg/nucleo-glass/icon-star-xp.svg" width="18"
+                height="18"> Your results
+            </div>
+
+          </div>
         </div>
-        <div class="ai-insight-row">
-          <img src="assets/svg/nucleo-glass/icon-star-xp.svg" width="22" height="22">
-          Braynr-enhanced timing
-        </div>
+
       </div>
     </div>
 
-    <!-- RIGHT: hub diagram -->
-    <div class="stagger" style="flex:0 0 380px;">
-      <div class="ai-hub-wrap">
-
-        <!-- SVG connecting lines -->
-        <svg class="ai-hub-svg" viewBox="0 0 380 340" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="lga" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#9333ea" stop-opacity=".55"/>
-              <stop offset="100%" stop-color="#36c6e2" stop-opacity=".55"/>
-            </linearGradient>
-            <linearGradient id="lgb" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#36c6e2" stop-opacity=".55"/>
-              <stop offset="100%" stop-color="#9333ea" stop-opacity=".55"/>
-            </linearGradient>
-          </defs>
-          <!-- center is at 190, 170 -->
-          <!-- TL node center ~68,36  TR ~312,36  BL ~68,310  BR ~312,310 -->
-          <line x1="190" y1="170" x2="100" y2="52"  stroke="url(#lga)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite"/>
-          <line x1="190" y1="170" x2="280" y2="52"  stroke="url(#lgb)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite 0.35s"/>
-          <line x1="190" y1="170" x2="100" y2="304" stroke="url(#lgb)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite 0.7s"/>
-          <line x1="190" y1="170" x2="280" y2="304" stroke="url(#lga)" stroke-width="1.5" stroke-dasharray="5 5" style="animation:dashMarch 1.4s linear infinite 1.05s"/>
-          <!-- glow dots at endpoints -->
-          <circle cx="100" cy="52"  r="3" fill="#9333ea" opacity=".7"/>
-          <circle cx="280" cy="52"  r="3" fill="#36c6e2" opacity=".7"/>
-          <circle cx="100" cy="304" r="3" fill="#36c6e2" opacity=".7"/>
-          <circle cx="280" cy="304" r="3" fill="#9333ea" opacity=".7"/>
-          <circle cx="190" cy="170" r="5" fill="#1a72e0" opacity=".5"/>
-        </svg>
-
-        <!-- Center: Gemini -->
-        <div class="ai-hub-center">
-          <img src="assets/svg/nucleo-glass/icon-rocket-blue.svg" width="30" height="30">
-          <span>Gemini 2.0</span>
-        </div>
-
-        <!-- TL: sources -->
-        <div class="ai-hub-node" style="top:16px;left:0;border-color:rgba(147,51,234,.3);background:rgba(147,51,234,.08);">
-          <img src="assets/svg/nucleo-glass/icon-book-open.svg" width="18" height="18"> Your sources
-        </div>
-        <!-- TR: profile -->
-        <div class="ai-hub-node" style="top:16px;right:0;border-color:rgba(54,198,226,.3);background:rgba(54,198,226,.07);">
-          <img src="assets/svg/nucleo-glass/icon-link.svg" width="18" height="18"> Braynr data
-        </div>
-        <!-- BL: roadmap -->
-        <div class="ai-hub-node" style="bottom:16px;left:0;border-color:rgba(54,198,226,.3);background:rgba(54,198,226,.07);">
-          <img src="assets/svg/nucleo-glass/icon-folder.svg" width="18" height="18"> Roadmap
-        </div>
-        <!-- BR: results -->
-        <div class="ai-hub-node" style="bottom:16px;right:0;border-color:rgba(255,210,0,.28);background:rgba(255,210,0,.05);">
-          <img src="assets/svg/nucleo-glass/icon-star-xp.svg" width="18" height="18"> Your results
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════
      S7 · CLOSING
 ══════════════════════════════════════════════════════════ -->
-<div class="slide" id="s7">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
+    <div class="slide" id="s7">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
 
-  <div class="s7-layout stagger">
+      <div class="s7-layout stagger">
 
-    <!-- LEFT: headline + copy + pills -->
-    <div class="s7-left">
-      <div><div class="eyebrow">DedSec &nbsp;·&nbsp; GDG 2026</div></div>
+        <!-- LEFT: headline + copy + pills -->
+        <div class="s7-left">
+          <div><div class="eyebrow">DedSec &nbsp;·&nbsp; GDG 2026</div></div>
 
-      <div>
-        <h2 style="font-size:clamp(44px,5.8vw,82px);font-weight:900;line-height:0.92;letter-spacing:-0.04em;">
-          Stop<br>procrastinating.<br>
-          <span class="grad">Start Questing.</span>
-        </h2>
+          <div>
+            <h2
+              style="font-size:clamp(44px,5.8vw,82px);font-weight:900;line-height:0.92;letter-spacing:-0.04em;">
+              Stop<br>procrastinating.<br>
+              <span class="grad">Start Questing.</span>
+            </h2>
+          </div>
+
+          <div>
+            <p
+              style="font-size:clamp(15px,1.6vw,20px);color:var(--muted2);max-width:420px;line-height:1.65;">
+              The only thing between you and your exam<br>
+              is knowing <strong
+                style="color:var(--text);font-weight:800;">where to
+                start.</strong>
+            </p>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: brand ring + info card -->
+        <div class="s7-right">
+
+          <div class="s7-ring-wrap">
+            <div class="s7-ring-outer"></div>
+            <div class="s7-ring-mid"></div>
+            <div class="s7-ring-core">
+              <img src="../assets/svg/nucleo-glass/icon-sparkle-yellow.svg"
+                width="54" height="54" style="opacity:.95;">
+              <div class="s7-brand-name">StudyQuest</div>
+              <div class="s7-brand-sub">by DedSec</div>
+            </div>
+          </div>
+
+          <div class="s7-info-card">
+            <div class="s7-info-row">
+              <span class="s7-info-label">Team</span>
+              <span class="s7-info-value">DedSec</span>
+            </div>
+            <div class="s7-info-row">
+              <span class="s7-info-label">Event</span>
+              <span class="s7-info-value">GDG DevFest 2026</span>
+            </div>
+            <div class="s7-info-row">
+              <span class="s7-info-label">Platform</span>
+              <span class="s7-info-value"
+                style="background:linear-gradient(90deg,#c084fc,#60b4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">iOS
+                &amp; Android</span>
+            </div>
+          </div>
+
+        </div>
+
       </div>
-
-      <div>
-        <p style="font-size:clamp(15px,1.6vw,20px);color:var(--muted2);max-width:420px;line-height:1.65;">
-          The only thing between you and your exam<br>
-          is knowing <strong style="color:var(--text);font-weight:800;">where to start.</strong>
-        </p>
-      </div>
-
     </div>
 
-    <!-- RIGHT: brand ring + info card -->
-    <div class="s7-right">
-
-      <div class="s7-ring-wrap">
-        <div class="s7-ring-outer"></div>
-        <div class="s7-ring-mid"></div>
-        <div class="s7-ring-core">
-          <img src="assets/svg/nucleo-glass/icon-sparkle-yellow.svg" width="54" height="54" style="opacity:.95;">
-          <div class="s7-brand-name">StudyQuest</div>
-          <div class="s7-brand-sub">by DedSec</div>
-        </div>
-      </div>
-
-      <div class="s7-info-card">
-        <div class="s7-info-row">
-          <span class="s7-info-label">Team</span>
-          <span class="s7-info-value">DedSec</span>
-        </div>
-        <div class="s7-info-row">
-          <span class="s7-info-label">Event</span>
-          <span class="s7-info-value">GDG DevFest 2026</span>
-        </div>
-        <div class="s7-info-row">
-          <span class="s7-info-label">Platform</span>
-          <span class="s7-info-value" style="background:linear-gradient(90deg,#c084fc,#60b4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">iOS &amp; Android</span>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-
-<script>
+    <script>
   const slides  = Array.from(document.querySelectorAll('.slide'));
   const dotsEl  = document.getElementById('dots');
   const curEl   = document.getElementById('cur');
@@ -959,5 +1153,5 @@
 
   goTo(0);
 </script>
-</body>
+  </body>
 </html>
