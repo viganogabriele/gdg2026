@@ -12,6 +12,7 @@ export const NUCLEO_ICONS = {
   calendar: require('@/assets/svg/nucleo-glass/icon-calendar.svg'),
   'circle-check': require('@/assets/svg/nucleo-glass/icon-circle-check.svg'),
   dial: require('@/assets/svg/nucleo-glass/icon-dial.svg'),
+  eye: require('@/assets/svg/nucleo-glass/icon-eye.svg'),
   'face-grin': require('@/assets/svg/nucleo-glass/icon-face-grin.svg'),
   'flame-fire': require('@/assets/svg/nucleo-glass/icon-flame-fire.svg'),
   folder: require('@/assets/svg/nucleo-glass/icon-folder.svg'),

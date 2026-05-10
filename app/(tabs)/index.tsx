@@ -6,6 +6,7 @@ import { LevelIndicator } from '@/components/home/LevelIndicator';
 import { QuickActions } from '@/components/home/QuickActions';
 import { StreakCounter } from '@/components/home/StreakCounter';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
@@ -106,11 +107,9 @@ export default function HomeScreen() {
           >
             <View className="flex-row items-center gap-md">
               <View className="bg-accent-primary/20 p-sm rounded-lg">
-                <IconSymbol
+                <NucleoIcon
                   name="eye"
                   size={20}
-                  weight="medium"
-                  color={Colors.text.secondary}
                 />
               </View>
               <View>

@@ -128,9 +128,8 @@ function ActionButton({
 
   return (
     <AnimatedTouchable
-      className={`flex-1 bg-bg-secondary rounded-lg p-lg items-center border relative ${disabled ? 'opacity-50' : ''}`}
+      className={`flex-1 bg-bg-secondary rounded-lg p-lg items-center border ${boosted ? 'border-red-500' : 'border-[#2c3b4e]'} relative ${disabled ? 'opacity-50' : ''}`}
       style={[
-        { borderColor: disabled ? Colors.border.subtle : `${color}99` },
         animatedStyle,
       ]}
       onPress={() => {
@@ -156,8 +155,8 @@ function ActionButton({
         )}
       </View>
       <Text
-        className={`text-md font-semibold ${disabled ? 'text-text-muted' : ''}`}
-        style={!disabled ? { color } : undefined}
+        className={`text-md font-semibold ${disabled ? 'text-text-muted' : boosted ? 'text-red-500' : ''}`}
+        style={!disabled && !boosted ? { color } : undefined}
       >
         {title}
       </Text>
