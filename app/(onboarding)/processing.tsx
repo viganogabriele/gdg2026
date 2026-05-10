@@ -73,7 +73,7 @@ export default function ProcessingScreen() {
         startQuiz({
           id: 'assessment_initial',
           type: 'assessment',
-          subjectId: 'subject_1',
+          subjectId: `subject_${onboardingData.subjectTitle}`,
           questions,
           passThreshold: 0,
         });

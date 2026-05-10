@@ -5,6 +5,7 @@ import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LevelCard } from './LevelCard';
+import { RoadmapSelector } from './RoadmapSelector';
 import { Colors } from '@/constants/theme';
 import type { StudyLevel } from '@/types';
 
@@ -47,7 +48,9 @@ export function TimelineView({ levels, onLevelPress, onTakeQuiz }: TimelineViewP
     >
       {/* Overall Progress Header */}
       <View className="mb-xxl pt-lg">
-        <Text className="text-text-primary text-xxl font-bold">Study Roadmap</Text>
+        <View className="flex-row items-center justify-between mb-sm">
+          <RoadmapSelector />
+        </View>
         <Text className="text-text-secondary text-sm mt-xs">
           {completedCount} / {totalCount} levels completed
         </Text>
