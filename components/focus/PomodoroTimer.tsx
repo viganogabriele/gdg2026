@@ -1,14 +1,15 @@
 /**
  * Pomodoro Timer — circular countdown with pause/resume
  */
-import { Button } from '@/components/ui/Button';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
 import { PomodoroDefaults } from '@/constants/gamification';
 import { Colors } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 interface PomodoroTimerProps {
   onSessionComplete: (durationMinutes: number) => void;
@@ -16,10 +17,12 @@ interface PomodoroTimerProps {
 }
 
 export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTimerProps) {
+  const router = useRouter();
   const sessionFocusTime = useStudyStore((s) => s.sessionFocusTime);
   const incrementSessionFocusTime = useStudyStore((s) => s.incrementSessionFocusTime);
 
   const [isRunning, setIsRunning] = useState(true);
+  const [sessionComplete, setSessionComplete] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(PomodoroDefaults.WORK_MINUTES * 60 - (sessionFocusTime % (PomodoroDefaults.WORK_MINUTES * 60)));
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
@@ -46,6 +49,7 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
 
         if (targetSessions && newCompleted >= targetSessions) {
           setIsRunning(false);
+          setSessionComplete(true);
           onSessionComplete(totalStudied.current);
           return;
         }
@@ -111,26 +115,84 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
         </View>
       </View>
 
-      <View className="flex-row gap-md w-full justify-center px-xl">
-        <View className="flex-1">
-          <Button
-            title={isRunning ? 'Pause' : 'Start'}
-            onPress={() => setIsRunning(!isRunning)}
-            variant={isRunning ? 'secondary' : 'primary'}
-            fullWidth
+      <View className="flex-row gap-xl w-full justify-center px-xl items-center">
+        {!sessionComplete && (
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="w-[72px] h-[72px] rounded-full items-center justify-center border-2"
+            style={{
+              borderColor: Colors.accent.danger,
+              backgroundColor: Colors.accent.danger
+            }}
+            activeOpacity={0.7}
+          >
+            <IconSymbol
+              name="xmark"
+              size={28}
+              color={Colors.text.primary}
+            />
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          onPress={() => setIsRunning(!isRunning)}
+          className="w-[72px] h-[72px] rounded-full items-center justify-center"
+          style={{
+            backgroundColor: isRunning ? Colors.bg.tertiary : Colors.accent.primary,
+            shadowColor: isRunning ? '#000' : Colors.accent.primary,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 10,
+            elevation: 8
+          }}
+          activeOpacity={0.8}
+        >
+          <IconSymbol
+            name={isRunning ? 'pause' : 'play.fill'}
+            size={36}
+            color={Colors.text.primary}
           />
-        </View>
+        </TouchableOpacity>
+
         {isBreak ? (
-          <View className="flex-1">
-            <Button title="Skip Break" variant="ghost" onPress={() => {
+          <TouchableOpacity
+            onPress={() => {
               setIsBreak(false);
               setSecondsLeft(PomodoroDefaults.WORK_MINUTES * 60);
-            }} fullWidth />
-          </View>
+            }}
+            className="w-[72px] h-[72px] rounded-full items-center justify-center border-2 border-dashed"
+            style={{
+              borderColor: Colors.border.subtle,
+              backgroundColor: 'transparent'
+            }}
+            activeOpacity={0.7}
+          >
+            <IconSymbol
+              name="forward.fill"
+              size={28}
+              color={Colors.text.primary}
+            />
+          </TouchableOpacity>
         ) : (
-          <View className="flex-1">
-            <Button title="Complete" variant="success" onPress={handleComplete} fullWidth />
-          </View>
+          <TouchableOpacity
+            onPress={handleComplete}
+            className="w-[72px] h-[72px] rounded-full items-center justify-center"
+            style={{
+              backgroundColor: Colors.accent.success,
+              shadowColor: Colors.accent.success,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 10,
+              elevation: 8
+            }}
+            activeOpacity={0.8}
+          >
+            <IconSymbol
+              name="checkmark"
+              size={36}
+              color={Colors.text.primary}
+            />
+          </TouchableOpacity>
         )}
       </View>
 

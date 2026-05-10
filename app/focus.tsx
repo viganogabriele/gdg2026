@@ -67,20 +67,6 @@ export default function FocusScreen() {
         }}
         className="bg-bg-primary"
       >
-        {/* Header / Close */}
-        {!sessionComplete && <TouchableOpacity
-          onPress={() => router.back()}
-          className="absolute top-xxl right-xl z-10 p-sm rounded-full"
-          style={{ backgroundColor: Colors.accent.danger }}
-        >
-          <IconSymbol
-            name="xmark"
-            size={24}
-            weight="medium"
-            color={Colors.bg.primary}
-          />
-        </TouchableOpacity>}
-
         <View className="flex-1 flex-row pt-xxl">
           {/* Left Column: Topic Info */}
           <View className="flex-1 justify-center px-xxl pl-xxxl">
@@ -101,7 +87,7 @@ export default function FocusScreen() {
                     {currentTopic.sourceRefs.map((ref, i) => (
                       <View key={i} className="flex-row items-center gap-sm mt-sm">
                         <NucleoIcon name="link" size={14} />
-                        <Text className="text-accent-secondary text-md font-medium">{ref.label}</Text>
+                        <Text className="text-gray-400 text-md font-medium">{ref.label}</Text>
                       </View>
                     ))}
                   </View>
