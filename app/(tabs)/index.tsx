@@ -44,9 +44,9 @@ export default function HomeScreen() {
     router.push('/spaced-review');
   };
 
-  const handleObjectivePress = () => {
+  const handleObjectivePress = (objective: import('@/types').DailyObjective) => {
     if (activeLevel) {
-      router.push('/focus');
+      router.push(`/focus?objectiveId=${objective.id}`);
     }
   };
 
