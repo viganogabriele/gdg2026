@@ -28,7 +28,7 @@ export function BadgeDisplay({
   }[size];
 
   return (
-    <View className="items-center w-[80px]">
+    <View className="items-center w-full">
       <View
         className={`rounded-lg items-center justify-center border-[1.5px] ${
           earned

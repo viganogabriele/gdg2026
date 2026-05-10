@@ -70,16 +70,17 @@ export default function ProfileScreen() {
           <NucleoIcon name="star-xp" size={18} />
           <Text className="text-text-primary text-lg font-bold">Badges</Text>
         </View>
-        <View className="flex-row flex-wrap gap-md mb-lg">
+        <View className="flex-row flex-wrap mb-lg" style={{ gap: 12 }}>
           {BadgeDefinitions.map((def) => (
-            <BadgeDisplay
-              key={def.id}
-              icon={def.icon}
-              title={def.title}
-              description={def.description}
-              earned={earnedBadgeIds.has(def.id)}
-              size="md"
-            />
+            <View key={def.id} style={{ width: '30%', flexGrow: 1 }}>
+              <BadgeDisplay
+                icon={def.icon}
+                title={def.title}
+                description={def.description}
+                earned={earnedBadgeIds.has(def.id)}
+                size="md"
+              />
+            </View>
           ))}
         </View>
 
@@ -96,7 +97,7 @@ export default function ProfileScreen() {
           <SettingRow label="Streak Warnings" value={prefs.streakWarnings}
             onChange={(v) => updatePrefs({ streakWarnings: v })} />
           <SettingRow label="Challenge Alerts" value={prefs.challengeNotifications}
-            onChange={(v) => updatePrefs({ challengeNotifications: v })} />
+            onChange={(v) => updatePrefs({ challengeNotifications: v })} last />
         </Card>
 
         {/* Danger Zone */}
@@ -118,9 +119,9 @@ function StatCard({ iconName, label, value }: { iconName: NucleoIconName; label:
   );
 }
 
-function SettingRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+function SettingRow({ label, value, onChange, last }: { label: string; value: boolean; onChange: (v: boolean) => void; last?: boolean }) {
   return (
-    <View className="flex-row justify-between items-center py-md border-b border-border-subtle">
+    <View className={`flex-row justify-between items-center py-md ${last ? '' : 'border-b border-border-subtle'}`}>
       <Text className="text-text-primary text-md">{label}</Text>
       <Switch value={value} onValueChange={onChange}
         trackColor={{ false: Colors.bg.tertiary, true: Colors.accent.primary }}
