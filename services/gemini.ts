@@ -347,7 +347,7 @@ ${sectionList}
 
 Rules:
 - Create one level per section (${sections.length} levels total)
-- Each level can have more than topics, preceded by the day number and a dash, e.g. "Day 1 - Topic Title"
+- Each level can have more than topics, preceded by the day number and a dash, e.g. "Day 1 - Topic Title" (Days need to be incremental, no skipping days)
 - Each topic has 3 specific study arguments (what to study)
 - If the student scored well (>${Math.round(assessmentScore * 100)}%), mark early levels as completed
 - Levels should be numbered 1 through ${sections.length}
@@ -522,7 +522,9 @@ export async function geminiGenerateLevelQuiz(
   levelTitle: string,
   topics: LevelTopic[],
   count: number = 8,
-  provider: AIProvider = 'gemini'
+  provider: AIProvider = 'gemini',
+  flaggedObjectives?: DailyObjective[],
+  sources?: Source[]
 ): Promise<{ questions: QuizQuestion[] }> {
   const topicList = topics
     .map(
@@ -531,10 +533,20 @@ export async function geminiGenerateLevelQuiz(
     )
     .join('\n');
 
+  const objectivesText = flaggedObjectives && flaggedObjectives.length > 0
+    ? `\nFocus the questions heavily on these completed daily objectives:\n` + flaggedObjectives.map(o => `- ${o.title}: ${o.description}`).join('\n')
+    : '';
+
+  const sourcesText = sources && sources.length > 0
+    ? `\nBase the questions on the loaded sources provided:\n` + sources.map(s => `Source: "${s.title}"\nContent Preview: ${s.content?.slice(0, 500) || s.rawText?.slice(0, 500) || 'No content preview available'}`).join('\n\n')
+    : '';
+
   const prompt = `You are a quiz generator for a study app. Create ${count} multiple-choice questions for the level "${levelTitle}".
 
 Topics in this level:
 ${topicList}
+${objectivesText}
+${sourcesText}
 
 Requirements:
 - Each question must have exactly 4 options

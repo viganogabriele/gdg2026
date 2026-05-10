@@ -26,6 +26,8 @@ export default function QuizScreen() {
   const [score, setScore] = useState(0);
 
   const level = store.levels.find((l) => l.id === levelId);
+  const flaggedObjectives = store.dailyObjectives.filter(o => o.completed);
+  const sources = store.subjects[0]?.sources || [];
 
   useEffect(() => {
     // Wait up to 1s for store hydration before giving up
@@ -46,7 +48,7 @@ export default function QuizScreen() {
       if (!lvl) return;
       try {
         const { questions: q } = await api.generateLevelQuiz(
-          lvl.id, lvl.title, lvl.topics, 8
+          lvl.id, lvl.title, lvl.topics, 8, flaggedObjectives, sources
         );
         setQuestions(q);
       } catch (e) {

@@ -1,20 +1,21 @@
 /**
  * Quick Actions — Challenge and Review action buttons
  */
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withRepeat,
-  withSequence,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
+import * as Haptics from 'expo-haptics';
+import React, { useEffect } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -24,6 +25,7 @@ interface QuickActionsProps {
   hasDueReviews: boolean;
   dueReviewCount: number;
   challengeAvailable: boolean;
+  challengeBoosted?: boolean;
 }
 
 export function QuickActions({
@@ -32,16 +34,18 @@ export function QuickActions({
   hasDueReviews,
   dueReviewCount,
   challengeAvailable,
+  challengeBoosted,
 }: QuickActionsProps) {
   return (
     <View className="flex-row gap-md">
       <ActionButton
         iconName="rocket"
         title="Take Challenge"
-        subtitle={challengeAvailable ? 'Test your knowledge' : 'No challenge available'}
+        subtitle={challengeAvailable ? 'Test what you studied today' : 'Flag an objective to start'}
         onPress={onTakeChallenge}
         disabled={!challengeAvailable}
         color={Colors.accent.primary}
+        boosted={challengeBoosted}
       />
       <ActionButton
         iconName="sparkle"
@@ -64,6 +68,7 @@ function ActionButton({
   disabled,
   color,
   badge,
+  boosted,
 }: {
   iconName: NucleoIconName;
   title: string;
@@ -72,6 +77,7 @@ function ActionButton({
   disabled?: boolean;
   color: string;
   badge?: number;
+  boosted?: boolean;
 }) {
   const scale = useSharedValue(1);
   const iconScale = useSharedValue(1);
@@ -115,10 +121,10 @@ function ActionButton({
   const resolvedIconName = disabled
     ? iconName
     : isRocket
-    ? 'rocket-blue'
-    : isSparkle
-    ? 'sparkle-yellow'
-    : iconName;
+      ? 'rocket-red'
+      : isSparkle
+        ? 'sparkle-yellow'
+        : iconName;
 
   const shouldAnimate = (isRocket || isSparkle) && !disabled;
 
