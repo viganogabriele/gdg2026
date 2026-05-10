@@ -3,7 +3,7 @@
  */
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { PomodoroTimer } from '@/components/focus/PomodoroTimer';
@@ -19,9 +19,17 @@ export default function FocusScreen() {
   const { awardSessionPoints, stats } = useGamePoints();
   const [sessionComplete, setSessionComplete] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
+  const { objectiveId } = useLocalSearchParams<{ objectiveId?: string }>();
 
   const activeLevel = store.levels.find((l) => l.status === 'active');
   const currentTopic = activeLevel?.topics.find((t) => !t.completed);
+
+  const activeObjective = objectiveId
+    ? store.dailyObjectives.find((o) => o.id === objectiveId)
+    : undefined;
+  const targetSessions = activeObjective
+    ? Math.ceil(activeObjective.estimatedMinutes / 25)
+    : undefined;
 
   const handleSessionComplete = (durationMinutes: number) => {
     // Create session record
@@ -68,7 +76,7 @@ export default function FocusScreen() {
       )}
 
       {/* Timer */}
-      <PomodoroTimer onSessionComplete={handleSessionComplete} />
+      <PomodoroTimer onSessionComplete={handleSessionComplete} targetSessions={targetSessions} />
 
       {/* Session Complete Overlay */}
       {sessionComplete && (

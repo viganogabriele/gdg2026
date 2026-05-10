@@ -35,10 +35,10 @@ module.exports = {
           success: '#22c55e',
           'success-light': '#bbf7d0',
           warning: '#e88930',
-          'warning-light': '#db57c3',
+          'warning-light': '#9333ea',
           danger: '#ba1c1e',
           'danger-light': '#ffffff',
-          xp: '#db57c3',
+          xp: '#9333ea',
         },
       },
       spacing: {

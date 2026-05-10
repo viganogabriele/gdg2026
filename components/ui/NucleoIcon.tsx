@@ -19,6 +19,7 @@ export const NUCLEO_ICONS = {
   rocket: require('@/assets/svg/nucleo-glass/icon-rocket.svg'),
   'rocket-red': require('@/assets/svg/nucleo-glass/icon-rocket-red.svg'),
   sparkle: require('@/assets/svg/nucleo-glass/icon-sparkle.svg'),
+  'sparkle-yellow': require('@/assets/svg/nucleo-glass/icon-sparkle-yellow.svg'),
   star: require('@/assets/svg/nucleo-glass/icon-star.svg'),
   'star-xp': require('@/assets/svg/nucleo-glass/icon-star-xp.svg'),
 } as const;

@@ -1,20 +1,20 @@
 /**
  * Styled Text Input — with floating label, focus animation, error state
  */
+import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
 import {
-  View,
-  TextInput,
   Text,
+  TextInput,
   TextInputProps,
+  View,
   ViewStyle,
 } from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Colors } from '@/constants/theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -39,7 +39,7 @@ export function Input({
   const borderStyle = useAnimatedStyle(() => ({
     borderColor: error
       ? Colors.accent.danger
-      : `rgba(108, 92, 231, ${borderOpacity.value})`,
+      : `rgba(17, 86, 174, ${borderOpacity.value})`,
   }));
 
   const handleFocus = (e: any) => {
@@ -65,7 +65,7 @@ export function Input({
         <TextInput
           className="text-text-primary text-md px-lg py-md min-h-[48px]"
           placeholderTextColor={Colors.text.muted}
-          selectionColor={Colors.accent.primary}
+          selectionColor="#1156ae"
           onFocus={handleFocus}
           onBlur={handleBlur}
           style={style}
