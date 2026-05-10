@@ -19,6 +19,7 @@ const MAPPING = {
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'eye': 'visibility',
+  'trash.fill': 'delete-outline',
   'xmark': 'close',
   'play.fill': 'play-arrow',
   'pause.fill': 'pause',

@@ -1,5 +1,6 @@
 /**
  * Zustand Store — Central state management with AsyncStorage persistence
+ * Supports multiple roadmaps with independent data per subject
  */
 import { BadgeDefinitions, Points } from '@/constants/gamification';
 import type { BraynrStudyProfile } from '@/services/braynrParser';
@@ -9,6 +10,7 @@ import type {
   DailyObjective,
   NotificationPreferences,
   Quiz,
+  Roadmap,
   Source,
   SourceSection,
   SpacedRepetitionCard,
@@ -29,6 +31,7 @@ function uid(): string {
 interface StudyState {
   // Onboarding
   onboardingComplete: boolean;
+  isAddingRoadmap: boolean; // true when adding a new roadmap (not initial onboarding)
   onboardingData: {
     subjectTitle: string;
     sources: Source[];
@@ -38,7 +41,11 @@ interface StudyState {
     assessmentScore: number;
   };
 
-  // Core Data
+  // Multi-Roadmap
+  roadmaps: Roadmap[];
+  activeRoadmapId: string | null;
+
+  // Core Data — derived from active roadmap (kept for backward compat)
   subjects: Subject[];
   levels: StudyLevel[];
   dailyObjectives: DailyObjective[];
@@ -108,6 +115,12 @@ interface StudyState {
   // Actions — Settings
   updateNotificationPrefs: (prefs: Partial<NotificationPreferences>) => void;
 
+  // Actions — Multi-Roadmap
+  startNewRoadmapOnboarding: () => void;
+  switchRoadmap: (roadmapId: string) => void;
+  deleteRoadmap: (roadmapId: string) => void;
+  cancelAddRoadmap: () => void;
+
   // Actions — Reset
   resetStore: () => void;
 
@@ -136,6 +149,102 @@ const initialNotificationPrefs: NotificationPreferences = {
   tiltToFocusEnabled: true,
 };
 
+const initialOnboardingData = {
+  subjectTitle: '',
+  sources: [],
+  deadline: '',
+  hoursPerWeek: 10,
+  sections: [],
+  assessmentScore: 0,
+};
+
+// ─── Helpers ────────────────────────────────────────────────────────
+
+function getSharedStreakStats(stats: UserStats) {
+  return {
+    currentStreak: stats.currentStreak,
+    longestStreak: stats.longestStreak,
+    lastStudyDate: stats.lastStudyDate,
+  };
+}
+
+function mergeRoadmapStatsWithSharedStreak(
+  roadmapStats: UserStats | undefined,
+  sharedStats: UserStats,
+): UserStats {
+  return {
+    ...initialStats,
+    ...(roadmapStats ?? {}),
+    ...getSharedStreakStats(sharedStats),
+  };
+}
+
+/** Save active roadmap's mutable fields back into the roadmaps array */
+function syncActiveRoadmapToArray(state: StudyState): Roadmap[] {
+  let currentRoadmaps = state.roadmaps;
+
+  // Migration for legacy state: if there's no active roadmap but subjects exist, create one
+  if (!state.activeRoadmapId && state.subjects.length > 0) {
+    const legacyId = uid();
+    const legacyRoadmap: Roadmap = {
+      id: legacyId,
+      subject: state.subjects[0],
+      stats: { ...state.stats },
+      levels: state.levels,
+      dailyObjectives: state.dailyObjectives,
+      spacedRepCards: state.spacedRepCards,
+      quizzes: state.quizzes,
+      sessions: state.sessions,
+      currentDayIndex: state.currentDayIndex,
+      dayAdvanceReady: state.dayAdvanceReady,
+      onboardingData: { ...state.onboardingData },
+    };
+    currentRoadmaps = [...currentRoadmaps, legacyRoadmap];
+  }
+
+  const targetId = state.activeRoadmapId || (state.subjects.length > 0 ? currentRoadmaps[currentRoadmaps.length - 1].id : null);
+
+  if (!targetId) return currentRoadmaps;
+
+  return currentRoadmaps.map((rm) =>
+    rm.id === targetId
+      ? {
+          ...rm,
+          stats: mergeRoadmapStatsWithSharedStreak(state.stats, state.stats),
+          levels: state.levels,
+          dailyObjectives: state.dailyObjectives,
+          spacedRepCards: state.spacedRepCards,
+          quizzes: state.quizzes,
+          sessions: state.sessions,
+          currentDayIndex: state.currentDayIndex,
+          dayAdvanceReady: state.dayAdvanceReady,
+          subject: state.subjects.find((s) => s.id === rm.subject.id) || rm.subject,
+        }
+      : rm
+  );
+}
+
+/** Load a roadmap's data into the top-level state fields */
+function loadRoadmapState(rm: Roadmap, sharedStats: UserStats) {
+  return {
+    onboardingComplete: true,
+    isAddingRoadmap: false,
+    subjects: [rm.subject],
+    stats: mergeRoadmapStatsWithSharedStreak(rm.stats, sharedStats),
+    levels: rm.levels,
+    dailyObjectives: rm.dailyObjectives,
+    spacedRepCards: rm.spacedRepCards,
+    quizzes: rm.quizzes,
+    sessions: rm.sessions,
+    currentDayIndex: rm.currentDayIndex,
+    dayAdvanceReady: rm.dayAdvanceReady,
+    activeSubjectId: rm.subject.id,
+    activeRoadmapId: rm.id,
+    activeQuiz: null,
+    sessionFocusTime: 0,
+  };
+}
+
 // ─── Store Definition ───────────────────────────────────────────────
 
 export const useStudyStore = create<StudyState>()(
@@ -143,14 +252,10 @@ export const useStudyStore = create<StudyState>()(
     (set, get) => ({
       // State
       onboardingComplete: false,
-      onboardingData: {
-        subjectTitle: '',
-        sources: [],
-        deadline: '',
-        hoursPerWeek: 10,
-        sections: [],
-        assessmentScore: 0,
-      },
+      isAddingRoadmap: false,
+      onboardingData: { ...initialOnboardingData },
+      roadmaps: [],
+      activeRoadmapId: null,
       subjects: [],
       levels: [],
       dailyObjectives: [],
@@ -193,14 +298,47 @@ export const useStudyStore = create<StudyState>()(
           onboardingData: { ...state.onboardingData, assessmentScore: score },
         })),
 
-      completeOnboarding: (subject, levels, objectives) =>
+      completeOnboarding: (subject, levels, objectives) => {
+        const state = get();
+        const roadmapId = uid();
+
+        const newRoadmap: Roadmap = {
+          id: roadmapId,
+          subject,
+          stats: mergeRoadmapStatsWithSharedStreak(undefined, state.stats),
+          levels,
+          dailyObjectives: objectives,
+          spacedRepCards: [],
+          quizzes: [],
+          sessions: [],
+          currentDayIndex: 0,
+          dayAdvanceReady: false,
+          onboardingData: { ...state.onboardingData },
+        };
+
+        // Sync the currently active roadmap back before switching
+        const syncedRoadmaps = state.isAddingRoadmap
+          ? syncActiveRoadmapToArray(state)
+          : state.roadmaps;
+
         set({
           onboardingComplete: true,
+          isAddingRoadmap: false,
+          roadmaps: [...syncedRoadmaps, newRoadmap],
+          activeRoadmapId: roadmapId,
           subjects: [subject],
           levels,
           dailyObjectives: objectives,
+          spacedRepCards: [],
+          quizzes: [],
+          sessions: [],
           activeSubjectId: subject.id,
-        }),
+          currentDayIndex: 0,
+          dayAdvanceReady: false,
+          stats: mergeRoadmapStatsWithSharedStreak(undefined, state.stats),
+          onboardingData: { ...initialOnboardingData },
+        });
+      },
 
       // ─── Subject Actions ────────────────────────────────────────
       setActiveSubject: (id) => set({ activeSubjectId: id }),
@@ -573,18 +711,117 @@ export const useStudyStore = create<StudyState>()(
           braynrLastSyncedAt: new Date().toISOString(),
         }),
 
+      // ─── Multi-Roadmap Actions ──────────────────────────────────
+
+      startNewRoadmapOnboarding: () => {
+        const state = get();
+        // Sync current roadmap back before starting onboarding
+        const syncedRoadmaps = syncActiveRoadmapToArray(state);
+        set({
+          roadmaps: syncedRoadmaps,
+          isAddingRoadmap: true,
+          onboardingComplete: false,
+          onboardingData: { ...initialOnboardingData },
+        });
+      },
+
+      switchRoadmap: (roadmapId: string) => {
+        const state = get();
+        const target = state.roadmaps.find((rm) => rm.id === roadmapId);
+        if (!target || target.id === state.activeRoadmapId) return;
+
+        // Sync current roadmap back first
+        const syncedRoadmaps = syncActiveRoadmapToArray(state);
+
+        // Load the target roadmap (re-find in synced array in case it was the current one)
+        const freshTarget = syncedRoadmaps.find((rm) => rm.id === roadmapId) || target;
+
+        set({
+          roadmaps: syncedRoadmaps,
+          ...loadRoadmapState(freshTarget, state.stats),
+          onboardingData: { ...freshTarget.onboardingData },
+        });
+      },
+
+      deleteRoadmap: (roadmapId: string) => {
+        const state = get();
+        const syncedRoadmaps = syncActiveRoadmapToArray(state);
+        const filtered = syncedRoadmaps.filter((rm) => rm.id !== roadmapId);
+
+        if (filtered.length === 0) {
+          // Deleted the last roadmap — go back to onboarding
+          set({
+            roadmaps: [],
+            activeRoadmapId: null,
+            onboardingComplete: false,
+            isAddingRoadmap: false,
+            subjects: [],
+            levels: [],
+            dailyObjectives: [],
+            quizzes: [],
+            sessions: [],
+            spacedRepCards: [],
+            activeSubjectId: null,
+            currentDayIndex: 0,
+            dayAdvanceReady: false,
+            onboardingData: { ...initialOnboardingData },
+          });
+          return;
+        }
+
+        if (roadmapId === state.activeRoadmapId) {
+          // Switch to another roadmap
+          const nextRoadmap = filtered[0];
+          set({
+            roadmaps: filtered,
+            ...loadRoadmapState(nextRoadmap, state.stats),
+            onboardingData: { ...nextRoadmap.onboardingData },
+          });
+        } else {
+          set({ roadmaps: filtered });
+        }
+      },
+
+      cancelAddRoadmap: () => {
+        const state = get();
+        if (!state.isAddingRoadmap) return;
+
+        // Restore back to the active roadmap
+        const activeRm = state.roadmaps.find((rm) => rm.id === state.activeRoadmapId);
+        if (activeRm) {
+          set({
+            ...loadRoadmapState(activeRm, state.stats),
+            isAddingRoadmap: false,
+            onboardingComplete: true,
+            onboardingData: { ...initialOnboardingData },
+          });
+        } else if (state.roadmaps.length > 0) {
+          // fallback: load the first roadmap
+          const first = state.roadmaps[0];
+          set({
+            ...loadRoadmapState(first, state.stats),
+            isAddingRoadmap: false,
+            onboardingComplete: true,
+            onboardingData: { ...initialOnboardingData },
+          });
+        } else {
+          // No roadmaps at all — stay in onboarding
+          set({
+            isAddingRoadmap: false,
+            onboardingComplete: false,
+            onboardingData: { ...initialOnboardingData },
+          });
+        }
+      },
+
       // ─── Reset ──────────────────────────────────────────────────
       resetStore: () =>
         set({
           onboardingComplete: false,
-          onboardingData: {
-            subjectTitle: '',
-            sources: [],
-            deadline: '',
-            hoursPerWeek: 10,
-            sections: [],
-            assessmentScore: 0,
-          },
+          isAddingRoadmap: false,
+          onboardingData: { ...initialOnboardingData },
+          roadmaps: [],
+          activeRoadmapId: null,
           subjects: [],
           levels: [],
           dailyObjectives: [],
@@ -607,7 +844,10 @@ export const useStudyStore = create<StudyState>()(
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         onboardingComplete: state.onboardingComplete,
+        isAddingRoadmap: state.isAddingRoadmap,
         onboardingData: state.onboardingData,
+        roadmaps: state.roadmaps,
+        activeRoadmapId: state.activeRoadmapId,
         subjects: state.subjects,
         levels: state.levels,
         dailyObjectives: state.dailyObjectives,

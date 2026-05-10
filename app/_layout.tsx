@@ -30,6 +30,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const onboardingComplete = useStudyStore((s) => s.onboardingComplete);
+  const isAddingRoadmap = useStudyStore((s) => s.isAddingRoadmap);
   const segments = useSegments();
   const router = useRouter();
   const pathname = usePathname();
@@ -37,18 +38,19 @@ export default function RootLayout() {
 
   useEffect(() => {
     // avoid navigating before the router/segments are ready
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (!segments) return;
 
       const inOnboarding = segments[0] === '(onboarding)';
 
       if (!onboardingComplete && !inOnboarding) {
         router.replace('/(onboarding)/subject');
-      } else if (onboardingComplete && inOnboarding) {
+      } else if (onboardingComplete && inOnboarding && !isAddingRoadmap) {
         router.replace('/(tabs)');
       }
-    }, 10);
-  }, [onboardingComplete, segments, router]);
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, [onboardingComplete, isAddingRoadmap, segments, router]);
 
   const tiltToFocusEnabled = useStudyStore((s) => s.notificationPrefs.tiltToFocusEnabled);
   const isHomeTab = pathname === '/' || pathname === '/(tabs)' || pathname === '/(tabs)/index';
@@ -82,8 +84,8 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={CustomDarkTheme}>
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.bg.primary } }}>
-          <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="quiz/[id]" options={{ presentation: 'fullScreenModal' }} />
           <Stack.Screen name="focus" options={{ presentation: 'fullScreenModal' }} />
           <Stack.Screen name="spaced-review" options={{ presentation: 'modal' }} />
