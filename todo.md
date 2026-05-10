@@ -1,6 +1,4 @@
 TODO:
-1. [ ] Non si deve interrompere sempre il timer.
-2. [ ] Creare un pannello settings, tipo per disattivare focus mode rotando.
 2. [ ] Migliorare le 6 domande iniziali per capire il livello di conoscenza. Valutare il fatto di dire non so niente sull'argomento.
 3. [ ] Guardare l'algoritmo di spaced repetition. 
 4. [ ] Si riaggiusta la rodmap quando non fai qualcosa il giorno
@@ -11,6 +9,7 @@ Feature finali:
 2. Aggiungere più materie
 3. Aggiungere materiali nel tempo
 4. Se riusciamo guardare il web da desktop
+5. Creare un pannello settings, tipo per disattivare focus mode rotando.
 
 
 Presentazione finale:
