@@ -105,10 +105,16 @@ export interface SpacedRepetitionCard {
   questionId: string;
   subjectId: string;
   topicId: string;
-  box: number; // Leitner box 1-5
+  box: number;              // Leitner box 1–5 (derived from intervalDays for display)
   nextReviewDate: string;
   lastReviewDate?: string;
   consecutiveCorrect: number;
+  // SM-2+ fields
+  intervalDays: number;     // current interval in days
+  easeFactor: number;       // multiplier for interval growth (default 2.5, min 1.3)
+  consecutiveFails: number; // resets to 0 on any correct answer
+  needsReinforcement: boolean; // true when consecutiveFails >= 3 → show in every session
+  totalReviews: number;     // total number of reviews ever
 }
 
 export interface DailyObjective {
