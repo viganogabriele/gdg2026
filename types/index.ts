@@ -152,6 +152,7 @@ export interface NotificationPreferences {
 export interface Roadmap {
   id: string;
   subject: Subject;
+  stats: UserStats;
   levels: StudyLevel[];
   dailyObjectives: DailyObjective[];
   spacedRepCards: SpacedRepetitionCard[];

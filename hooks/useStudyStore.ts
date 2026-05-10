@@ -151,6 +151,25 @@ const initialOnboardingData = {
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
+function getSharedStreakStats(stats: UserStats) {
+  return {
+    currentStreak: stats.currentStreak,
+    longestStreak: stats.longestStreak,
+    lastStudyDate: stats.lastStudyDate,
+  };
+}
+
+function mergeRoadmapStatsWithSharedStreak(
+  roadmapStats: UserStats | undefined,
+  sharedStats: UserStats,
+): UserStats {
+  return {
+    ...initialStats,
+    ...(roadmapStats ?? {}),
+    ...getSharedStreakStats(sharedStats),
+  };
+}
+
 /** Save active roadmap's mutable fields back into the roadmaps array */
 function syncActiveRoadmapToArray(state: StudyState): Roadmap[] {
   let currentRoadmaps = state.roadmaps;
@@ -161,6 +180,7 @@ function syncActiveRoadmapToArray(state: StudyState): Roadmap[] {
     const legacyRoadmap: Roadmap = {
       id: legacyId,
       subject: state.subjects[0],
+      stats: { ...state.stats },
       levels: state.levels,
       dailyObjectives: state.dailyObjectives,
       spacedRepCards: state.spacedRepCards,
@@ -181,6 +201,7 @@ function syncActiveRoadmapToArray(state: StudyState): Roadmap[] {
     rm.id === targetId
       ? {
           ...rm,
+          stats: mergeRoadmapStatsWithSharedStreak(state.stats, state.stats),
           levels: state.levels,
           dailyObjectives: state.dailyObjectives,
           spacedRepCards: state.spacedRepCards,
@@ -195,9 +216,12 @@ function syncActiveRoadmapToArray(state: StudyState): Roadmap[] {
 }
 
 /** Load a roadmap's data into the top-level state fields */
-function loadRoadmapState(rm: Roadmap) {
+function loadRoadmapState(rm: Roadmap, sharedStats: UserStats) {
   return {
+    onboardingComplete: true,
+    isAddingRoadmap: false,
     subjects: [rm.subject],
+    stats: mergeRoadmapStatsWithSharedStreak(rm.stats, sharedStats),
     levels: rm.levels,
     dailyObjectives: rm.dailyObjectives,
     spacedRepCards: rm.spacedRepCards,
@@ -207,6 +231,8 @@ function loadRoadmapState(rm: Roadmap) {
     dayAdvanceReady: rm.dayAdvanceReady,
     activeSubjectId: rm.subject.id,
     activeRoadmapId: rm.id,
+    activeQuiz: null,
+    sessionFocusTime: 0,
   };
 }
 
@@ -268,6 +294,7 @@ export const useStudyStore = create<StudyState>()(
         const newRoadmap: Roadmap = {
           id: roadmapId,
           subject,
+          stats: mergeRoadmapStatsWithSharedStreak(undefined, state.stats),
           levels,
           dailyObjectives: objectives,
           spacedRepCards: [],
@@ -297,6 +324,7 @@ export const useStudyStore = create<StudyState>()(
           activeSubjectId: subject.id,
           currentDayIndex: 0,
           dayAdvanceReady: false,
+          stats: mergeRoadmapStatsWithSharedStreak(undefined, state.stats),
           onboardingData: { ...initialOnboardingData },
         });
       },
@@ -687,7 +715,7 @@ export const useStudyStore = create<StudyState>()(
 
         set({
           roadmaps: syncedRoadmaps,
-          ...loadRoadmapState(freshTarget),
+          ...loadRoadmapState(freshTarget, state.stats),
           onboardingData: { ...freshTarget.onboardingData },
         });
       },
@@ -723,7 +751,7 @@ export const useStudyStore = create<StudyState>()(
           const nextRoadmap = filtered[0];
           set({
             roadmaps: filtered,
-            ...loadRoadmapState(nextRoadmap),
+            ...loadRoadmapState(nextRoadmap, state.stats),
             onboardingData: { ...nextRoadmap.onboardingData },
           });
         } else {
@@ -742,7 +770,7 @@ export const useStudyStore = create<StudyState>()(
             isAddingRoadmap: false,
             onboardingComplete: true,
             onboardingData: { ...initialOnboardingData },
-            ...loadRoadmapState(activeRm),
+            ...loadRoadmapState(activeRm, state.stats),
           });
         } else if (state.roadmaps.length > 0) {
           // fallback: load the first roadmap
@@ -751,7 +779,7 @@ export const useStudyStore = create<StudyState>()(
             isAddingRoadmap: false,
             onboardingComplete: true,
             onboardingData: { ...initialOnboardingData },
-            ...loadRoadmapState(first),
+            ...loadRoadmapState(first, state.stats),
           });
         } else {
           // No roadmaps at all — stay in onboarding

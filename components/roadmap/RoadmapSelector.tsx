@@ -1,12 +1,14 @@
 /**
  * RoadmapSelector — Dropdown to switch between roadmaps, add new, or delete
  */
+import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
+  LayoutChangeEvent,
   Modal,
   Platform,
   Text,
@@ -17,6 +19,7 @@ import {
 
 export function RoadmapSelector() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [triggerWidth, setTriggerWidth] = useState(0);
 
   const roadmaps = useStudyStore((s) => s.roadmaps);
   const activeRoadmapId = useStudyStore((s) => s.activeRoadmapId);
@@ -27,6 +30,14 @@ export function RoadmapSelector() {
 
   const activeRoadmap = roadmaps.find((rm) => rm.id === activeRoadmapId);
   const currentTitle = activeRoadmap?.subject?.title || subjects[0]?.title || 'StudyQuest';
+  const dropdownWidth = Math.min(Math.max(triggerWidth + 36, 236), 320);
+
+  const handleTriggerLayout = (event: LayoutChangeEvent) => {
+    const nextWidth = Math.ceil(event.nativeEvent.layout.width);
+    if (nextWidth !== triggerWidth) {
+      setTriggerWidth(nextWidth);
+    }
+  };
 
   const handleSwitch = (roadmapId: string) => {
     setDropdownOpen(false);
@@ -62,10 +73,11 @@ export function RoadmapSelector() {
     <>
       {/* Trigger Button */}
       <TouchableOpacity
-        className="flex-row items-center gap-xs py-xs px-sm rounded-lg bg-bg-secondary border border-border-subtle"
+        className="self-start flex-row items-center gap-xs py-xs px-sm rounded-lg bg-bg-secondary border border-border-subtle"
         onPress={() => setDropdownOpen(!dropdownOpen)}
         activeOpacity={0.7}
-        style={{ maxWidth: '70%' }}
+        onLayout={handleTriggerLayout}
+        style={{ maxWidth: '82%' }}
       >
         <Text
           className="text-text-primary text-md font-bold"
@@ -94,9 +106,9 @@ export function RoadmapSelector() {
                   position: 'absolute',
                   top: Platform.OS === 'ios' ? 100 : 80,
                   left: 16,
-                  right: 16,
+                  width: dropdownWidth,
                   backgroundColor: Colors.bg.secondary,
-                  borderRadius: 12,
+                  borderRadius: 16,
                   borderWidth: 1,
                   borderColor: Colors.border.subtle,
                   overflow: 'hidden',
@@ -135,7 +147,7 @@ export function RoadmapSelector() {
                         className="flex-row items-center border-b border-border-subtle"
                       >
                         <TouchableOpacity
-                          className="flex-1 px-lg py-md flex-row items-center gap-md"
+                        className="flex-1 px-lg py-md flex-row items-center gap-md"
                           onPress={() => handleSwitch(rm.id)}
                           activeOpacity={0.6}
                         >
@@ -161,24 +173,17 @@ export function RoadmapSelector() {
                               {completedLevels}/{totalLevels} levels
                             </Text>
                           </View>
-                          {isActive && (
-                            <View className="bg-accent-primary/20 px-sm py-[2px] rounded-full">
-                              <Text className="text-xs font-semibold" style={{ color: Colors.accent.primary }}>
-                                Active
-                              </Text>
-                            </View>
-                          )}
                         </TouchableOpacity>
 
                         {/* Delete button */}
                         <TouchableOpacity
-                          className="px-md py-md"
+                          className="px-md py-md items-center justify-center"
                           onPress={() =>
                             handleDelete(rm.id, rm.subject.title)
                           }
                           activeOpacity={0.5}
                         >
-                          <Text style={{ color: Colors.accent.danger, fontSize: 16 }}>✕</Text>
+                          <IconSymbol name="trash.fill" size={18} color={Colors.accent.danger} />
                         </TouchableOpacity>
                       </View>
                     );
@@ -196,11 +201,6 @@ export function RoadmapSelector() {
                         </Text>
                         <Text className="text-text-muted text-xs mt-[2px]">
                           Legacy subject
-                        </Text>
-                      </View>
-                      <View className="bg-accent-primary/20 px-sm py-[2px] rounded-full">
-                        <Text className="text-xs font-semibold" style={{ color: Colors.accent.primary }}>
-                          Active
                         </Text>
                       </View>
                     </View>
@@ -243,56 +243,104 @@ export function RoadmapSelector() {
         transparent
         animationType="fade"
         onRequestClose={() => setDeleteCandidate(null)}
+        statusBarTranslucent
       >
         <TouchableWithoutFeedback onPress={() => setDeleteCandidate(null)}>
-          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.65)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 24,
+            }}
+          >
             <TouchableWithoutFeedback>
               <View
                 style={{
-                  width: '85%',
-                  backgroundColor: Colors.bg.secondary,
-                  borderRadius: 16,
+                  width: '100%',
+                  maxWidth: 320,
+                  backgroundColor: Colors.bg.overlay,
+                  borderRadius: 20,
+                  borderWidth: 1.5,
+                  borderColor: Colors.border.subtle,
                   padding: 24,
-                  alignItems: 'center',
                   ...Platform.select({
                     ios: {
                       shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 12,
+                      shadowOffset: { width: 0, height: 10 },
+                      shadowOpacity: 0.22,
+                      shadowRadius: 24,
                     },
                     android: {
-                      elevation: 8,
+                      elevation: 12,
                     },
                   }),
                 }}
               >
-                <View className="w-12 h-12 rounded-full items-center justify-center mb-md" style={{ backgroundColor: Colors.accent.danger + '20' }}>
-                  <Text style={{ color: Colors.accent.danger, fontSize: 24, fontWeight: 'bold' }}>!</Text>
+                <View
+                  className="w-[72px] h-[72px] rounded-[18px] items-center justify-center mb-lg self-center"
+                  style={{
+                    backgroundColor: Colors.bg.secondary,
+                    borderWidth: 1.5,
+                    borderColor: Colors.accent.danger + '55',
+                  }}
+                >
+                  <IconSymbol name="trash.fill" size={28} color={Colors.accent.danger} />
                 </View>
+
+                <View
+                  className="self-center px-sm py-[4px] rounded-full mb-md"
+                  style={{
+                    backgroundColor: Colors.accent.danger + '18',
+                    borderWidth: 1,
+                    borderColor: Colors.accent.danger + '35',
+                  }}
+                >
+                  <Text
+                    className="text-[11px] font-semibold uppercase"
+                    style={{ color: Colors.accent.danger, letterSpacing: 0.5 }}
+                  >
+                    Permanent action
+                  </Text>
+                </View>
+
                 <Text className="text-text-primary text-xl font-bold mb-xs text-center">
                   Delete Subject?
                 </Text>
-                <Text className="text-text-secondary text-md text-center mb-xl">
-                  Are you sure you want to delete <Text className="font-bold text-text-primary">"{deleteCandidate?.title}"</Text>? All your progress, cards, and levels for this subject will be permanently lost.
+
+                <Text className="text-text-secondary text-sm text-center leading-[21px] mb-lg">
+                  You’re about to remove{' '}
+                  <Text className="font-bold text-text-primary">&quot;{deleteCandidate?.title}&quot;</Text>.
+                  {' '}This will permanently delete its roadmap, progress, cards, and study history.
                 </Text>
-                
-                <View className="flex-row gap-md w-full">
-                  <TouchableOpacity
-                    className="flex-1 py-md rounded-lg items-center border border-border-subtle"
+
+                <View
+                  className="rounded-xl border px-md py-md mb-lg"
+                  style={{
+                    borderColor: Colors.border.subtle,
+                    backgroundColor: Colors.bg.secondary,
+                  }}
+                >
+                  <Text className="text-text-muted text-xs uppercase mb-xs">Subject</Text>
+                  <Text className="text-text-primary text-md font-semibold">
+                    {deleteCandidate?.title}
+                  </Text>
+                </View>
+
+                <View className="gap-sm">
+                  <Button
+                    title="Keep Subject"
+                    variant="secondary"
                     onPress={() => setDeleteCandidate(null)}
-                    activeOpacity={0.7}
-                  >
-                    <Text className="text-text-primary font-semibold text-md">Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="flex-1 py-md rounded-lg items-center"
-                    style={{ backgroundColor: Colors.accent.danger }}
+                    fullWidth
+                  />
+                  <Button
+                    title="Delete Permanently"
+                    variant="danger"
                     onPress={confirmDelete}
-                    activeOpacity={0.7}
-                  >
-                    <Text className="text-white font-semibold text-md">Delete</Text>
-                  </TouchableOpacity>
+                    fullWidth
+                  />
                 </View>
               </View>
             </TouchableWithoutFeedback>
