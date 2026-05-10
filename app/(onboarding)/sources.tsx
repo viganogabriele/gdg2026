@@ -15,8 +15,8 @@ export default function SourcesScreen() {
   const sources = useStudyStore((s) => s.onboardingData.sources);
   const setSources = useStudyStore((s) => s.setOnboardingSources);
 
-  const handleAddSource = (source: Source) => {
-    setSources([...sources, source]);
+  const handleAddSource = (newsources: Source[]) => {
+    setSources([...sources, ...newsources]);
   };
 
   const handleRemoveSource = (id: string) => {
@@ -30,7 +30,7 @@ export default function SourcesScreen() {
 
         <Text className="text-text-primary text-xxl font-bold mt-lg">What are your sources?</Text>
         <Text className="text-text-secondary text-md mt-sm mb-xxl leading-[22px]">
-          Add PDFs, URLs, or paste notes. We'll analyze them to build your study plan.
+          Add PDFs, URLs, or paste notes. We&apos;ll analyze them to build your study plan.
         </Text>
 
         <View className="flex-1">
