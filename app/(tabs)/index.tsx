@@ -54,6 +54,7 @@ export default function HomeScreen() {
     }
   };
 
+
   return (
     <SafeAreaView className="flex-1 bg-bg-primary" edges={['top']}>
       <ScrollView

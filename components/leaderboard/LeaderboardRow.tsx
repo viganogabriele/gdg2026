@@ -18,11 +18,14 @@ export function LeaderboardRow({ entry, rank }: LeaderboardRowProps) {
   return (
     <Card
       style={{
-        borderColor: entry.isMe
-          ? `${Colors.accent.primary}99`
-          : isTop3
-          ? `${medal!.border}66`
-          : Colors.border.subtle,
+        borderColor: entry.isMe ? `${Colors.accent.primary}99` : Colors.border.subtle,
+        ...(isTop3 && !entry.isMe && {
+          shadowColor: medal!.border,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.6,
+          shadowRadius: 8,
+          elevation: 6,
+        }),
       }}
     >
       <View className="flex-row items-center gap-md">
@@ -53,7 +56,7 @@ export function LeaderboardRow({ entry, rank }: LeaderboardRowProps) {
             className="font-semibold text-md"
             style={{ color: entry.isMe ? Colors.accent.primaryLight : Colors.text.primary }}
           >
-            {entry.name}{entry.isMe ? ' (tu)' : ''}
+            {entry.name}
           </Text>
           <View className="flex-row items-center gap-xs mt-[2px]">
             <NucleoIcon name="flame-fire" size={12} />

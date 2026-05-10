@@ -12,12 +12,10 @@ export interface LeaderboardEntry {
 }
 
 const MOCK_FRIENDS: Omit<LeaderboardEntry, 'isMe'>[] = [
-  { id: '1', name: 'Giulia',  xp: 1840, streak: 12 },
-  { id: '2', name: 'Marco',   xp: 1560, streak: 7  },
-  { id: '3', name: 'Sofia',   xp: 1120, streak: 5  },
-  { id: '4', name: 'Luca',    xp: 870,  streak: 3  },
-  { id: '5', name: 'Anna',    xp: 640,  streak: 9  },
-  { id: '6', name: 'Matteo',  xp: 420,  streak: 1  },
+  { id: '1', name: 'Giulia', xp: 180, streak: 20 },
+  { id: '2', name: 'Marco', xp: 170, streak: 14 },
+  { id: '3', name: 'Sofia', xp: 150, streak: 8 },
+  { id: '4', name: 'Luca', xp: 140, streak: 5 },
 ];
 
 export async function fetchLeaderboard(myXp: number, myStreak: number): Promise<LeaderboardEntry[]> {
