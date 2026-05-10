@@ -46,14 +46,14 @@ export default function SettingsScreen() {
   };
 
   const lastSyncLabel = braynrLastSyncedAt
-    ? new Date(braynrLastSyncedAt).toLocaleString('it-IT', {
+    ? new Date(braynrLastSyncedAt).toLocaleString('en-GB', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
       })
-    : 'Mai';
+    : 'Never';
 
   const openBraynrModal = () => {
     modalScale.setValue(0.92);
@@ -164,7 +164,7 @@ export default function SettingsScreen() {
           <Card style={{ marginBottom: 24, opacity: syncing ? 0.5 : 1 }}>
             <View className="flex-row items-center gap-md">
               <View className="flex-1">
-                <Text className="text-text-primary text-md font-semibold">Sincronizza con Braynr</Text>
+                <Text className="text-text-primary text-md font-semibold">Sync with Braynr</Text>
                 <Text className="text-text-muted text-xs mt-xs">Last synchronization: {lastSyncLabel}</Text>
               </View>
 
@@ -187,14 +187,14 @@ export default function SettingsScreen() {
         <View className="mt-lg pb-xxl gap-sm">
           {confirmReset && (
             <View className="flex-row items-center gap-sm bg-bg-secondary rounded-lg px-md py-sm border border-border-subtle">
-              <Text className="text-text-muted text-sm flex-1">Sicuro? Tutti i dati verranno eliminati.</Text>
+              <Text className="text-text-muted text-sm flex-1">Are you sure? All data will be deleted.</Text>
               <TouchableOpacity onPress={() => setConfirmReset(false)}>
-                <Text className="text-text-muted text-sm px-sm">Annulla</Text>
+                <Text className="text-text-muted text-sm px-sm">Cancel</Text>
               </TouchableOpacity>
             </View>
           )}
           <Button
-            title={confirmReset ? 'Conferma Reset' : 'Reset All Data'}
+            title={confirmReset ? 'Confirm Reset' : 'Reset All Data'}
             variant="danger"
             onPress={handleReset}
             fullWidth

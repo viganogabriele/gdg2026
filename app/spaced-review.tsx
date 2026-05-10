@@ -16,9 +16,9 @@ import type { QuizQuestion, SpacedRepetitionCard } from '@/types';
 
 // Rating levels exposed to the user
 const RATINGS = [
-  { label: 'Non sapevo', emoji: '🔴', rating: 0, color: Colors.accent.danger,  bg: 'rgba(186,28,30,0.15)' },
-  { label: 'Difficile',  emoji: '🟡', rating: 2, color: Colors.accent.warning, bg: 'rgba(232,137,48,0.15)' },
-  { label: 'Facile',     emoji: '🟢', rating: 4, color: Colors.accent.success, bg: 'rgba(34,197,94,0.15)'  },
+  { label: "Didn't know", emoji: '🔴', rating: 0, color: Colors.accent.danger,  bg: 'rgba(186,28,30,0.15)' },
+  { label: 'Hard',        emoji: '🟡', rating: 2, color: Colors.accent.warning, bg: 'rgba(232,137,48,0.15)' },
+  { label: 'Easy',        emoji: '🟢', rating: 4, color: Colors.accent.success, bg: 'rgba(34,197,94,0.15)'  },
 ] as const;
 
 export default function SpacedReviewScreen() {
@@ -101,12 +101,12 @@ export default function SpacedReviewScreen() {
             />
           </View>
           <Text className="text-text-primary text-xxl font-bold">
-            {questions.length === 0 ? 'Nessuna card in scadenza!' : 'Review completata!'}
+            {questions.length === 0 ? 'No cards due!' : 'Review complete!'}
           </Text>
           <Text className="text-text-muted text-md text-center mt-sm mb-lg leading-[22px]">
             {questions.length === 0
-              ? 'Continua a studiare — i ripassi appariranno man mano che progredisci.'
-              : 'La spaced repetition rafforza la memoria a lungo termine. Continua così!'}
+              ? 'Keep studying — reviews will appear as you make progress.'
+              : 'Spaced repetition strengthens long-term memory. Keep it up!'}
           </Text>
 
           {total > 0 && (
@@ -129,7 +129,7 @@ export default function SpacedReviewScreen() {
             </View>
           )}
 
-          <Button title="Fine" onPress={() => router.back()} fullWidth size="lg" />
+          <Button title="Done" onPress={() => router.back()} fullWidth size="lg" />
         </View>
       </SafeAreaView>
     );
@@ -162,12 +162,12 @@ export default function SpacedReviewScreen() {
               }}
             >
               <Text style={{ color: Colors.accent.warning, fontSize: 11, fontWeight: '700' }}>
-                🔁 Ripasso extra
+                🔁 Extra review
               </Text>
             </View>
           )}
         </View>
-        <Button title="Esci" variant="ghost" onPress={() => router.back()} />
+        <Button title="Exit" variant="ghost" onPress={() => router.back()} />
       </View>
 
       {/* Question */}
@@ -213,7 +213,7 @@ export default function SpacedReviewScreen() {
             </>
           ) : (
             <Button
-              title={currentIndex < questions.length - 1 ? 'Prossima →' : 'Fine sessione'}
+              title={currentIndex < questions.length - 1 ? 'Next →' : 'End session'}
               onPress={handleNext}
               fullWidth
               size="lg"

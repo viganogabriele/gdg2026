@@ -15,7 +15,7 @@ export default function LeaderboardScreen() {
   const handleShare = () => {
     const slug = subject?.title.toLowerCase().replace(/\s+/g, '-') ?? 'subject';
     Share.share({
-      message: `Studia con me su StudyQuest!\nhttps://studyquest.app/join/${slug}`,
+      message: `Study with me on StudyQuest!\nhttps://studyquest.app/join/${slug}`,
       title: subject?.title,
     });
   };
