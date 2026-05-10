@@ -31,12 +31,17 @@ export default function HomeScreen() {
   const activeLevel = levels.find((l) => l.status === 'active');
   const currentLevelNum = Math.floor(stats.totalPoints / 100) + 1;
 
-  const challengeAvailable = !!activeLevel;
+  const onboardingData = useStudyStore((s) => s.onboardingData);
+  const levelTotalDays = activeLevel
+    ? Math.max(1, Math.ceil(activeLevel.requiredStudyMinutes / 60 / (onboardingData.hoursPerWeek || 10) * 7))
+    : 30;
+
+  const completedObjectivesCount = dailyObjectives.filter(o => o.completed).length;
+  const challengeAvailable = completedObjectivesCount > 0;
+  const challengeBoosted = dailyObjectives.length > 0 && completedObjectivesCount === dailyObjectives.length;
 
   const handleChallenge = () => {
-    if (activeLevel) {
-      router.push(`/quiz/${activeLevel.id}`);
-    }
+    router.push('/quiz/daily-challenge');
   };
 
   const handleQuickReview = () => {
@@ -88,7 +93,7 @@ export default function HomeScreen() {
             hasDueReviews={hasDueCards}
             dueReviewCount={dueCount}
             challengeAvailable={challengeAvailable}
-
+            challengeBoosted={challengeBoosted}
           />
         </View>
 

@@ -359,7 +359,7 @@ Rules:
 - Space deadlines evenly across ${totalDays} days
 - Estimate required study minutes per level (90-180 min)
 
-Also create 3 daily objectives for today based on the first active level.
+Also create exactly 3 daily study objectives for today based on the FIRST topic (Day 1) of the first active level. Each objective should correspond to one of the topic's arguments. Do NOT include review-type objectives.
 
 Return JSON:
 {
@@ -387,10 +387,10 @@ Return JSON:
   ],
   "dailyObjectives": [
     {
-      "title": "Study: Topic Name",
-      "description": "What to focus on",
+      "title": "Day 1 - Topic: Argument",
+      "description": "Focus on: Argument details",
       "type": "study",
-      "estimatedMinutes": 45
+      "estimatedMinutes": 30
     }
   ]
 }`;
@@ -505,15 +505,17 @@ Return JSON:
   });
 
   const activeLevel = levels.find((l) => l.status === 'active');
+  const firstTopic = activeLevel?.topics[0];
   const dailyObjectives: DailyObjective[] = raw.dailyObjectives.map((obj) => ({
     id: uid(),
     title: obj.title,
     description: obj.description,
-    sourceRefs: activeLevel?.topics[0]?.sourceRefs || [],
+    sourceRefs: firstTopic?.sourceRefs || [],
     type: (obj.type as 'study' | 'review' | 'quiz') || 'study',
     completed: false,
     estimatedMinutes: obj.estimatedMinutes || 30,
     levelId: activeLevel?.id,
+    topicId: firstTopic?.id,
   }));
 
   return { levels, dailyObjectives };
@@ -610,6 +612,85 @@ Return JSON:
       id: q.id || uid(),
       topicId: topic?.id || q.topicId,
       sourceRef: topic?.sourceRefs[0],
+    };
+  });
+
+  return result;
+}
+
+/**
+ * Generate a daily challenge quiz based ONLY on completed objectives and loaded sources.
+ */
+export async function geminiGenerateDailyChallengeQuiz(
+  flaggedObjectives: DailyObjective[],
+  sources: Source[],
+  count: number = 8,
+  provider: AIProvider = 'gemini'
+): Promise<{ questions: QuizQuestion[] }> {
+  const objectivesText = flaggedObjectives.length > 0
+    ? `\nFocus the questions heavily on these completed daily objectives:\n` + flaggedObjectives.map(o => `- ${o.title}: ${o.description}`).join('\n')
+    : '';
+
+  const sourcesText = sources.length > 0
+    ? `\nBase the questions on the loaded sources provided:\n` + sources.map(s => `Source: "${s.title}"\nContent Preview: ${s.content?.slice(0, 500) || s.rawText?.slice(0, 500) || 'No content preview available'}`).join('\n\n')
+    : '';
+
+  const prompt = `You are a quiz generator for a study app. Create ${count} multiple-choice questions for a daily challenge.
+
+${objectivesText}
+${sourcesText}
+
+Requirements:
+- Each question must have exactly 4 options
+- The correctIndex is 0-based (0, 1, 2, or 3)
+- Questions should test understanding, not just memorization
+- Include clear explanations for correct answers
+- Make questions specific to the daily objectives and sources provided
+
+Return JSON:
+{
+  "questions": [
+    {
+      "id": "unique_id",
+      "text": "Question text?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "Why this answer is correct."
+    }
+  ]
+}`;
+
+  const responseSchema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      questions: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            id: { type: SchemaType.STRING },
+            text: { type: SchemaType.STRING },
+            options: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            correctIndex: { type: SchemaType.INTEGER },
+            explanation: { type: SchemaType.STRING },
+          },
+          required: ['id', 'text', 'options', 'correctIndex', 'explanation'],
+        },
+      },
+    },
+    required: ['questions'],
+  };
+
+  const result = await callAI<{ questions: QuizQuestion[] }>({
+    prompt,
+    responseSchema,
+    temperature: 0.8,
+  }, provider);
+
+  result.questions = result.questions.map((q) => {
+    return {
+      ...q,
+      id: q.id || uid(),
     };
   });
 

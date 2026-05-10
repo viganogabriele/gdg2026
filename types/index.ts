@@ -120,6 +120,7 @@ export interface DailyObjective {
   completed: boolean;
   estimatedMinutes: number;
   levelId?: string;
+  topicId?: string;
 }
 
 export interface StudySession {
