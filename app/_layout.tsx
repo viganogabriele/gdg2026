@@ -37,7 +37,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     // avoid navigating before the router/segments are ready
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (!segments) return;
 
       const inOnboarding = segments[0] === '(onboarding)';
@@ -47,7 +47,8 @@ export default function RootLayout() {
       } else if (onboardingComplete && inOnboarding) {
         router.replace('/(tabs)');
       }
-    }, 10);
+    }, 100);
+    return () => clearTimeout(timeout);
   }, [onboardingComplete, segments, router]);
 
   const tiltToFocusEnabled = useStudyStore((s) => s.notificationPrefs.tiltToFocusEnabled);
@@ -82,8 +83,8 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={CustomDarkTheme}>
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.bg.primary } }}>
-          <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="quiz/[id]" options={{ presentation: 'fullScreenModal' }} />
           <Stack.Screen name="focus" options={{ presentation: 'fullScreenModal' }} />
           <Stack.Screen name="spaced-review" options={{ presentation: 'modal' }} />

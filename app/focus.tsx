@@ -11,7 +11,7 @@ import { useStudyStore } from '@/hooks/useStudyStore';
 import type { StudySession } from '@/types';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function FocusScreen() {
@@ -34,7 +34,7 @@ export default function FocusScreen() {
   const saInsets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ dir?: string }>();
   // Default to 90deg (Landscape Right) if not specified
-  const rotation = params.dir === 'left' ? '90deg' : '-90deg';
+  const rotation = Platform.OS === 'ios' ? (params.dir === 'left' ? '90deg' : '-90deg') : (params.dir === 'left' ? '-90deg' : '90deg');
 
   const handleSessionComplete = (durationMinutes: number) => {
     // Create session record
