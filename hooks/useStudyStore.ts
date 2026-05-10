@@ -250,16 +250,36 @@ export const useStudyStore = create<StudyState>()(
       setDailyObjectives: (objectives) => set({ dailyObjectives: objectives }),
 
       completeObjective: (objectiveId) => {
+        const objective = get().dailyObjectives.find((o) => o.id === objectiveId);
+        if (!objective) return;
+        const completing = !objective.completed;
+        const minutes = objective.estimatedMinutes;
+        const activeLevelId =
+          objective.levelId ?? get().levels.find((l) => l.status === 'active')?.id;
+
         set((state) => ({
           dailyObjectives: state.dailyObjectives.map((o) =>
-            o.id === objectiveId ? { ...o, completed: true } : o
+            o.id === objectiveId ? { ...o, completed: completing } : o
           ),
           stats: {
             ...state.stats,
-            totalPoints: state.stats.totalPoints + Points.STUDY_SESSION_COMPLETE,
+            totalPoints:
+              state.stats.totalPoints +
+              (completing ? Points.STUDY_SESSION_COMPLETE : -Points.STUDY_SESSION_COMPLETE),
           },
+          levels: state.levels.map((l) =>
+            l.id === activeLevelId
+              ? {
+                  ...l,
+                  completedStudyMinutes: Math.max(
+                    0,
+                    l.completedStudyMinutes + (completing ? minutes : -minutes)
+                  ),
+                }
+              : l
+          ),
         }));
-        get().updateStreak();
+        if (completing) get().updateStreak();
       },
 
       // ─── Quiz Actions ──────────────────────────────────────────

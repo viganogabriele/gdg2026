@@ -47,7 +47,7 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
     locked: { color: Colors.text.muted, icon: 'lock' as const, label: 'Locked' },
     active: { color: levelColor, icon: 'book-open' as const, label: 'In Progress' },
     completed: { color: levelColor, icon: 'circle-check' as const, label: 'Completed' },
-    failed: { color: Colors.accent.danger, icon: 'flame' as const, label: 'Needs Review' },
+    failed: { color: Colors.accent.danger, icon: 'flame-fire' as const, label: 'Needs Review' },
   }[level.status];
 
   const progress =
@@ -133,7 +133,7 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
               {topic.sourceRefs.map((ref, i) => (
                 <View key={i} className="flex-row items-center gap-[4px] mt-[4px]">
                   <NucleoIcon name="link" size={12} />
-                  <Text className="text-xs" style={{ color: levelColor }}>
+                  <Text className="text-text-muted text-xs">
                     {ref.label}
                   </Text>
                 </View>

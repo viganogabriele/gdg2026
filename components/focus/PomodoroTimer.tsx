@@ -11,9 +11,10 @@ import { PomodoroDefaults } from '@/constants/gamification';
 
 interface PomodoroTimerProps {
   onSessionComplete: (durationMinutes: number) => void;
+  targetSessions?: number;
 }
 
-export function PomodoroTimer({ onSessionComplete }: PomodoroTimerProps) {
+export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTimerProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(PomodoroDefaults.WORK_MINUTES * 60);
@@ -34,9 +35,17 @@ export function PomodoroTimer({ onSessionComplete }: PomodoroTimerProps) {
       }, 1000);
     } else if (secondsLeft <= 0) {
       if (!isBreak) {
+        const newCompleted = sessionsCompleted + 1;
         totalStudied.current += PomodoroDefaults.WORK_MINUTES;
-        setSessionsCompleted((s) => s + 1);
-        const breakMins = (sessionsCompleted + 1) % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK === 0
+        setSessionsCompleted(newCompleted);
+
+        if (targetSessions && newCompleted >= targetSessions) {
+          setIsRunning(false);
+          onSessionComplete(totalStudied.current);
+          return;
+        }
+
+        const breakMins = newCompleted % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK === 0
           ? PomodoroDefaults.LONG_BREAK_MINUTES
           : PomodoroDefaults.BREAK_MINUTES;
         setIsBreak(true);
@@ -83,7 +92,9 @@ export function PomodoroTimer({ onSessionComplete }: PomodoroTimerProps) {
           <Text className="text-display text-text-primary font-extrabold" style={{ fontVariant: ['tabular-nums'] }}>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </Text>
-          <Text className="text-text-muted text-sm mt-xs">Session {sessionsCompleted + 1}</Text>
+          <Text className="text-text-muted text-sm mt-xs">
+            Session {sessionsCompleted + 1}{targetSessions ? ` of ${targetSessions}` : ''}
+          </Text>
         </View>
       </View>
 

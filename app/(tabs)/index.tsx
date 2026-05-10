@@ -5,7 +5,6 @@ import { DailyObjectives } from '@/components/home/DailyObjectives';
 import { LevelIndicator } from '@/components/home/LevelIndicator';
 import { QuickActions } from '@/components/home/QuickActions';
 import { StreakCounter } from '@/components/home/StreakCounter';
-import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { router } from 'expo-router';
@@ -45,9 +44,9 @@ export default function HomeScreen() {
     router.push('/spaced-review');
   };
 
-  const handleObjectivePress = () => {
+  const handleObjectivePress = (objective: import('@/types').DailyObjective) => {
     if (activeLevel) {
-      router.push('/focus');
+      router.push(`/focus?objectiveId=${objective.id}`);
     }
   };
 
@@ -58,18 +57,10 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View className="flex-row justify-between items-start mb-lg">
-          <View>
-            <Text className="text-text-primary text-xxl font-bold mt-[4px] max-w-[250px]" numberOfLines={1}>
-              {activeSubject?.title || 'StudyQuest'}
-            </Text>
-          </View>
-          <View className="bg-[rgba(255,215,0,0.1)] rounded-[20px] px-md py-sm border border-[rgba(255,215,0,0.2)]">
-            <View className="flex-row items-center gap-[4px]">
-              <NucleoIcon name="star-xp" size={16} />
-              <Text className="text-accent-xp text-md font-bold">{stats.totalPoints}</Text>
-            </View>
-          </View>
+        <View className="mb-lg">
+          <Text className="text-text-primary text-xxl font-bold mt-[4px]" numberOfLines={1}>
+            {activeSubject?.title || 'StudyQuest'}
+          </Text>
         </View>
 
         {/* Level Indicator */}
@@ -79,7 +70,6 @@ export default function HomeScreen() {
           levelTitle={activeLevel?.title || 'No active level'}
           completedMinutes={activeLevel?.completedStudyMinutes || 0}
           requiredMinutes={activeLevel?.requiredStudyMinutes || 100}
-          totalPoints={stats.totalPoints}
           deadline={activeLevel?.deadline || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()}
           totalDays={levelTotalDays}
         />

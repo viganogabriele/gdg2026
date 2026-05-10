@@ -58,7 +58,7 @@ export function DailyObjectives({
                   {obj.sourceRefs.length > 0 && (
                     <View className="flex-row items-center gap-[4px] flex-1">
                       <NucleoIcon name="link" size={12} />
-                      <Text className="text-accent-secondary text-xs font-medium flex-1" numberOfLines={1}>
+                      <Text className="text-text-muted text-xs font-medium flex-1" numberOfLines={1}>
                         {obj.sourceRefs[0].label}
                       </Text>
                     </View>
