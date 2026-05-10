@@ -5,11 +5,13 @@ import { DailyObjectives } from '@/components/home/DailyObjectives';
 import { LevelIndicator } from '@/components/home/LevelIndicator';
 import { QuickActions } from '@/components/home/QuickActions';
 import { StreakCounter } from '@/components/home/StreakCounter';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Colors } from '@/constants/theme';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -23,7 +25,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     updateStreak();
-  }, []);
+  }, [updateStreak]);
 
   const onboardingData = useStudyStore((s) => s.onboardingData);
   const activeSubject = subjects[0];
@@ -65,6 +67,37 @@ export default function HomeScreen() {
           <Text className="text-text-primary text-xxl font-bold mt-[4px]" numberOfLines={1}>
             {activeSubject?.title || 'StudyQuest'}
           </Text>
+        </View>
+
+        {/* Focus Mode Manual Button */}
+        <View className="mt-md">
+          <TouchableOpacity
+            className="bg-bg-secondary border border-border-subtle rounded-xl p-md flex-row items-center justify-between"
+            onPress={() => router.push('/focus')}
+            activeOpacity={0.7}
+          >
+            <View className="flex-row items-center gap-md">
+              <View className="bg-accent-primary/20 p-sm rounded-lg">
+                <IconSymbol
+                  name="eye"
+                  size={20}
+                  weight="medium"
+                  color={Colors.text.secondary}
+                />
+
+              </View>
+              <View>
+                <Text className="text-text-primary text-md font-bold">Focus Mode</Text>
+                <Text className="text-text-muted text-sm">Rotate phone to auto-start</Text>
+              </View>
+            </View>
+            <IconSymbol
+              name="chevron.right"
+              size={16}
+              weight="medium"
+              color={Colors.text.secondary}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Level Indicator */}

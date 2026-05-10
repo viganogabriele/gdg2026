@@ -49,6 +49,7 @@ interface StudyState {
   // Active State
   activeSubjectId: string | null;
   activeQuiz: Quiz | null;
+  sessionFocusTime: number; // Time in seconds spent in focus mode this app session
 
   // Actions — Onboarding
   setOnboardingSubject: (title: string) => void;
@@ -80,6 +81,7 @@ interface StudyState {
   // Actions — Sessions
   startSession: (session: StudySession) => void;
   endSession: (sessionId: string) => void;
+  incrementSessionFocusTime: () => void;
 
   // Actions — Spaced Repetition
   addSpacedRepCards: (cards: SpacedRepetitionCard[]) => void;
@@ -143,6 +145,7 @@ export const useStudyStore = create<StudyState>()(
       notificationPrefs: { ...initialNotificationPrefs },
       activeSubjectId: null,
       activeQuiz: null,
+      sessionFocusTime: 0,
 
       // ─── Onboarding Actions ─────────────────────────────────────
       setOnboardingSubject: (title) =>
@@ -364,6 +367,8 @@ export const useStudyStore = create<StudyState>()(
         get().checkBadgeEligibility();
       },
 
+      incrementSessionFocusTime: () => set((state) => ({ sessionFocusTime: state.sessionFocusTime + 1 })),
+
       // ─── Spaced Repetition Actions ──────────────────────────────
       addSpacedRepCards: (cards) =>
         set((state) => ({
@@ -519,6 +524,7 @@ export const useStudyStore = create<StudyState>()(
           notificationPrefs: { ...initialNotificationPrefs },
           activeSubjectId: null,
           activeQuiz: null,
+          sessionFocusTime: 0,
         }),
     }),
     {

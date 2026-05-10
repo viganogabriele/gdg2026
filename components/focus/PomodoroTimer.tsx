@@ -1,13 +1,14 @@
 /**
  * Pomodoro Timer — circular countdown with pause/resume
  */
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text } from 'react-native';
-import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Button } from '@/components/ui/Button';
+import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
-import { Colors } from '@/constants/theme';
 import { PomodoroDefaults } from '@/constants/gamification';
+import { Colors } from '@/constants/theme';
+import { useStudyStore } from '@/hooks/useStudyStore';
+import React, { useEffect, useRef, useState } from 'react';
+import { Text, View } from 'react-native';
 
 interface PomodoroTimerProps {
   onSessionComplete: (durationMinutes: number) => void;
@@ -15,7 +16,10 @@ interface PomodoroTimerProps {
 }
 
 export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTimerProps) {
-  const [isRunning, setIsRunning] = useState(false);
+  const sessionFocusTime = useStudyStore((s) => s.sessionFocusTime);
+  const incrementSessionFocusTime = useStudyStore((s) => s.incrementSessionFocusTime);
+
+  const [isRunning, setIsRunning] = useState(true);
   const [isBreak, setIsBreak] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(PomodoroDefaults.WORK_MINUTES * 60);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
@@ -24,14 +28,15 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
 
   const totalSeconds = isBreak
     ? (sessionsCompleted % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK === 0
-        ? PomodoroDefaults.LONG_BREAK_MINUTES
-        : PomodoroDefaults.BREAK_MINUTES) * 60
+      ? PomodoroDefaults.LONG_BREAK_MINUTES
+      : PomodoroDefaults.BREAK_MINUTES) * 60
     : PomodoroDefaults.WORK_MINUTES * 60;
 
   useEffect(() => {
     if (isRunning && secondsLeft > 0) {
       intervalRef.current = setInterval(() => {
         setSecondsLeft((s) => s - 1);
+        incrementSessionFocusTime();
       }, 1000);
     } else if (secondsLeft <= 0) {
       if (!isBreak) {
@@ -56,7 +61,7 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
       }
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isRunning, secondsLeft]);
+  }, [isRunning, secondsLeft, isBreak, sessionsCompleted, incrementSessionFocusTime, targetSessions, onSessionComplete]);
 
   const minutes = Math.floor(secondsLeft / 60);
   const seconds = secondsLeft % 60;
@@ -68,9 +73,17 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
     onSessionComplete(totalStudied.current + (isBreak ? 0 : Math.max(elapsed, 0)));
   };
 
+  const formatTotalTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    return `${m}m ${s}s`;
+  };
+
   return (
-    <View className="flex-1 items-center justify-center p-xxl">
-      <View className="flex-row items-center gap-xs mb-xxl">
+    <View className="flex-1 items-center justify-center w-full h-full p-3xl">
+      <View className="flex-row items-center gap-xs mb-md">
         <NucleoIcon
           name={isBreak ? 'star' : 'book-open'}
           size={20}
@@ -80,16 +93,16 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
         </Text>
       </View>
 
-      <View className="items-center justify-center w-[220px] h-[220px] mb-xxxl">
+      <View className="items-center justify-center w-[200px] h-[200px] mb-lg">
         <ProgressCircle
           progress={progress}
-          size={220}
-          strokeWidth={12}
+          size={200}
+          strokeWidth={10}
           color={isBreak ? Colors.accent.success : Colors.accent.primary}
           showPercentage={false}
         />
         <View className="absolute items-center">
-          <Text className="text-display text-text-primary font-extrabold" style={{ fontVariant: ['tabular-nums'] }}>
+          <Text className="text-display text-text-primary font-extrabold" style={{ fontVariant: ['tabular-nums'], fontSize: 48 }}>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </Text>
           <Text className="text-text-muted text-sm mt-xs">
@@ -98,25 +111,31 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
         </View>
       </View>
 
-      <View className="w-full gap-md">
-        <Button
-          title={isRunning ? 'Pause' : 'Start'}
-          onPress={() => setIsRunning(!isRunning)}
-          variant={isRunning ? 'secondary' : 'primary'}
-          size="lg"
-          fullWidth
-        />
-        {isBreak && (
-          <Button title="Skip Break" variant="ghost" onPress={() => {
-            setIsBreak(false);
-            setSecondsLeft(PomodoroDefaults.WORK_MINUTES * 60);
-          }} fullWidth />
+      <View className="flex-row gap-md w-full justify-center px-xl">
+        <View className="flex-1">
+          <Button
+            title={isRunning ? 'Pause' : 'Start'}
+            onPress={() => setIsRunning(!isRunning)}
+            variant={isRunning ? 'secondary' : 'primary'}
+            fullWidth
+          />
+        </View>
+        {isBreak ? (
+          <View className="flex-1">
+            <Button title="Skip Break" variant="ghost" onPress={() => {
+              setIsBreak(false);
+              setSecondsLeft(PomodoroDefaults.WORK_MINUTES * 60);
+            }} fullWidth />
+          </View>
+        ) : (
+          <View className="flex-1">
+            <Button title="Complete" variant="success" onPress={handleComplete} fullWidth />
+          </View>
         )}
-        <Button title="Complete Session" variant="success" onPress={handleComplete} fullWidth />
       </View>
 
-      <Text className="text-text-muted text-sm mt-xxl">
-        Total studied: {totalStudied.current} min
+      <Text className="text-accent-secondary font-bold text-sm mt-xl uppercase tracking-widest">
+        Total Session Time: {formatTotalTime(sessionFocusTime)}
       </Text>
     </View>
   );
