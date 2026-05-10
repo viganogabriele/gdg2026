@@ -2,7 +2,9 @@
  * Quick Actions — Challenge and Review action buttons
  */
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
+import { Card } from '@/components/ui/Card';
 import { Colors } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import * as Haptics from 'expo-haptics';
 import React, { useEffect } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -36,8 +38,10 @@ export function QuickActions({
   challengeAvailable,
   challengeBoosted,
 }: QuickActionsProps) {
-  return (
-    <View className="flex-row gap-md">
+  const { isWide } = useResponsiveLayout();
+
+  const buttons = (
+    <View style={{ flexDirection: 'row', gap: isWide ? 16 : 12 }}>
       <ActionButton
         iconName="rocket-blue"
         title="Take Challenge"
@@ -58,6 +62,8 @@ export function QuickActions({
       />
     </View>
   );
+
+  return buttons;
 }
 
 function ActionButton({
@@ -126,44 +132,76 @@ function ActionButton({
 
   const shouldAnimate = ((isRocket && boosted) || isSparkle) && !disabled;
 
+  const iconBg = boosted ? 'rgba(239,68,68,0.15)' : `${color}22`;
+  const borderColor = boosted ? 'rgba(239,68,68,0.5)' : Colors.border.subtle;
+  const titleColor = disabled ? Colors.text.muted : boosted ? '#ef4444' : color;
+
   return (
     <AnimatedTouchable
-      className={`flex-1 bg-bg-secondary rounded-lg p-lg items-center border ${boosted ? 'border-red-500' : 'border-[#2c3b4e]'} relative ${disabled ? 'opacity-50' : ''}`}
       style={[
+        {
+          flex: 1,
+          backgroundColor: Colors.bg.secondary,
+          borderRadius: 12,
+          borderWidth: 1,
+          borderColor,
+          padding: 16,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          opacity: disabled ? 0.5 : 1,
+        },
         animatedStyle,
       ]}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         onPress();
       }}
-      onPressIn={() => {
-        scale.value = withSpring(0.96, { damping: 15, stiffness: 400 });
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-      }}
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 400 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 400 }); }}
       disabled={disabled}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
-      <View className="mb-sm">
+      {/* Icon bubble */}
+      <View style={{
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        backgroundColor: iconBg,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}>
         {shouldAnimate ? (
           <Animated.View style={iconStyle}>
-            <NucleoIcon name={resolvedIconName} size={28} />
+            <NucleoIcon name={resolvedIconName} size={26} />
           </Animated.View>
         ) : (
-          <NucleoIcon name={resolvedIconName} size={28} />
+          <NucleoIcon name={resolvedIconName} size={26} />
         )}
       </View>
-      <Text
-        className={`text-md font-semibold ${disabled ? 'text-text-muted' : boosted ? 'text-red-500' : ''}`}
-        style={!disabled && !boosted ? { color } : undefined}
-      >
-        {title}
-      </Text>
-      <Text className="text-text-muted text-xs mt-xs text-center">{subtitle}</Text>
+
+      {/* Text */}
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: titleColor, fontSize: 14, fontWeight: '600' }}>
+          {title}
+        </Text>
+        <Text style={{ color: Colors.text.muted, fontSize: 12, marginTop: 2 }}>
+          {subtitle}
+        </Text>
+      </View>
+
+      {/* Badge */}
       {badge !== undefined && badge > 0 && (
-        <View className="absolute top-[-6px] right-[-6px] w-[24px] h-[24px] rounded-full items-center justify-center" style={{ backgroundColor: color }}>
-          <Text className="text-text-primary text-xs font-bold">{badge}</Text>
+        <View style={{
+          width: 22,
+          height: 22,
+          borderRadius: 11,
+          backgroundColor: color,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Text style={{ color: Colors.text.primary, fontSize: 11, fontWeight: '700' }}>{badge}</Text>
         </View>
       )}
     </AnimatedTouchable>

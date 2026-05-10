@@ -4,6 +4,8 @@
 import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { Button } from '@/components/ui/Button';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import type { QuizQuestion } from '@/types';
 import { router } from 'expo-router';
@@ -41,6 +43,7 @@ export default function AssessmentScreen() {
   const answerQuestion = useStudyStore((s) => s.answerQuestion);
   const setAssessmentScore = useStudyStore((s) => s.setAssessmentScore);
   const completeQuiz = useStudyStore((s) => s.completeQuiz);
+  const { contentPadding } = useResponsiveLayout();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [orderedQuestionIds, setOrderedQuestionIds] = useState<string[]>([]);
@@ -189,30 +192,38 @@ export default function AssessmentScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg-primary">
-      <StepIndicator totalSteps={6} currentStep={4} />
+      <ResponsiveContainer maxWidth={640}>
+        <StepIndicator totalSteps={6} currentStep={4} />
+      </ResponsiveContainer>
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 48 }}>
-        <QuestionCard
-          question={currentQuestion}
-          questionNumber={currentIndex + 1}
-          totalQuestions={orderedQuestionIds.length || questions.length}
-          onAnswer={handleAnswer}
-          showFeedback={false}
-        />
+        <ResponsiveContainer maxWidth={640}>
+          <QuestionCard
+            question={currentQuestion}
+            questionNumber={currentIndex + 1}
+            totalQuestions={orderedQuestionIds.length || questions.length}
+            onAnswer={handleAnswer}
+            showFeedback={false}
+          />
+        </ResponsiveContainer>
       </ScrollView>
 
-      <View className="px-xxl pb-xxl gap-sm">
-        <Button
-          title="I don't know, start from scratch"
-          variant="danger"
-          onPress={handleStartFromZero}
-          fullWidth
-        />
-        <Button
-          title="Back"
-          variant="ghost"
-          onPress={handleBack}
-          fullWidth
-        />
+      <View style={{ paddingHorizontal: contentPadding, paddingBottom: 24, alignItems: 'center' }}>
+        <ResponsiveContainer maxWidth={640}>
+          <View className="gap-sm">
+            <Button
+              title="I don't know, start from scratch"
+              variant="danger"
+              onPress={handleStartFromZero}
+              fullWidth
+            />
+            <Button
+              title="Back"
+              variant="ghost"
+              onPress={handleBack}
+              fullWidth
+            />
+          </View>
+        </ResponsiveContainer>
       </View>
     </SafeAreaView>
   );

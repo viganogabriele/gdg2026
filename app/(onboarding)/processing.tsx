@@ -2,6 +2,7 @@
  * Onboarding Step 4 — Processing screen with animated progress
  */
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
 import { router } from 'expo-router';
@@ -98,28 +99,32 @@ export default function ProcessingScreen() {
   return (
     <SafeAreaView className="flex-1 bg-bg-primary">
       <View className="flex-1 justify-center items-center px-xxl">
-        <Animated.View
-          className="w-[120px] h-[120px] rounded-[60px] bg-bg-secondary items-center justify-center border-2 border-accent-primary mb-xxxl"
-          style={pulseStyle}
-        >
-          <NucleoIcon name={step.icon} size={48} />
-        </Animated.View>
+        <ResponsiveContainer maxWidth={480}>
+          <View style={{ alignItems: 'center' }}>
+            <Animated.View
+              className="w-[120px] h-[120px] rounded-[60px] bg-bg-secondary items-center justify-center border-2 border-accent-primary mb-xxxl"
+              style={pulseStyle}
+            >
+              <NucleoIcon name={step.icon} size={48} />
+            </Animated.View>
 
-        <Text className="text-text-primary text-xl font-semibold text-center mb-xxl">{step.label}</Text>
+            <Text className="text-text-primary text-xl font-semibold text-center mb-xxl">{step.label}</Text>
 
-        <View className="flex-row gap-sm">
-          {STEPS.map((_, i) => (
-            <View
-              key={i}
-              className={`h-[8px] rounded-[4px] ${i <= currentStep ? 'bg-accent-primary w-[24px]' : 'bg-bg-tertiary w-[8px]'}`}
-            />
-          ))}
-        </View>
+            <View className="flex-row gap-sm">
+              {STEPS.map((_, i) => (
+                <View
+                  key={i}
+                  className={`h-[8px] rounded-[4px] ${i <= currentStep ? 'bg-accent-primary w-[24px]' : 'bg-bg-tertiary w-[8px]'}`}
+                />
+              ))}
+            </View>
 
-        <Text className="text-text-muted text-sm text-center mt-xxxl leading-[20px]">
-          Preparing your personalized study plan for{'\n'}
-          &quot;{onboardingData.subjectTitle}&quot;
-        </Text>
+            <Text className="text-text-muted text-sm text-center mt-xxxl leading-[20px]">
+              Preparing your personalized study plan for{'\n'}
+              &quot;{onboardingData.subjectTitle}&quot;
+            </Text>
+          </View>
+        </ResponsiveContainer>
       </View>
     </SafeAreaView>
   );

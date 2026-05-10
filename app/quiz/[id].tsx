@@ -4,7 +4,9 @@
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { QuizResults } from '@/components/quiz/QuizResults';
 import { Button } from '@/components/ui/Button';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { LevelThresholds } from '@/constants/gamification';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
@@ -18,6 +20,7 @@ export default function QuizScreen() {
   const { id: levelId } = useLocalSearchParams<{ id: string }>();
   const store = useStudyStore();
   const { addCardsFromQuiz } = useSpacedRepetition();
+  const { contentPadding } = useResponsiveLayout();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -125,16 +128,18 @@ export default function QuizScreen() {
     const passed = score >= LevelThresholds.PASS_PERCENTAGE;
     return (
       <SafeAreaView className="flex-1 bg-bg-primary">
-        <QuizResults
-          score={score}
-          totalQuestions={questions.length}
-          correctAnswers={correct}
-          passThreshold={LevelThresholds.PASS_PERCENTAGE}
-          feedback={passed ? 'Great job! You\'ve mastered this level.' : 'Keep studying and try again.'}
-          onContinue={handleContinue}
-          onRetry={!passed ? handleRetry : undefined}
-          pointsEarned={pointsEarned}
-        />
+        <ResponsiveContainer maxWidth={640}>
+          <QuizResults
+            score={score}
+            totalQuestions={questions.length}
+            correctAnswers={correct}
+            passThreshold={LevelThresholds.PASS_PERCENTAGE}
+            feedback={passed ? 'Great job! You\'ve mastered this level.' : 'Keep studying and try again.'}
+            onContinue={handleContinue}
+            onRetry={!passed ? handleRetry : undefined}
+            pointsEarned={pointsEarned}
+          />
+        </ResponsiveContainer>
       </SafeAreaView>
     );
   }
@@ -145,21 +150,25 @@ export default function QuizScreen() {
   return (
     <SafeAreaView className="flex-1 bg-bg-primary">
       <ScrollView className="flex-1">
-        <QuestionCard
-          question={currentQ}
-          questionNumber={currentIndex + 1}
-          totalQuestions={questions.length}
-          onAnswer={handleAnswer}
-          showFeedback={true}
-        />
+        <ResponsiveContainer maxWidth={640}>
+          <QuestionCard
+            question={currentQ}
+            questionNumber={currentIndex + 1}
+            totalQuestions={questions.length}
+            onAnswer={handleAnswer}
+            showFeedback={true}
+          />
+        </ResponsiveContainer>
       </ScrollView>
       {currentQ.userAnswer !== undefined && (
-        <View className="px-xxl pb-xxl">
-          <Button
-            title={currentIndex < questions.length - 1 ? 'Next' : 'Finish'}
-            onPress={handleNext}
-            fullWidth size="lg"
-          />
+        <View style={{ paddingHorizontal: contentPadding, paddingBottom: 24, alignItems: 'center' }}>
+          <ResponsiveContainer maxWidth={640}>
+            <Button
+              title={currentIndex < questions.length - 1 ? 'Next' : 'Finish'}
+              onPress={handleNext}
+              fullWidth size="lg"
+            />
+          </ResponsiveContainer>
         </View>
       )}
     </SafeAreaView>

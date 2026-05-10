@@ -62,7 +62,7 @@ export function StreakCounter({ currentStreak, longestStreak }: StreakCounterPro
       <View className="flex-row items-center gap-md">
         <Animated.View style={flameStyle}>
           <NucleoIcon
-            name={isActive ? 'flame-fire' : 'flame'}
+            name={isActive ? 'flame-fire' : 'bell'}
             size={36}
             className={isActive ? 'opacity-100' : 'opacity-40'}
           />

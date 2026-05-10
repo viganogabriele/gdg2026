@@ -4,7 +4,9 @@
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { Colors, Shadow } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
 import { parseBraynrJson } from '@/services/braynrParser';
@@ -28,6 +30,7 @@ export default function SettingsScreen() {
   const braynrLastSyncedAt = useStudyStore((s) => s.braynrLastSyncedAt);
   const onboardingData = useStudyStore((s) => s.onboardingData);
   const onboardingComplete = useStudyStore((s) => s.onboardingComplete);
+  const { contentPadding } = useResponsiveLayout();
 
   const [syncing, setSyncing] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -46,14 +49,14 @@ export default function SettingsScreen() {
   };
 
   const lastSyncLabel = braynrLastSyncedAt
-    ? new Date(braynrLastSyncedAt).toLocaleString('it-IT', {
+    ? new Date(braynrLastSyncedAt).toLocaleString('en-GB', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
       })
-    : 'Mai';
+    : 'Never';
 
   const openBraynrModal = () => {
     modalScale.setValue(0.92);
@@ -128,78 +131,80 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg-primary" edges={['top']}>
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 48 }} showsVerticalScrollIndicator={false}>
-        <Text className="text-text-primary text-xxl font-bold mb-xxl">Settings</Text>
+      <ScrollView contentContainerStyle={{ padding: contentPadding, paddingBottom: 48 }} showsVerticalScrollIndicator={false}>
+        <ResponsiveContainer maxWidth={600}>
+          <Text className="text-text-primary text-xxl font-bold mb-xxl">Settings</Text>
 
-        <View className="flex-row items-center gap-sm mb-md">
-          <NucleoIcon name="bell" size={18} />
-          <Text className="text-text-primary text-lg font-bold">Notifications</Text>
-        </View>
-        <Card style={{ marginBottom: 24 }}>
-          <SettingRow label="Daily Reminder" value={prefs.dailyReminder} onChange={(v) => updatePrefs({ dailyReminder: v })} />
-          <SettingRow label="Deadline Warnings" value={prefs.deadlineWarnings} onChange={(v) => updatePrefs({ deadlineWarnings: v })} />
-          <SettingRow label="Streak Warnings" value={prefs.streakWarnings} onChange={(v) => updatePrefs({ streakWarnings: v })} />
-          <SettingRow label="Challenge Alerts" value={prefs.challengeNotifications} onChange={(v) => updatePrefs({ challengeNotifications: v })} last />
-        </Card>
-
-        <View className="flex-row items-center gap-sm mb-md mt-lg">
-          <NucleoIcon name="dial" size={18} />
-          <Text className="text-text-primary text-lg font-bold">Focus</Text>
-        </View>
-        <Card style={{ marginBottom: 24 }}>
-          <SettingRow
-            label="Tilt to Focus"
-            description="Open focus mode by rotating your phone on the home screen."
-            value={prefs.tiltToFocusEnabled}
-            onChange={(v) => updatePrefs({ tiltToFocusEnabled: v })}
-            last
-          />
-        </Card>
-
-        <View className="flex-row items-center gap-sm mb-md mt-lg">
-          <NucleoIcon name="book-open" size={18} />
-          <Text className="text-text-primary text-lg font-bold">Braynr</Text>
-        </View>
-        <TouchableOpacity activeOpacity={0.78} onPress={openBraynrModal} disabled={syncing}>
-          <Card style={{ marginBottom: 24, opacity: syncing ? 0.5 : 1 }}>
-            <View className="flex-row items-center gap-md">
-              <View className="flex-1">
-                <Text className="text-text-primary text-md font-semibold">Sincronizza con Braynr</Text>
-                <Text className="text-text-muted text-xs mt-xs">Last synchronization: {lastSyncLabel}</Text>
-              </View>
-
-              <View
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.accent.primary + '22',
-                }}
-              >
-                <NucleoIcon name="circle-check" size={18} />
-              </View>
-            </View>
+          <View className="flex-row items-center gap-sm mb-md">
+            <NucleoIcon name="bell" size={18} />
+            <Text className="text-text-primary text-lg font-bold">Notifications</Text>
+          </View>
+          <Card style={{ marginBottom: 24 }}>
+            <SettingRow label="Daily Reminder" value={prefs.dailyReminder} onChange={(v) => updatePrefs({ dailyReminder: v })} />
+            <SettingRow label="Deadline Warnings" value={prefs.deadlineWarnings} onChange={(v) => updatePrefs({ deadlineWarnings: v })} />
+            <SettingRow label="Streak Warnings" value={prefs.streakWarnings} onChange={(v) => updatePrefs({ streakWarnings: v })} />
+            <SettingRow label="Challenge Alerts" value={prefs.challengeNotifications} onChange={(v) => updatePrefs({ challengeNotifications: v })} last />
           </Card>
-        </TouchableOpacity>
 
-        <View className="mt-lg pb-xxl gap-sm">
-          {confirmReset && (
-            <View className="flex-row items-center gap-sm bg-bg-secondary rounded-lg px-md py-sm border border-border-subtle">
-              <Text className="text-text-muted text-sm flex-1">Sicuro? Tutti i dati verranno eliminati.</Text>
-              <TouchableOpacity onPress={() => setConfirmReset(false)}>
-                <Text className="text-text-muted text-sm px-sm">Annulla</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          <Button
-            title={confirmReset ? 'Conferma Reset' : 'Reset All Data'}
-            variant="danger"
-            onPress={handleReset}
-            fullWidth
-          />
-        </View>
+          <View className="flex-row items-center gap-sm mb-md mt-lg">
+            <NucleoIcon name="dial" size={18} />
+            <Text className="text-text-primary text-lg font-bold">Focus</Text>
+          </View>
+          <Card style={{ marginBottom: 24 }}>
+            <SettingRow
+              label="Tilt to Focus"
+              description="Open focus mode by rotating your phone on the home screen."
+              value={prefs.tiltToFocusEnabled}
+              onChange={(v) => updatePrefs({ tiltToFocusEnabled: v })}
+              last
+            />
+          </Card>
+
+          <View className="flex-row items-center gap-sm mb-md mt-lg">
+            <NucleoIcon name="book-open" size={18} />
+            <Text className="text-text-primary text-lg font-bold">Braynr</Text>
+          </View>
+          <TouchableOpacity activeOpacity={0.78} onPress={openBraynrModal} disabled={syncing}>
+            <Card style={{ marginBottom: 24, opacity: syncing ? 0.5 : 1 }}>
+              <View className="flex-row items-center gap-md">
+                <View className="flex-1">
+                  <Text className="text-text-primary text-md font-semibold">Sync with Braynr</Text>
+                  <Text className="text-text-muted text-xs mt-xs">Last synchronization: {lastSyncLabel}</Text>
+                </View>
+
+                <View
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 18,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.accent.primary + '22',
+                  }}
+                >
+                  <NucleoIcon name="circle-check" size={18} />
+                </View>
+              </View>
+            </Card>
+          </TouchableOpacity>
+
+          <View className="mt-lg pb-xxl gap-sm">
+            {confirmReset && (
+              <View className="flex-row items-center gap-sm bg-bg-secondary rounded-lg px-md py-sm border border-border-subtle">
+                <Text className="text-text-muted text-sm flex-1">Are you sure? All data will be deleted.</Text>
+                <TouchableOpacity onPress={() => setConfirmReset(false)}>
+                  <Text className="text-text-muted text-sm px-sm">Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <Button
+              title={confirmReset ? 'Confirm Reset' : 'Reset All Data'}
+              variant="danger"
+              onPress={handleReset}
+              fullWidth
+            />
+          </View>
+        </ResponsiveContainer>
       </ScrollView>
 
       <Modal transparent visible={braynrModalVisible} onRequestClose={closeBraynrModal} statusBarTranslucent>

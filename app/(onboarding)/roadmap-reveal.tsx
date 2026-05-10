@@ -7,10 +7,12 @@ import Animated, {
   FadeInDown,
 } from 'react-native-reanimated';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
 import { useStudyStore } from '@/hooks/useStudyStore';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import * as api from '@/services/api';
 import { Colors } from '@/constants/theme';
 
@@ -18,6 +20,7 @@ export default function RoadmapRevealScreen() {
   const store = useStudyStore();
   const [loading, setLoading] = useState(true);
   const [levels, setLevels] = useState<any[]>([]);
+  const { contentPadding } = useResponsiveLayout();
 
   useEffect(() => {
     async function generateRoadmap() {
@@ -70,67 +73,69 @@ export default function RoadmapRevealScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg-primary">
-      <ScrollView contentContainerStyle={{ padding: 24, paddingTop: 48 }} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.delay(200)} className="items-center">
-          <View className="mb-lg">
-            <NucleoIcon name="book-open" size={64} />
-          </View>
-          <Text className="text-text-primary text-xxl font-bold text-center">Your Study Plan is Ready!</Text>
-          <Text className="text-text-secondary text-md text-center mt-sm mb-xxxl">
-            Assessment score: {score}% — {score >= 70 ? 'Great foundation!' : score >= 40 ? 'Good start!' : "We'll build you up!"}
-          </Text>
-        </Animated.View>
+      <ScrollView contentContainerStyle={{ padding: contentPadding, paddingTop: 48 }} showsVerticalScrollIndicator={false}>
+        <ResponsiveContainer maxWidth={600}>
+          <Animated.View entering={FadeInDown.delay(200)} className="items-center">
+            <View className="mb-lg">
+              <NucleoIcon name="book-open" size={64} />
+            </View>
+            <Text className="text-text-primary text-xxl font-bold text-center">Your Study Plan is Ready!</Text>
+            <Text className="text-text-secondary text-md text-center mt-sm mb-xxxl">
+              Assessment score: {score}% — {score >= 70 ? 'Great foundation!' : score >= 40 ? 'Good start!' : "We'll build you up!"}
+            </Text>
+          </Animated.View>
 
-        {/* Level List */}
-        <View className="gap-md">
-          {levels.map((level, i) => (
-            <Animated.View
-              key={level.id}
-              entering={FadeInDown.delay(400 + i * 150)}
-              className={`flex-row items-center bg-bg-secondary rounded-md p-lg border gap-md ${
-                level.status === 'active' ? 'border-accent-primary border-[1.5px]' : 'border-border-subtle'
-              }`}
-            >
-              <View className="w-[36px] h-[36px] rounded-[18px] items-center justify-center" style={{
-                backgroundColor: level.status === 'completed'
-                  ? Colors.accent.success
-                  : level.status === 'active'
-                  ? Colors.accent.primary
-                  : Colors.bg.tertiary,
-              }}>
-                <Text className="text-text-primary text-sm font-bold">{level.levelNumber}</Text>
-              </View>
-              <View className="flex-1">
-                <Text className="text-text-primary text-md font-semibold">{level.title}</Text>
-                <View className="flex-row items-center gap-xs mt-[2px]">
-                  <NucleoIcon
-                    name={
-                      level.status === 'completed' ? 'circle-check'
-                      : level.status === 'active' ? 'book-open'
-                      : 'lock'
-                    }
-                    size={12}
-                  />
-                  <Text className="text-text-muted text-xs">
-                    {level.status === 'completed' ? 'Already known' :
-                     level.status === 'active' ? 'Start here' : 'Locked'}
-                  </Text>
+          {/* Level List */}
+          <View className="gap-md">
+            {levels.map((level, i) => (
+              <Animated.View
+                key={level.id}
+                entering={FadeInDown.delay(400 + i * 150)}
+                className={`flex-row items-center bg-bg-secondary rounded-md p-lg border gap-md ${
+                  level.status === 'active' ? 'border-accent-primary border-[1.5px]' : 'border-border-subtle'
+                }`}
+              >
+                <View className="w-[36px] h-[36px] rounded-[18px] items-center justify-center" style={{
+                  backgroundColor: level.status === 'completed'
+                    ? Colors.accent.success
+                    : level.status === 'active'
+                    ? Colors.accent.primary
+                    : Colors.bg.tertiary,
+                }}>
+                  <Text className="text-text-primary text-sm font-bold">{level.levelNumber}</Text>
                 </View>
-              </View>
-            </Animated.View>
-          ))}
-        </View>
+                <View className="flex-1">
+                  <Text className="text-text-primary text-md font-semibold">{level.title}</Text>
+                  <View className="flex-row items-center gap-xs mt-[2px]">
+                    <NucleoIcon
+                      name={
+                        level.status === 'completed' ? 'circle-check'
+                        : level.status === 'active' ? 'book-open'
+                        : 'lock'
+                      }
+                      size={12}
+                    />
+                    <Text className="text-text-muted text-xs">
+                      {level.status === 'completed' ? 'Already known' :
+                       level.status === 'active' ? 'Start here' : 'Locked'}
+                    </Text>
+                  </View>
+                </View>
+              </Animated.View>
+            ))}
+          </View>
 
-        <Animated.View entering={FadeInDown.delay(400 + levels.length * 150)} className="mt-xxxl pb-xxl">
-          <Button
-            title="Start Studying!"
-            icon={<NucleoIcon name="rocket-blue" size={18} />}
-            onPress={handleStart}
-            fullWidth
-            size="lg"
-            loading={loading}
-          />
-        </Animated.View>
+          <Animated.View entering={FadeInDown.delay(400 + levels.length * 150)} className="mt-xxxl pb-xxl">
+            <Button
+              title="Start Studying!"
+              icon={<NucleoIcon name="rocket-blue" size={18} />}
+              onPress={handleStart}
+              fullWidth
+              size="lg"
+              loading={loading}
+            />
+          </Animated.View>
+        </ResponsiveContainer>
       </ScrollView>
     </SafeAreaView>
   );

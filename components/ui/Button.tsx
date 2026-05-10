@@ -16,6 +16,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -46,6 +47,7 @@ export function Button({
   fullWidth = false,
 }: ButtonProps) {
   const scale = useSharedValue(1);
+  const { isWide } = useResponsiveLayout();
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -74,6 +76,7 @@ export function Button({
         variantStyles.container,
         sizeStyles.container,
         animatedStyle,
+        fullWidth && isWide ? { maxWidth: 480, alignSelf: 'center' as const } : undefined,
         style,
       ]}
       onPress={handlePress}

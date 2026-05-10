@@ -30,13 +30,19 @@ export function DailyObjectives({
   return (
     <View className="gap-sm">
       <Text className="text-text-primary text-lg font-bold mb-xs">Don't know what to study?</Text>
+      <View style={{ gap: 8 }}>
       {objectives.map((obj) => {
         const estimatedPages = studyProfile
           ? estimatePagesForStudyMinutes(obj.estimatedMinutes, studyProfile)
           : null;
 
         return (
-          <TouchableOpacity key={obj.id} onPress={() => onPress(obj)} activeOpacity={0.7} className="mb-xs">
+          <TouchableOpacity
+            key={obj.id}
+            onPress={() => onPress(obj)}
+            activeOpacity={0.7}
+            style={{ marginBottom: 0 }}
+          >
             <Card className={obj.completed ? 'opacity-60' : ''} style={{ borderColor: '#1156ae99' }}>
               <View className="flex-row items-start gap-md">
                 <TouchableOpacity
@@ -92,6 +98,7 @@ export function DailyObjectives({
           </View>
         </Card>
       )}
+      </View>
     </View>
   );
 }

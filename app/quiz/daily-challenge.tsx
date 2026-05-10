@@ -4,8 +4,10 @@
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { QuizResults } from '@/components/quiz/QuizResults';
 import { Button } from '@/components/ui/Button';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { LevelThresholds, Points } from '@/constants/gamification';
 import { Colors } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
@@ -18,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function DailyChallengeScreen() {
   const store = useStudyStore();
   const { addCardsFromQuiz } = useSpacedRepetition();
+  const { contentPadding } = useResponsiveLayout();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -123,56 +126,58 @@ export default function DailyChallengeScreen() {
     const canAdvanceInline = passed && wasBoosted.current && hasNextDay;
     return (
       <SafeAreaView className="flex-1 bg-bg-primary">
-        <QuizResults
-          score={score}
-          totalQuestions={questions.length}
-          correctAnswers={correct}
-          passThreshold={LevelThresholds.PASS_PERCENTAGE}
-          feedback={canAdvanceInline ? undefined : (passed ? undefined : 'Keep reviewing those objectives!')}
-          onContinue={handleContinue}
-          onRetry={!passed ? handleRetry : undefined}
-          pointsEarned={pointsEarned}
-          title={passed ? 'Great work!' : undefined}
-          continueLabel={canAdvanceInline ? 'Start next day' : undefined}
-          secondaryActionLabel={canAdvanceInline ? 'Close' : undefined}
-          onSecondaryAction={canAdvanceInline ? handleClose : undefined}
-          extraContent={canAdvanceInline ? (
-            <View
-              style={{
-                width: '100%',
-                marginTop: 16,
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: Colors.border.subtle,
-                backgroundColor: Colors.bg.secondary,
-                paddingHorizontal: 16,
-                paddingVertical: 14,
-              }}
-            >
-              <Text
+        <ResponsiveContainer maxWidth={640}>
+          <QuizResults
+            score={score}
+            totalQuestions={questions.length}
+            correctAnswers={correct}
+            passThreshold={LevelThresholds.PASS_PERCENTAGE}
+            feedback={canAdvanceInline ? undefined : (passed ? undefined : 'Keep reviewing those objectives!')}
+            onContinue={handleContinue}
+            onRetry={!passed ? handleRetry : undefined}
+            pointsEarned={pointsEarned}
+            title={passed ? 'Great work!' : undefined}
+            continueLabel={canAdvanceInline ? 'Start next day' : undefined}
+            secondaryActionLabel={canAdvanceInline ? 'Close' : undefined}
+            onSecondaryAction={canAdvanceInline ? handleClose : undefined}
+            extraContent={canAdvanceInline ? (
+              <View
                 style={{
-                  color: Colors.text.muted,
-                  fontSize: 11,
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
+                  width: '100%',
+                  marginTop: 16,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: Colors.border.subtle,
+                  backgroundColor: Colors.bg.secondary,
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
                 }}
               >
-                Next up
-              </Text>
-              <Text
-                style={{
-                  color: Colors.text.primary,
-                  fontSize: 16,
-                  fontWeight: '600',
-                  marginTop: 4,
-                }}
-              >
-                {nextTopicTitle}
-              </Text>
-            </View>
-          ) : undefined}
-        />
+                <Text
+                  style={{
+                    color: Colors.text.muted,
+                    fontSize: 11,
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Next up
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.text.primary,
+                    fontSize: 16,
+                    fontWeight: '600',
+                    marginTop: 4,
+                  }}
+                >
+                  {nextTopicTitle}
+                </Text>
+              </View>
+            ) : undefined}
+          />
+        </ResponsiveContainer>
       </SafeAreaView>
     );
   }
@@ -183,21 +188,25 @@ export default function DailyChallengeScreen() {
   return (
     <SafeAreaView className="flex-1 bg-bg-primary">
       <ScrollView className="flex-1">
-        <QuestionCard
-          question={currentQ}
-          questionNumber={currentIndex + 1}
-          totalQuestions={questions.length}
-          onAnswer={handleAnswer}
-          showFeedback={true}
-        />
+        <ResponsiveContainer maxWidth={640}>
+          <QuestionCard
+            question={currentQ}
+            questionNumber={currentIndex + 1}
+            totalQuestions={questions.length}
+            onAnswer={handleAnswer}
+            showFeedback={true}
+          />
+        </ResponsiveContainer>
       </ScrollView>
       {currentQ.userAnswer !== undefined && (
-        <View className="px-xxl pb-xxl">
-          <Button
-            title={currentIndex < questions.length - 1 ? 'Next' : 'Finish'}
-            onPress={handleNext}
-            fullWidth size="lg"
-          />
+        <View style={{ paddingHorizontal: contentPadding, paddingBottom: 24, alignItems: 'center' }}>
+          <ResponsiveContainer maxWidth={640}>
+            <Button
+              title={currentIndex < questions.length - 1 ? 'Next' : 'Finish'}
+              onPress={handleNext}
+              fullWidth size="lg"
+            />
+          </ResponsiveContainer>
         </View>
       )}
     </SafeAreaView>

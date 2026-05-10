@@ -1,7 +1,9 @@
 import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { Button } from '@/components/ui/Button';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { Colors } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { router } from 'expo-router';
@@ -23,6 +25,7 @@ function formatDate(date: Date) {
 
 export default function DeadlineScreen() {
   const store = useStudyStore();
+  const { contentPadding } = useResponsiveLayout();
 
   const initial = store.onboardingData.deadline
     ? new Date(store.onboardingData.deadline)
@@ -58,10 +61,11 @@ export default function DeadlineScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <SafeAreaView style={{ flex: 1 }} className="bg-bg-primary">
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: contentPadding }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+        <ResponsiveContainer maxWidth={560}>
         <StepIndicator totalSteps={6} currentStep={2} />
 
         <View className="flex-1 pt-xxl">
@@ -158,6 +162,7 @@ export default function DeadlineScreen() {
           <Button title="Generate Study Plan" onPress={handleContinue} fullWidth size="lg" />
           <Button title="Back" variant="ghost" onPress={() => router.back()} fullWidth />
         </View>
+        </ResponsiveContainer>
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>

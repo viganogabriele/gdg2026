@@ -8,8 +8,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { Button } from '@/components/ui/Button';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import * as api from '@/services/api';
 import { Colors } from '@/constants/theme';
 import type { QuizQuestion, SpacedRepetitionCard } from '@/types';
@@ -30,6 +32,7 @@ export default function SpacedReviewScreen() {
   const [done, setDone] = useState(false);
   const [ratingPicked, setRatingPicked] = useState<number | null>(null);
   const [ratingCounts, setRatingCounts] = useState({ wrong: 0, hard: 0, easy: 0 });
+  const { contentPadding } = useResponsiveLayout();
 
   const completedTopics = store.levels
     .filter((l) => l.status === 'completed' || l.status === 'active')
@@ -94,42 +97,48 @@ export default function SpacedReviewScreen() {
     return (
       <SafeAreaView className="flex-1 bg-bg-primary">
         <View className="flex-1 justify-center items-center p-xxl">
-          <View className="mb-lg">
-            <NucleoIcon
-              name={questions.length === 0 ? 'circle-check' : 'sparkle-yellow'}
-              size={64}
-            />
-          </View>
-          <Text className="text-text-primary text-xxl font-bold">
-            {questions.length === 0 ? 'Nessuna card in scadenza!' : 'Review completata!'}
-          </Text>
-          <Text className="text-text-muted text-md text-center mt-sm mb-lg leading-[22px]">
-            {questions.length === 0
-              ? 'Continua a studiare — i ripassi appariranno man mano che progredisci.'
-              : 'La spaced repetition rafforza la memoria a lungo termine. Continua così!'}
-          </Text>
+          <ResponsiveContainer maxWidth={480}>
+            <View style={{ alignItems: 'center' }}>
+              <View className="mb-lg">
+                <NucleoIcon
+                  name={questions.length === 0 ? 'circle-check' : 'sparkle-yellow'}
+                  size={64}
+                />
+              </View>
+              <Text className="text-text-primary text-xxl font-bold">
+                {questions.length === 0 ? 'No cards due!' : 'Review complete!'}
+              </Text>
+              <Text className="text-text-muted text-md text-center mt-sm mb-lg leading-[22px]">
+                {questions.length === 0
+                  ? 'Keep studying — reviews will appear as you make progress.'
+                  : 'Spaced repetition strengthens long-term memory. Keep it up!'}
+              </Text>
 
-          {total > 0 && (
-            <View className="w-full bg-bg-secondary rounded-xl p-lg mb-xxl" style={{ gap: 8 }}>
-              {RATINGS.map(({ label, emoji, rating, color }) => {
-                const count = rating === 0 ? ratingCounts.wrong : rating === 2 ? ratingCounts.hard : ratingCounts.easy;
-                const pct = total > 0 ? count / total : 0;
-                return (
-                  <View key={rating} style={{ gap: 4 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={{ color: Colors.text.muted, fontSize: 13 }}>{emoji} {label}</Text>
-                      <Text style={{ color, fontSize: 13, fontWeight: '600' }}>{count}</Text>
-                    </View>
-                    <View style={{ height: 6, backgroundColor: Colors.bg.tertiary, borderRadius: 3 }}>
-                      <View style={{ height: 6, width: `${pct * 100}%`, backgroundColor: color, borderRadius: 3 }} />
-                    </View>
-                  </View>
-                );
-              })}
+              {total > 0 && (
+                <View className="w-full bg-bg-secondary rounded-xl p-lg mb-xxl" style={{ gap: 8 }}>
+                  {RATINGS.map(({ label, emoji, rating, color }) => {
+                    const count = rating === 0 ? ratingCounts.wrong : rating === 2 ? ratingCounts.hard : ratingCounts.easy;
+                    const pct = total > 0 ? count / total : 0;
+                    return (
+                      <View key={rating} style={{ gap: 4 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                          <Text style={{ color: Colors.text.muted, fontSize: 13 }}>{emoji} {label}</Text>
+                          <Text style={{ color, fontSize: 13, fontWeight: '600' }}>{count}</Text>
+                        </View>
+                        <View style={{ height: 6, backgroundColor: Colors.bg.tertiary, borderRadius: 3 }}>
+                          <View style={{ height: 6, width: `${pct * 100}%`, backgroundColor: color, borderRadius: 3 }} />
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+
+              <View style={{ width: '100%' }}>
+                <Button title="Fine" onPress={() => router.back()} fullWidth size="lg" />
+              </View>
             </View>
-          )}
-
-          <Button title="Fine" onPress={() => router.back()} fullWidth size="lg" />
+          </ResponsiveContainer>
         </View>
       </SafeAreaView>
     );
@@ -172,53 +181,57 @@ export default function SpacedReviewScreen() {
 
       {/* Question */}
       <ScrollView className="flex-1">
-        <QuestionCard
-          question={currentQ}
-          questionNumber={currentIndex + 1}
-          totalQuestions={questions.length}
-          onAnswer={handleAnswer}
-          showFeedback={true}
-        />
+        <ResponsiveContainer maxWidth={640}>
+          <QuestionCard
+            question={currentQ}
+            questionNumber={currentIndex + 1}
+            totalQuestions={questions.length}
+            onAnswer={handleAnswer}
+            showFeedback={true}
+          />
+        </ResponsiveContainer>
       </ScrollView>
 
       {/* Rating buttons — appear after answering */}
       {answered && (
-        <View style={{ paddingHorizontal: 24, paddingBottom: 24, gap: 10 }}>
-          {ratingPicked === null ? (
-            <>
-              <Text style={{ color: Colors.text.muted, fontSize: 13, textAlign: 'center', marginBottom: 4 }}>
-                Com'è andata?
-              </Text>
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                {RATINGS.map(({ label, emoji, rating, color, bg }) => (
-                  <Pressable
-                    key={rating}
-                    onPress={() => handleRating(rating)}
-                    style={({ pressed }) => ({
-                      flex: 1,
-                      backgroundColor: bg,
-                      borderWidth: 1.5,
-                      borderColor: color,
-                      borderRadius: 12,
-                      paddingVertical: 12,
-                      alignItems: 'center',
-                      opacity: pressed ? 0.7 : 1,
-                    })}
-                  >
-                    <Text style={{ fontSize: 20 }}>{emoji}</Text>
-                    <Text style={{ color, fontSize: 12, fontWeight: '600', marginTop: 4 }}>{label}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            </>
-          ) : (
-            <Button
-              title={currentIndex < questions.length - 1 ? 'Prossima →' : 'Fine sessione'}
-              onPress={handleNext}
-              fullWidth
-              size="lg"
-            />
-          )}
+        <View style={{ paddingHorizontal: contentPadding, paddingBottom: 24, gap: 10, alignItems: 'center' }}>
+          <ResponsiveContainer maxWidth={640}>
+            {ratingPicked === null ? (
+              <>
+                <Text style={{ color: Colors.text.muted, fontSize: 13, textAlign: 'center', marginBottom: 4 }}>
+                  Com'è andata?
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  {RATINGS.map(({ label, emoji, rating, color, bg }) => (
+                    <Pressable
+                      key={rating}
+                      onPress={() => handleRating(rating)}
+                      style={({ pressed }) => ({
+                        flex: 1,
+                        backgroundColor: bg,
+                        borderWidth: 1.5,
+                        borderColor: color,
+                        borderRadius: 12,
+                        paddingVertical: 12,
+                        alignItems: 'center',
+                        opacity: pressed ? 0.7 : 1,
+                      })}
+                    >
+                      <Text style={{ fontSize: 20 }}>{emoji}</Text>
+                      <Text style={{ color, fontSize: 12, fontWeight: '600', marginTop: 4 }}>{label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </>
+            ) : (
+              <Button
+                title={currentIndex < questions.length - 1 ? 'Prossima →' : 'Fine sessione'}
+                onPress={handleNext}
+                fullWidth
+                size="lg"
+              />
+            )}
+          </ResponsiveContainer>
         </View>
       )}
     </SafeAreaView>

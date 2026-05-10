@@ -4,6 +4,7 @@ import { LeaderboardEntry } from '@/services/leaderboard';
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { MEDAL } from './MedalConfig';
 
 interface PodiumViewProps {
@@ -42,8 +43,13 @@ function FloatingIcon({ rank }: { rank: 1 | 2 | 3 }) {
 }
 
 export function PodiumView({ top3 }: PodiumViewProps) {
+  const { isDesktop, isWide } = useResponsiveLayout();
+  const scale = isDesktop ? 1.4 : isWide ? 1.2 : 1;
+  const heights = { 1: Math.round(180 * scale), 2: Math.round(140 * scale), 3: Math.round(110 * scale) };
+  const containerHeight = Math.round(220 * scale);
+
   return (
-    <View className="flex-row items-end justify-center gap-md mb-xxl" style={{ height: 220 }}>
+    <View className="flex-row items-end justify-center gap-md mb-xxl" style={{ height: containerHeight }}>
       {VISUAL_ORDER.map((rank) => {
         const entry = top3[rank - 1];
         if (!entry) return null;
@@ -59,7 +65,7 @@ export function PodiumView({ top3 }: PodiumViewProps) {
             <View
               style={{
                 width: '100%',
-                height: HEIGHTS[rank],
+                height: heights[rank],
                 backgroundColor: medal.bg,
                 borderTopLeftRadius: 10,
                 borderTopRightRadius: 10,

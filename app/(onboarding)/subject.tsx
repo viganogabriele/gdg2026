@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepIndicator } from '@/components/onboarding/StepIndicator';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useStudyStore } from '@/hooks/useStudyStore';
 
 export default function SubjectScreen() {
@@ -13,6 +15,7 @@ export default function SubjectScreen() {
   const isAddingRoadmap = useStudyStore((s) => s.isAddingRoadmap);
   const cancelAddRoadmap = useStudyStore((s) => s.cancelAddRoadmap);
   const [subject, setSubject] = useState(existing);
+  const { contentPadding } = useResponsiveLayout();
 
   const handleContinue = () => {
     if (!subject.trim()) return;
@@ -32,46 +35,48 @@ export default function SubjectScreen() {
     >
       <SafeAreaView style={{ flex: 1 }} className="bg-bg-primary">
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: contentPadding }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <StepIndicator totalSteps={6} currentStep={0} />
+          <ResponsiveContainer maxWidth={560}>
+            <StepIndicator totalSteps={6} currentStep={0} />
 
-          <View style={{ flex: 1, justifyContent: 'center', paddingVertical: 32 }}>
-            <Text className="text-xxl text-text-primary mb-sm">Let's get started</Text>
-            <Text className="text-text-primary text-xxxl font-bold mb-md">What are you studying?</Text>
-            <Text className="text-text-secondary text-md leading-[22px] mb-xxxl">
-              Enter the subject or course name you want to master
-            </Text>
+            <View style={{ flex: 1, justifyContent: 'center', paddingVertical: 32 }}>
+              <Text className="text-xxl text-text-primary mb-sm">Let's get started</Text>
+              <Text className="text-text-primary text-xxxl font-bold mb-md">What are you studying?</Text>
+              <Text className="text-text-secondary text-md leading-[22px] mb-xxxl">
+                Enter the subject or course name you want to master
+              </Text>
 
-            <Input
-              placeholder="e.g. Calculus II, Organic Chemistry, History..."
-              value={subject}
-              onChangeText={setSubject}
-              autoFocus
-              returnKeyType="done"
-              onSubmitEditing={handleContinue}
-            />
-          </View>
-
-          <View style={{ paddingBottom: 32, gap: 8 }}>
-            <Button
-              title="Continue"
-              onPress={handleContinue}
-              disabled={!subject.trim()}
-              fullWidth
-              size="lg"
-            />
-            {isAddingRoadmap && (
-              <Button
-                title="Cancel"
-                variant="ghost"
-                onPress={handleCancel}
-                fullWidth
+              <Input
+                placeholder="e.g. Calculus II, Organic Chemistry, History..."
+                value={subject}
+                onChangeText={setSubject}
+                autoFocus
+                returnKeyType="done"
+                onSubmitEditing={handleContinue}
               />
-            )}
-          </View>
+            </View>
+
+            <View style={{ paddingBottom: 32, gap: 8 }}>
+              <Button
+                title="Continue"
+                onPress={handleContinue}
+                disabled={!subject.trim()}
+                fullWidth
+                size="lg"
+              />
+              {isAddingRoadmap && (
+                <Button
+                  title="Cancel"
+                  variant="ghost"
+                  onPress={handleCancel}
+                  fullWidth
+                />
+              )}
+            </View>
+          </ResponsiveContainer>
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>

@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Colors, Shadow } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import type { StudyLevel } from '@/types';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -28,6 +29,7 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
   const dailyObjectives = useStudyStore((s) => s.dailyObjectives);
   const advanceToDay = useStudyStore((s) => s.advanceToDay);
   const dayAdvanceReady = useStudyStore((s) => s.dayAdvanceReady);
+  const { isDesktop } = useResponsiveLayout();
 
   const isActiveLevel = level.status === 'active' || level.status === 'failed';
   const allCurrentDayDone =
@@ -112,6 +114,7 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
 
       {/* Expanded Content */}
       <Animated.View className="overflow-hidden mt-md" style={expandStyle}>
+        <View style={isDesktop ? { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } : undefined}>
         {level.topics.map((topic, topicIndex) => {
           const isPastDay = isActiveLevel && topicIndex < currentDayIndex;
           const isCurrentDay = isActiveLevel && topicIndex === currentDayIndex;
@@ -123,7 +126,10 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
             <TouchableOpacity
               key={topic.id}
               className={`flex-row gap-sm mb-md p-sm rounded-md ${isCurrentDay ? 'bg-bg-tertiary' : ''}`}
-              style={canAdvance ? { borderWidth: 1, borderColor: `${levelColor}66`, borderStyle: 'dashed' } : undefined}
+              style={[
+                isDesktop ? { width: '48%' } : undefined,
+                canAdvance ? { borderWidth: 1, borderColor: `${levelColor}66`, borderStyle: 'dashed' } : undefined,
+              ] as any}
               onPress={canAdvance ? () => advanceToDay(topicIndex) : undefined}
               disabled={!canAdvance}
               activeOpacity={canAdvance ? 0.6 : 1}
@@ -159,6 +165,7 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
             </TouchableOpacity>
           );
         })}
+        </View>
 
         {/* Actions */}
         {(level.status === 'active' || level.status === 'failed') && (

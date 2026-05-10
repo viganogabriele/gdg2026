@@ -6,7 +6,8 @@ import { Colors } from '@/constants/theme';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
+import React, { useRef, useState } from 'react';
 import {
   LayoutChangeEvent,
   Modal,
@@ -20,6 +21,9 @@ import {
 export function RoadmapSelector() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [triggerWidth, setTriggerWidth] = useState(0);
+  const [triggerLayout, setTriggerLayout] = useState({ x: 0, y: 0, height: 0 });
+  const triggerRef = useRef<View>(null);
+  const { isWide } = useResponsiveLayout();
 
   const roadmaps = useStudyStore((s) => s.roadmaps);
   const activeRoadmapId = useStudyStore((s) => s.activeRoadmapId);
@@ -30,13 +34,18 @@ export function RoadmapSelector() {
 
   const activeRoadmap = roadmaps.find((rm) => rm.id === activeRoadmapId);
   const currentTitle = activeRoadmap?.subject?.title || subjects[0]?.title || 'StudyQuest';
-  const dropdownWidth = Math.min(Math.max(triggerWidth + 36, 236), 320);
+  const dropdownWidth = Math.min(Math.max(triggerWidth + 36, 236), isWide ? 400 : 320);
 
   const handleTriggerLayout = (event: LayoutChangeEvent) => {
     const nextWidth = Math.ceil(event.nativeEvent.layout.width);
-    if (nextWidth !== triggerWidth) {
-      setTriggerWidth(nextWidth);
-    }
+    if (nextWidth !== triggerWidth) setTriggerWidth(nextWidth);
+  };
+
+  const openDropdown = () => {
+    triggerRef.current?.measure((_x, _y, _w, h, pageX, pageY) => {
+      setTriggerLayout({ x: pageX, y: pageY, height: h });
+      setDropdownOpen(true);
+    });
   };
 
   const handleSwitch = (roadmapId: string) => {
@@ -73,8 +82,9 @@ export function RoadmapSelector() {
     <>
       {/* Trigger Button */}
       <TouchableOpacity
+        ref={triggerRef}
         className="self-start flex-row items-center gap-xs py-xs px-sm rounded-lg bg-bg-secondary border border-border-subtle"
-        onPress={() => setDropdownOpen(!dropdownOpen)}
+        onPress={openDropdown}
         activeOpacity={0.7}
         onLayout={handleTriggerLayout}
         style={{ maxWidth: '82%' }}
@@ -104,8 +114,8 @@ export function RoadmapSelector() {
               <View
                 style={{
                   position: 'absolute',
-                  top: Platform.OS === 'ios' ? 100 : 80,
-                  left: 16,
+                  top: triggerLayout.y + triggerLayout.height + 6,
+                  left: triggerLayout.x,
                   width: dropdownWidth,
                   backgroundColor: Colors.bg.secondary,
                   borderRadius: 16,

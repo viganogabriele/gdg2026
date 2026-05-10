@@ -1,12 +1,15 @@
 /**
  * Timeline View — vertical timeline connector for roadmap levels
+ * Content is capped with ResponsiveContainer on wide screens.
  */
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LevelCard } from './LevelCard';
 import { RoadmapSelector } from './RoadmapSelector';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import { Colors } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import type { StudyLevel } from '@/types';
 
 interface TimelineViewProps {
@@ -39,93 +42,96 @@ export function TimelineView({ levels, onLevelPress, onTakeQuiz }: TimelineViewP
   const totalCount = levels.length;
   const overallProgress = totalCount > 0 ? completedCount / totalCount : 0;
   const glowColor = getLevelColor(completedCount, totalCount);
+  const { contentPadding } = useResponsiveLayout();
 
   return (
     <ScrollView
       className="flex-1"
-      contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 48 }}
+      contentContainerStyle={{ paddingHorizontal: contentPadding, paddingBottom: 48 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Overall Progress Header */}
-      <View className="mb-xxl pt-lg">
-        <View className="flex-row items-center justify-between mb-sm">
-          <RoadmapSelector />
-        </View>
-        <Text className="text-text-secondary text-sm mt-xs">
-          {completedCount} / {totalCount} levels completed
-        </Text>
-        <View className="h-[6px] bg-bg-tertiary rounded-[3px] mt-md">
-          {overallProgress > 0 && (
-            <LinearGradient
-              colors={['#9333ea', '#36c6e2', '#1156ae']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{
-                width: `${overallProgress * 100}%`,
-                height: '100%',
-                borderRadius: 3,
-                shadowColor: glowColor,
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 1,
-                shadowRadius: 10,
-                elevation: 8,
-              }}
-            />
-          )}
-        </View>
-      </View>
-
-      {/* Timeline */}
-      {levels.map((level, index) => {
-        const levelColor = level.status !== 'locked' ? getLevelColor(index, totalCount) : Colors.border.medium;
-        const prevColor = index > 0 && levels[index - 1].status !== 'locked'
-          ? getLevelColor(index - 1, totalCount)
-          : Colors.border.subtle;
-
-        return (
-          <View key={level.id} className="flex-row">
-            {/* Timeline connector line */}
-            <View className="w-[24px] items-center mr-md">
-              {index > 0 && (
-                <View
-                  className="w-[2px] flex-1 min-h-[12px]"
-                  style={{
-                    backgroundColor:
-                      level.status === 'completed' || levels[index - 1]?.status === 'completed'
-                        ? prevColor
-                        : Colors.border.subtle,
-                  }}
-                />
-              )}
-              <View
-                className="w-[14px] h-[14px] rounded-[7px] border-2"
+      <ResponsiveContainer maxWidth={800}>
+        {/* Overall Progress Header */}
+        <View className="mb-xxl pt-lg">
+          <View className="flex-row items-center justify-between mb-sm">
+            <RoadmapSelector />
+          </View>
+          <Text className="text-text-secondary text-sm mt-xs">
+            {completedCount} / {totalCount} levels completed
+          </Text>
+          <View className="h-[6px] bg-bg-tertiary rounded-[3px] mt-md">
+            {overallProgress > 0 && (
+              <LinearGradient
+                colors={['#9333ea', '#36c6e2', '#1156ae']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
                 style={{
-                  backgroundColor: level.status === 'locked' ? Colors.bg.tertiary : levelColor,
-                  borderColor: levelColor,
+                  width: `${overallProgress * 100}%`,
+                  height: '100%',
+                  borderRadius: 3,
+                  shadowColor: glowColor,
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 1,
+                  shadowRadius: 10,
+                  elevation: 8,
                 }}
               />
-              {index < levels.length - 1 && (
+            )}
+          </View>
+        </View>
+
+        {/* Timeline */}
+        {levels.map((level, index) => {
+          const levelColor = level.status !== 'locked' ? getLevelColor(index, totalCount) : Colors.border.medium;
+          const prevColor = index > 0 && levels[index - 1].status !== 'locked'
+            ? getLevelColor(index - 1, totalCount)
+            : Colors.border.subtle;
+
+          return (
+            <View key={level.id} className="flex-row">
+              {/* Timeline connector line */}
+              <View className="w-[24px] items-center mr-md">
+                {index > 0 && (
+                  <View
+                    className="w-[2px] flex-1 min-h-[12px]"
+                    style={{
+                      backgroundColor:
+                        level.status === 'completed' || levels[index - 1]?.status === 'completed'
+                          ? prevColor
+                          : Colors.border.subtle,
+                    }}
+                  />
+                )}
                 <View
-                  className="w-[2px] flex-1 min-h-[12px]"
+                  className="w-[14px] h-[14px] rounded-[7px] border-2"
                   style={{
-                    backgroundColor: level.status === 'completed' ? levelColor : Colors.border.subtle,
+                    backgroundColor: level.status === 'locked' ? Colors.bg.tertiary : levelColor,
+                    borderColor: levelColor,
                   }}
                 />
-              )}
-            </View>
+                {index < levels.length - 1 && (
+                  <View
+                    className="w-[2px] flex-1 min-h-[12px]"
+                    style={{
+                      backgroundColor: level.status === 'completed' ? levelColor : Colors.border.subtle,
+                    }}
+                  />
+                )}
+              </View>
 
-            {/* Level Card */}
-            <View className="flex-1">
-              <LevelCard
-                level={level}
-                levelColor={levelColor}
-                onPress={() => onLevelPress(level)}
-                onTakeQuiz={() => onTakeQuiz(level)}
-              />
+              {/* Level Card */}
+              <View className="flex-1">
+                <LevelCard
+                  level={level}
+                  levelColor={levelColor}
+                  onPress={() => onLevelPress(level)}
+                  onTakeQuiz={() => onTakeQuiz(level)}
+                />
+              </View>
             </View>
-          </View>
-        );
-      })}
+          );
+        })}
+      </ResponsiveContainer>
     </ScrollView>
   );
 }

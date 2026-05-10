@@ -12,6 +12,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { Colors } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import type { QuizQuestion } from '@/types';
 
 interface QuestionCardProps {
@@ -70,7 +71,7 @@ export function QuestionCard({
   };
 
   return (
-    <Animated.View className="p-lg" style={containerStyle}>
+    <Animated.View className="p-lg" style={[containerStyle, { maxWidth: 720, alignSelf: 'center', width: '100%' }]}>
       <View className="mb-xxl">
         <Text className="text-text-muted text-sm font-medium mb-xs text-center">
           {questionNumber} / {totalQuestions}
@@ -112,7 +113,7 @@ export function QuestionCard({
         <View className="bg-bg-tertiary rounded-md p-lg mt-xxl border border-border-subtle">
           <View className="flex-row items-center gap-sm mb-sm">
             <NucleoIcon
-              name={question.userAnswer === question.correctIndex ? 'circle-check' : 'flame'}
+              name={question.userAnswer === question.correctIndex ? 'circle-check' : 'bell'}
               size={18}
             />
             <Text className="text-text-primary text-md font-semibold">

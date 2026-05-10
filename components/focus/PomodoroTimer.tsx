@@ -10,6 +10,7 @@ import { useStudyStore } from '@/hooks/useStudyStore';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 
 interface PomodoroTimerProps {
   onSessionComplete: (durationMinutes: number) => void;
@@ -20,6 +21,9 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
   const router = useRouter();
   const sessionFocusTime = useStudyStore((s) => s.sessionFocusTime);
   const incrementSessionFocusTime = useStudyStore((s) => s.incrementSessionFocusTime);
+  const { isDesktop, isWide } = useResponsiveLayout();
+  const timerSize = isDesktop ? 250 : isWide ? 220 : 200;
+  const btnSize = isDesktop ? 80 : 72;
 
   const [isRunning, setIsRunning] = useState(true);
   const [sessionComplete, setSessionComplete] = useState(false);
@@ -97,11 +101,11 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
         </Text>
       </View>
 
-      <View className="items-center justify-center w-[200px] h-[200px] mb-lg">
+      <View className="items-center justify-center mb-lg" style={{ width: timerSize, height: timerSize }}>
         <ProgressCircle
           progress={progress}
-          size={200}
-          strokeWidth={10}
+          size={timerSize}
+          strokeWidth={isDesktop ? 12 : 10}
           color={isBreak ? Colors.accent.success : Colors.accent.primary}
           showPercentage={false}
         />
@@ -119,8 +123,10 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
         {!sessionComplete && (
           <TouchableOpacity
             onPress={() => router.back()}
-            className="w-[72px] h-[72px] rounded-full items-center justify-center border-2"
+            className="rounded-full items-center justify-center border-2"
             style={{
+              width: btnSize,
+              height: btnSize,
               borderColor: Colors.accent.danger,
               backgroundColor: Colors.accent.danger
             }}
@@ -136,8 +142,10 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
 
         <TouchableOpacity
           onPress={() => setIsRunning(!isRunning)}
-          className="w-[72px] h-[72px] rounded-full items-center justify-center"
+          className="rounded-full items-center justify-center"
           style={{
+            width: btnSize,
+            height: btnSize,
             backgroundColor: isRunning ? Colors.bg.tertiary : Colors.accent.primary,
             shadowColor: isRunning ? '#000' : Colors.accent.primary,
             shadowOffset: { width: 0, height: 4 },
@@ -160,8 +168,10 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
               setIsBreak(false);
               setSecondsLeft(PomodoroDefaults.WORK_MINUTES * 60);
             }}
-            className="w-[72px] h-[72px] rounded-full items-center justify-center border-2 border-dashed"
+            className="rounded-full items-center justify-center border-2 border-dashed"
             style={{
+              width: btnSize,
+              height: btnSize,
               borderColor: Colors.border.subtle,
               backgroundColor: 'transparent'
             }}
@@ -176,8 +186,10 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
         ) : (
           <TouchableOpacity
             onPress={handleComplete}
-            className="w-[72px] h-[72px] rounded-full items-center justify-center"
+            className="rounded-full items-center justify-center"
             style={{
+              width: btnSize,
+              height: btnSize,
               backgroundColor: Colors.accent.success,
               shadowColor: Colors.accent.success,
               shadowOffset: { width: 0, height: 4 },

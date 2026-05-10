@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { NucleoIcon, NucleoIconName } from '@/components/ui/NucleoIcon';
 import { Colors, Shadow, BorderRadius } from '@/constants/theme';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 
 interface BadgeDisplayProps {
   icon: string;
@@ -29,6 +30,7 @@ export function BadgeDisplay({
   size = 'md',
 }: BadgeDisplayProps) {
   const [visible, setVisible] = useState(false);
+  const { isDesktop } = useResponsiveLayout();
 
   // Animation values
   const scaleAnim = useRef(new Animated.Value(0.6)).current;
@@ -36,9 +38,9 @@ export function BadgeDisplay({
   const backdropOpacity = useRef(new Animated.Value(0)).current;
 
   const sizeConfig = {
-    sm: { icon: 20, container: 48 },
-    md: { icon: 28, container: 64 },
-    lg: { icon: 36, container: 80 },
+    sm: { icon: isDesktop ? 24 : 20, container: isDesktop ? 56 : 48 },
+    md: { icon: isDesktop ? 32 : 28, container: isDesktop ? 72 : 64 },
+    lg: { icon: isDesktop ? 40 : 36, container: isDesktop ? 88 : 80 },
   }[size];
 
   const openModal = () => {

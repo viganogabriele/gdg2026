@@ -3,6 +3,7 @@
  */
 import React, { useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import { ResponsiveContainer } from '@/components/ui/ResponsiveContainer';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -46,112 +47,116 @@ export function QuizResults({
       contentContainerStyle={{ alignItems: 'center', padding: 24, paddingTop: 56, paddingBottom: 48 }}
       showsVerticalScrollIndicator={false}
     >
-      <Text
-        style={{
-          color: Colors.text.primary,
-          fontSize: 26,
-          fontWeight: '700',
-          marginBottom: 6,
-          textAlign: 'center',
-        }}
-      >
-        {title ?? (passed ? 'Great work!' : 'Keep studying')}
-      </Text>
-      <Text
-        style={{
-          color: Colors.text.muted,
-          fontSize: 14,
-          marginBottom: 36,
-          textAlign: 'center',
-        }}
-      >
-        {passed ? 'You nailed this session' : 'Review the weak spots and try again'}
-      </Text>
+      <ResponsiveContainer maxWidth={520}>
+        <View style={{ alignItems: 'center' }}>
+          <Text
+            style={{
+              color: Colors.text.primary,
+              fontSize: 26,
+              fontWeight: '700',
+              marginBottom: 6,
+              textAlign: 'center',
+            }}
+          >
+            {title ?? (passed ? 'Great work!' : 'Keep studying')}
+          </Text>
+          <Text
+            style={{
+              color: Colors.text.muted,
+              fontSize: 14,
+              marginBottom: 36,
+              textAlign: 'center',
+            }}
+          >
+            {passed ? 'You nailed this session' : 'Review the weak spots and try again'}
+          </Text>
 
-      {/* XP Circle */}
-      <ProgressCircle
-        progress={score}
-        size={180}
-        strokeWidth={14}
-        gradientColors={[Colors.accent.xp, '#36c6e2', Colors.accent.primary]}
-        gradientId="quiz-xp-grad"
-        backgroundColor={Colors.bg.tertiary}
-        showPercentage={false}
-      >
-        {pointsEarned !== undefined && pointsEarned > 0 ? (
-          <XpLabel pointsEarned={pointsEarned} />
-        ) : (
-          <NucleoIcon name="circle-check" size={48} />
-        )}
-      </ProgressCircle>
+          {/* XP Circle */}
+          <ProgressCircle
+            progress={score}
+            size={180}
+            strokeWidth={14}
+            gradientColors={[Colors.accent.xp, '#36c6e2', Colors.accent.primary]}
+            gradientId="quiz-xp-grad"
+            backgroundColor={Colors.bg.tertiary}
+            showPercentage={false}
+          >
+            {pointsEarned !== undefined && pointsEarned > 0 ? (
+              <XpLabel pointsEarned={pointsEarned} />
+            ) : (
+              <NucleoIcon name="circle-check" size={48} />
+            )}
+          </ProgressCircle>
 
-      {/* Score pill */}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 6,
-          marginTop: 20,
-          backgroundColor: Colors.bg.secondary,
-          borderRadius: 20,
-          paddingHorizontal: 16,
-          paddingVertical: 8,
-          borderWidth: 1,
-          borderColor: Colors.border.subtle,
-        }}
-      >
-        <Text style={{ color: Colors.text.muted, fontSize: 13 }}>Score</Text>
-        <Text
-          style={{
-            color: passed ? Colors.accent.success : Colors.accent.danger,
-            fontSize: 13,
-            fontWeight: '700',
-          }}
-        >
-          {scorePercent}%
-        </Text>
-      </View>
+          {/* Score pill */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              marginTop: 20,
+              backgroundColor: Colors.bg.secondary,
+              borderRadius: 20,
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+              borderWidth: 1,
+              borderColor: Colors.border.subtle,
+            }}
+          >
+            <Text style={{ color: Colors.text.muted, fontSize: 13 }}>Score</Text>
+            <Text
+              style={{
+                color: passed ? Colors.accent.success : Colors.accent.danger,
+                fontSize: 13,
+                fontWeight: '700',
+              }}
+            >
+              {scorePercent}%
+            </Text>
+          </View>
 
-      {/* Stats row */}
-      <View
-        style={{
-          flexDirection: 'row',
-          gap: 12,
-          marginTop: 24,
-          width: '100%',
-        }}
-      >
-        <StatCard value={correctAnswers} label="Correct" color={Colors.accent.success} />
-        <StatCard value={wrongAnswers} label="Wrong" color={Colors.accent.danger} />
-        <StatCard value={totalQuestions} label="Total" color={Colors.text.muted} />
-      </View>
+          {/* Stats row */}
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 12,
+              marginTop: 24,
+              width: '100%',
+            }}
+          >
+            <StatCard value={correctAnswers} label="Correct" color={Colors.accent.success} />
+            <StatCard value={wrongAnswers} label="Wrong" color={Colors.accent.danger} />
+            <StatCard value={totalQuestions} label="Total" color={Colors.text.muted} />
+          </View>
 
-      {feedback ? (
-        <Text
-          style={{
-            color: Colors.text.muted,
-            fontSize: 14,
-            textAlign: 'center',
-            marginTop: 24,
-            lineHeight: 22,
-            paddingHorizontal: 8,
-          }}
-        >
-          {feedback}
-        </Text>
-      ) : null}
+          {feedback ? (
+            <Text
+              style={{
+                color: Colors.text.muted,
+                fontSize: 14,
+                textAlign: 'center',
+                marginTop: 24,
+                lineHeight: 22,
+                paddingHorizontal: 8,
+              }}
+            >
+              {feedback}
+            </Text>
+          ) : null}
 
-      {extraContent}
+          {extraContent}
 
-      <View style={{ width: '100%', gap: 12, marginTop: 32 }}>
-        <Button title={continueLabel ?? (passed ? 'Continue' : 'Back to Study')} onPress={onContinue} fullWidth />
-        {secondaryActionLabel && onSecondaryAction ? (
-          <Button title={secondaryActionLabel} variant="ghost" onPress={onSecondaryAction} fullWidth />
-        ) : null}
-        {!passed && onRetry && (
-          <Button title="Retry Quiz" variant="secondary" onPress={onRetry} fullWidth />
-        )}
-      </View>
+          <View style={{ width: '100%', gap: 12, marginTop: 32 }}>
+            <Button title={continueLabel ?? (passed ? 'Continue' : 'Back to Study')} onPress={onContinue} fullWidth />
+            {secondaryActionLabel && onSecondaryAction ? (
+              <Button title={secondaryActionLabel} variant="ghost" onPress={onSecondaryAction} fullWidth />
+            ) : null}
+            {!passed && onRetry && (
+              <Button title="Retry Quiz" variant="secondary" onPress={onRetry} fullWidth />
+            )}
+          </View>
+        </View>
+      </ResponsiveContainer>
     </ScrollView>
   );
 }
