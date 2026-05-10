@@ -1,4 +1,5 @@
 TODO:
+1. pulsanti che non funzionano su android
 1. [ ] Animazione con livello che sale.
 2. [ ] Migliorare le 6 domande iniziali per capire il livello di conoscenza. Valutare il fatto di dire non so niente sull'argomento.
 3. [ ] Guardare l'algoritmo di spaced repetition. 
