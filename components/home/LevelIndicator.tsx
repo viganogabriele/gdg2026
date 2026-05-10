@@ -26,7 +26,6 @@ interface LevelIndicatorProps {
   completedMinutes: number;
   requiredMinutes: number;
   deadline: string;
-  totalDays: number;
   totalPoints: number;
 }
 
@@ -37,12 +36,10 @@ export function LevelIndicator({
   completedMinutes,
   requiredMinutes,
   deadline,
-  totalDays,
   totalPoints,
 }: LevelIndicatorProps) {
   const daysLeft = Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-  const daysElapsed = Math.min(totalDays - daysLeft + 1, totalDays);
-  const xpProgress = Math.max(0, daysElapsed / totalDays);
+  const xpProgress = Math.min(1, (totalPoints % 100) / 100);
 
   const anim = useSharedValue(0);
 

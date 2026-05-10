@@ -27,14 +27,9 @@ export default function HomeScreen() {
     updateStreak();
   }, [updateStreak]);
 
-  const onboardingData = useStudyStore((s) => s.onboardingData);
   const activeSubject = subjects[0];
   const activeLevel = levels.find((l) => l.status === 'active');
-  const currentLevelNum = activeLevel?.levelNumber || 1;
-
-  const levelTotalDays = activeLevel
-    ? Math.max(1, Math.ceil(activeLevel.requiredStudyMinutes / 60 / (onboardingData.hoursPerWeek || 10) * 7))
-    : 30;
+  const currentLevelNum = Math.floor(stats.totalPoints / 100) + 1;
 
   const challengeAvailable = !!activeLevel;
 
@@ -76,7 +71,6 @@ export default function HomeScreen() {
           completedMinutes={activeLevel?.completedStudyMinutes || 0}
           requiredMinutes={activeLevel?.requiredStudyMinutes || 100}
           deadline={activeLevel?.deadline || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()}
-          totalDays={levelTotalDays}
           totalPoints={stats.totalPoints}
         />
 
