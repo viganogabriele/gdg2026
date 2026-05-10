@@ -4,6 +4,7 @@
 import { NucleoIcon } from '@/components/ui/NucleoIcon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Colors, Shadow } from '@/constants/theme';
+import { useStudyStore } from '@/hooks/useStudyStore';
 import type { StudyLevel } from '@/types';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -23,10 +24,18 @@ interface LevelCardProps {
 export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardProps) {
   const [expanded, setExpanded] = useState(false);
   const expandHeight = useSharedValue(0);
+  const updateLevel = useStudyStore((s) => s.updateLevel);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
     expandHeight.value = withTiming(expanded ? 0 : 1, { duration: 300 });
+  };
+
+  const handleToggleTopic = (topicId: string) => {
+    const newTopics = level.topics.map((t) =>
+      (t.id === topicId && level.status != 'locked') ? { ...t, completed: !t.completed } : t
+    );
+    updateLevel(level.id, { topics: newTopics });
   };
 
   const expandStyle = useAnimatedStyle(() => ({
@@ -101,7 +110,12 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
       {/* Expanded Content */}
       <Animated.View className="overflow-hidden mt-md" style={expandStyle}>
         {level.topics.map((topic) => (
-          <View key={topic.id} className="flex-row gap-sm mb-md">
+          <TouchableOpacity
+            key={topic.id}
+            className="flex-row gap-sm mb-md"
+            onPress={() => handleToggleTopic(topic.id)}
+            activeOpacity={level.status === 'locked' ? 1 : 0.7}
+          >
             <Text className="text-accent-primary text-md font-bold w-[20px] text-center">
               {topic.completed ? '✓' : '○'}
             </Text>
@@ -119,13 +133,13 @@ export function LevelCard({ level, levelColor, onPress, onTakeQuiz }: LevelCardP
               {topic.sourceRefs.map((ref, i) => (
                 <View key={i} className="flex-row items-center gap-[4px] mt-[4px]">
                   <NucleoIcon name="link" size={12} />
-                  <Text className="text-accent-secondary text-xs">
+                  <Text className="text-xs" style={{ color: levelColor }}>
                     {ref.label}
                   </Text>
                 </View>
               ))}
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
 
         {/* Actions */}

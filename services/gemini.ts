@@ -347,7 +347,7 @@ ${sectionList}
 
 Rules:
 - Create one level per section (${sections.length} levels total)
-- Each level has 2 topics: "Core Concepts" and "Applications"
+- Each level can have more than topics, preceded by the day number and a dash, e.g. "Day 1 - Topic Title"
 - Each topic has 3 specific study arguments (what to study)
 - If the student scored well (>${Math.round(assessmentScore * 100)}%), mark early levels as completed
 - Levels should be numbered 1 through ${sections.length}
@@ -364,16 +364,17 @@ Return JSON:
       "title": "Section Title",
       "topics": [
         {
-          "title": "Section Title — Core Concepts",
+          "title": "Day 1 - Topic Title",
           "arguments": ["Argument 1", "Argument 2", "Argument 3"],
           "completed": false
         },
         {
-          "title": "Section Title — Applications",
+          "title": "Day 2 — Topic Title",
           "arguments": ["Argument 1", "Argument 2", "Argument 3"],
           "completed": false
-        }
-      ],
+        },
+        ... //as many days as needed tailored to the student's availability and deadlines
+       ],
       "status": "active",
       "requiredStudyMinutes": 120,
       "completedStudyMinutes": 0
