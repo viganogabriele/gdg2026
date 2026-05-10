@@ -5,13 +5,14 @@ import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { QuizResults } from '@/components/quiz/QuizResults';
 import { Button } from '@/components/ui/Button';
 import { LevelThresholds, Points } from '@/constants/gamification';
+import { Colors } from '@/constants/theme';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudyStore } from '@/hooks/useStudyStore';
 import * as api from '@/services/api';
 import type { QuizQuestion } from '@/types';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DailyChallengeScreen() {
@@ -23,6 +24,7 @@ export default function DailyChallengeScreen() {
   const [loading, setLoading] = useState(true);
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+  const [pointsEarned, setPointsEarned] = useState(0);
 
   const activeLevel = store.levels.find((l) => l.status === 'active');
   const flaggedObjectives = store.dailyObjectives.filter(o => o.completed);
@@ -36,6 +38,8 @@ export default function DailyChallengeScreen() {
   const hasNextDay = activeLevel
     ? store.currentDayIndex + 1 < activeLevel.topics.length
     : false;
+  const nextDayIndex = store.currentDayIndex + 1;
+  const nextTopicTitle = activeLevel?.topics[nextDayIndex]?.title || `Day ${nextDayIndex + 1}`;
 
   useEffect(() => {
     async function loadQuiz() {
@@ -73,42 +77,27 @@ export default function DailyChallengeScreen() {
   };
 
   const finishQuiz = () => {
+    const pointsBefore = useStudyStore.getState().stats.totalPoints;
     const correct = questions.filter((q) => q.userAnswer === q.correctIndex).length;
     const s = questions.length > 0 ? correct / questions.length : 0;
     setScore(s);
-    setShowResults(true);
 
     // Add questions to spaced repetition
     addCardsFromQuiz(questions);
 
     store.updateStreak();
     store.addPoints(Points.STUDY_SESSION_COMPLETE);
+
+    const pointsAfter = useStudyStore.getState().stats.totalPoints;
+    setPointsEarned(Math.max(0, pointsAfter - pointsBefore));
+    setShowResults(true);
   };
 
   const handleContinue = () => {
-    // If this was a boosted challenge and there's a next day, prompt to advance
     if (wasBoosted.current && hasNextDay && score >= LevelThresholds.PASS_PERCENTAGE) {
       store.setDayAdvanceReady(true);
-      const nextDayIndex = store.currentDayIndex + 1;
-      const nextTopic = activeLevel?.topics[nextDayIndex];
-      Alert.alert(
-        'Great work!',
-        `You completed all objectives for today! Ready to start "${nextTopic?.title || `Day ${nextDayIndex + 1}`}"?`,
-        [
-          {
-            text: 'Not yet',
-            style: 'cancel',
-            onPress: () => router.back(),
-          },
-          {
-            text: 'Start next day',
-            onPress: () => {
-              store.advanceToDay(nextDayIndex);
-              router.back();
-            },
-          },
-        ]
-      );
+      store.advanceToDay(nextDayIndex);
+      router.back();
     } else {
       router.back();
     }
@@ -120,6 +109,10 @@ export default function DailyChallengeScreen() {
     setQuestions((prev) => prev.map((q) => ({ ...q, userAnswer: undefined })));
   };
 
+  const handleClose = () => {
+    router.back();
+  };
+
   if (loading) {
     return <SafeAreaView className="flex-1 bg-bg-primary"><View className="flex-1" /></SafeAreaView>;
   }
@@ -127,6 +120,7 @@ export default function DailyChallengeScreen() {
   if (showResults) {
     const correct = questions.filter((q) => q.userAnswer === q.correctIndex).length;
     const passed = score >= LevelThresholds.PASS_PERCENTAGE;
+    const canAdvanceInline = passed && wasBoosted.current && hasNextDay;
     return (
       <SafeAreaView className="flex-1 bg-bg-primary">
         <QuizResults
@@ -134,10 +128,50 @@ export default function DailyChallengeScreen() {
           totalQuestions={questions.length}
           correctAnswers={correct}
           passThreshold={LevelThresholds.PASS_PERCENTAGE}
-          feedback={passed ? 'Great job on your Daily Challenge!' : 'Keep reviewing those objectives!'}
+          feedback={canAdvanceInline ? undefined : (passed ? undefined : 'Keep reviewing those objectives!')}
           onContinue={handleContinue}
           onRetry={!passed ? handleRetry : undefined}
-          pointsEarned={Points.STUDY_SESSION_COMPLETE}
+          pointsEarned={pointsEarned}
+          title={passed ? 'Great work!' : undefined}
+          continueLabel={canAdvanceInline ? 'Start next day' : undefined}
+          secondaryActionLabel={canAdvanceInline ? 'Close' : undefined}
+          onSecondaryAction={canAdvanceInline ? handleClose : undefined}
+          extraContent={canAdvanceInline ? (
+            <View
+              style={{
+                width: '100%',
+                marginTop: 16,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: Colors.border.subtle,
+                backgroundColor: Colors.bg.secondary,
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.text.muted,
+                  fontSize: 11,
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.5,
+                }}
+              >
+                Next up
+              </Text>
+              <Text
+                style={{
+                  color: Colors.text.primary,
+                  fontSize: 16,
+                  fontWeight: '600',
+                  marginTop: 4,
+                }}
+              >
+                {nextTopicTitle}
+              </Text>
+            </View>
+          ) : undefined}
         />
       </SafeAreaView>
     );

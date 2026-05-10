@@ -60,8 +60,8 @@ export function ProgressCircle({
   const strokeColor = gradientColors ? `url(#${gradientId})` : color;
 
   return (
-    <View className="items-center justify-center" style={{ width: size, height: size }}>
-      <Svg width={size} height={size} className="absolute">
+    <View style={{ width: size, height: size }}>
+      <Svg width={size} height={size} style={{ position: 'absolute', top: 0, left: 0 }}>
         {gradientColors && (
           <Defs>
             <LinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
@@ -93,7 +93,7 @@ export function ProgressCircle({
           origin={`${size / 2}, ${size / 2}`}
         />
       </Svg>
-      <View className="items-center justify-center">
+      <View style={{ position: 'absolute', top: 0, left: 0, width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
         {showPercentage && (
           <Text className="text-text-primary font-bold" style={{ fontSize: size * 0.2 }}>
             {Math.round(progress * 100)}%
