@@ -148,7 +148,7 @@ export function PomodoroTimer({ onSessionComplete, targetSessions }: PomodoroTim
           activeOpacity={0.8}
         >
           <IconSymbol
-            name={isRunning ? 'pause' : 'play.fill'}
+            name={isRunning ? 'pause.fill' : 'play.fill'}
             size={36}
             color={Colors.text.primary}
           />
