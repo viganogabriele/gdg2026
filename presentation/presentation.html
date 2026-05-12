@@ -356,51 +356,54 @@
     .phone-wrap {
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      perspective: 900px;
-      filter: drop-shadow(0 50px 90px rgba(0,0,0,.8)) drop-shadow(0 0 70px rgba(17,86,174,.3));
-      margin-right: -40px;
+      filter:
+        drop-shadow(0 60px 100px rgba(0,0,0,.85))
+        drop-shadow(0 0 80px rgba(17,86,174,.35))
+        drop-shadow(0 0 30px rgba(147,51,234,.15));
     }
     .phone-mock {
-      width: 210px;
-      height: 450px;
-      border-radius: 44px;
-      background: #06101a;
-      border: 2px solid rgba(255,255,255,0.13);
+      width: 248px;
+      height: 530px;
+      border-radius: 38px;
+      background: linear-gradient(160deg, #0d1e30 0%, #060f18 100%);
+      border: 2px solid rgba(255,255,255,0.16);
       position: relative;
       overflow: hidden;
+      clip-path: inset(0 round 38px);
       box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.05),
-        0 0 0 1px rgba(0,0,0,0.6);
-      transform: rotate(-14deg) rotateY(8deg);
+        inset 0 0 0 1px rgba(255,255,255,0.07),
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 0 0 1px rgba(0,0,0,0.8);
+      transform: rotate(-14deg);
     }
-    /* Dynamic Island */
+    /* iPhone 13 notch */
     .phone-mock::before {
       content: '';
-      position: absolute; top: 13px; left: 50%;
+      position: absolute; top: 0; left: 50%;
       transform: translateX(-50%);
-      width: 72px; height: 22px;
+      width: 118px; height: 28px;
       background: #000;
-      border-radius: 20px;
+      border-radius: 0 0 20px 20px;
       z-index: 10;
     }
     /* Power button */
     .phone-mock::after {
       content: '';
-      position: absolute; right: -3px; top: 90px;
-      width: 3px; height: 46px;
-      background: rgba(255,255,255,0.14);
+      position: absolute; right: -3px; top: 110px;
+      width: 3px; height: 54px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
       border-radius: 2px;
     }
     .phone-vol1 {
-      position: absolute; left: -3px; top: 80px;
-      width: 3px; height: 32px;
-      background: rgba(255,255,255,0.12);
+      position: absolute; left: -3px; top: 95px;
+      width: 3px; height: 36px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.07));
       border-radius: 2px;
     }
     .phone-vol2 {
-      position: absolute; left: -3px; top: 122px;
-      width: 3px; height: 32px;
-      background: rgba(255,255,255,0.12);
+      position: absolute; left: -3px; top: 142px;
+      width: 3px; height: 36px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.07));
       border-radius: 2px;
     }
     .phone-screen {
@@ -418,6 +421,23 @@
       border-radius: 50%;
       background: radial-gradient(circle, rgba(17,86,174,.22) 0%, transparent 70%);
       pointer-events: none; z-index: -1;
+    }
+
+    /* Phone entrance / exit */
+    .phone-stage {
+      opacity: 0;
+      transform: translateX(-40px) scale(0.92);
+      transition:
+        opacity   0.7s cubic-bezier(.22,1,.36,1),
+        transform 0.9s cubic-bezier(.22,1,.36,1);
+    }
+    .phone-stage.from-right {
+      transform: translateX(40px) scale(0.92);
+    }
+    .slide.active .phone-stage {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      transition-delay: 0.55s;
     }
 
     /* ═══════════════════════════════════════════════════════
@@ -710,6 +730,23 @@
       <div class="orb orb1"></div>
       <div class="orb orb2"></div>
 
+      <!-- Phone LEFT -->
+      <div class="phone-wrap"
+        style="position:absolute;left:110px;top:50%;transform:translateY(-50%);z-index:2;">
+        <div class="phone-stage">
+          <div class="phone-glow"></div>
+          <div class="phone-mock"
+            style="transform:rotate(7deg);clip-path:inset(0 round 38px);">
+            <div class="phone-vol1"></div>
+            <div class="phone-vol2"></div>
+            <div class="phone-screen">
+              <video src="onboard.mp4" muted playsinline loop
+                style="width:100%;height:100%;object-fit:cover;"></video>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div
         style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
 
@@ -803,50 +840,43 @@
     </div>
 
     <!-- ══════════════════════════════════════════════════════════
-     S4 · VIDEO DEMO
-══════════════════════════════════════════════════════════ -->
-    <div class="slide" id="s4" style="padding:40px 56px;">
-      <div class="stagger"
-        style="position:relative;z-index:1;width:100%;max-width:1000px;display:flex;flex-direction:column;gap:18px;align-items:center;">
-        <div style="text-align:center;">
-          <div class="eyebrow" style="justify-content:center;">See it in
-            action</div>
-          <h2 class="t-lg" style="margin-top:10px;">StudyQuest · Live Demo</h2>
-        </div>
-        <div style="width:100%;border-radius:20px;overflow:hidden;
-      border:1px solid rgba(17,86,174,.26);
-      box-shadow:
-        0 0 120px rgba(17,86,174,.22),
-        0 0 220px rgba(147,51,234,.1),
-        0 32px 80px rgba(0,0,0,.7);
-      background:#000;position:relative;">
-          <div
-            style="position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:20px;
-        box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);"></div>
-          <video id="demo-video" src="video.mp4" muted playsinline loop controls
-            style="width:100%;display:block;"></video>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════════
      S5 · FEATURES
 ══════════════════════════════════════════════════════════ -->
     <div class="slide" id="s5">
 
-      <!-- Phone: absolute, pinned to right edge of slide
+      <!-- Phone LEFT: mirrored -->
       <div class="phone-wrap"
-        style="position:absolute;right:0px;top:50%;transform:translateY(-20%);z-index:2;">
-        <div class="phone-glow"></div>
-        <div class="phone-mock">
-          <div class="phone-vol1"></div>
-          <div class="phone-vol2"></div>
-          <div class="phone-screen">
-            <video src="timer.MP4" muted playsinline loop
-              style="width:100%;height:100%;object-fit:cover;"></video>
+        style="position:absolute;left:130px;top:50%;transform:translateY(-42%);z-index:2;">
+        <div class="phone-stage">
+          <div class="phone-glow"></div>
+          <div class="phone-mock"
+            style="width:360px;height:770px;transform:rotate(6deg);clip-path:inset(0 round 38px);">
+            <div class="phone-vol1"></div>
+            <div class="phone-vol2"></div>
+            <div class="phone-screen">
+              <video src="timer.MP4" muted playsinline loop
+                style="width:100%;height:100%;object-fit:cover;"></video>
+            </div>
           </div>
         </div>
-      </div> -->
+      </div>
+
+      <!-- Phone RIGHT -->
+      <div class="phone-wrap"
+        style="position:absolute;right:200px;top:50%;transform:translateY(-50%);z-index:2;">
+        <div class="phone-stage from-right">
+          <div class="phone-glow"></div>
+          <div class="phone-mock"
+            style="width:310px;height:664px;transform:rotate(-7deg);clip-path:inset(0 round 38px);">
+            <div class="phone-vol1"></div>
+            <div class="phone-vol2"></div>
+            <div class="phone-screen">
+              <video src="quiz.mp4" muted playsinline loop
+                style="width:100%;height:100%;object-fit:cover;"></video>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Content: left-aligned, leaves room for phone -->
       <div
@@ -919,6 +949,23 @@
     <div class="slide" id="s6">
       <div class="orb orb1"></div>
       <div class="orb orb2"></div>
+
+      <!-- Phone LEFT -->
+      <div class="phone-wrap"
+        style="position:absolute;left:60px;top:50%;transform:translateY(-50%);z-index:2;">
+        <div class="phone-stage">
+          <div class="phone-glow"></div>
+          <div class="phone-mock"
+            style="width:310px;height:664px;transform:rotate(7deg);clip-path:inset(0 round 38px);">
+            <div class="phone-vol1"></div>
+            <div class="phone-vol2"></div>
+            <div class="phone-screen">
+              <video src="quiz.mp4" muted playsinline loop
+                style="width:100%;height:100%;object-fit:cover;"></video>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div
         style="position:relative;z-index:1;display:flex;gap:72px;align-items:center;max-width:1060px;width:100%;">
@@ -1084,13 +1131,13 @@
             </div>
             <div class="s7-info-row">
               <span class="s7-info-label">Event</span>
-              <span class="s7-info-value">GDG DevFest 2026</span>
+              <span class="s7-info-value">GDG HackAI 2026</span>
             </div>
             <div class="s7-info-row">
               <span class="s7-info-label">Platform</span>
               <span class="s7-info-value"
                 style="background:linear-gradient(90deg,#c084fc,#60b4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">iOS
-                &amp; Android</span>
+                &amp; Android &amp; Web</span>
             </div>
           </div>
 
@@ -1120,14 +1167,12 @@
 
   function goTo(idx) {
     slides[current].classList.remove('active');
-    const old = slides[current].querySelector('video');
-    if (old) { try { old.pause(); old.currentTime = 0; } catch(e){} }
+    slides[current].querySelectorAll('video').forEach(v => { try { v.pause(); v.currentTime = 0; } catch(e){} });
 
     current = Math.max(0, Math.min(N - 1, idx));
     slides[current].classList.add('active');
 
-    const vid = slides[current].querySelector('video');
-    if (vid && vid.src) vid.play().catch(() => {});
+    slides[current].querySelectorAll('video').forEach(v => { if (v.src) v.play().catch(() => {}); });
 
     curEl.textContent = current + 1;
     fillEl.style.width = ((current + 1) / N * 100) + '%';
