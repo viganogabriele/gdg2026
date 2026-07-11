@@ -4,6 +4,18 @@
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/onboarding.png" width="28%" alt="Onboarding — What are you studying?" />
+  &nbsp;&nbsp;
+  <img src="screenshots/home.png" width="28%" alt="Home — daily objectives and streak" />
+  &nbsp;&nbsp;
+  <img src="screenshots/profile.png" width="28%" alt="Profile — stats and badges" />
+</p>
+
+---
+
 ## Hackathon Context
 
 **Event:** [GDG AI HACK 2026](https://gdgaihack.com/) — organised by GDG on Campus PoliMi & GDG Cloud Milano  
