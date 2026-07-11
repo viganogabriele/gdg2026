@@ -33,13 +33,14 @@ The result is a personalised, level-by-level roadmap where each level has a dead
 
 | Feature | How it works |
 |---|---|
-| **AI Roadmap Generation** | Gemini 2.0 Flash analyses subject + sources and produces a typed, structured level graph — no regex, native JSON schema output |
-| **Knowledge Assessment** | 12 questions before onboarding completes; students with prior knowledge start at the right level |
-| **Spaced Repetition** | Leitner box (5 boxes, SM-2 ease factor, 1/3/7/14/30-day intervals) — runs as a 5-minute daily warm-up |
-| **Gamification** | Points, streaks, badges — deliberately no leaderboard (competitive pressure during exam prep is net-negative) |
-| **Focus Mode** | Rotating the phone to landscape triggers a distraction-free Pomodoro view — a physical affordance, not a software lock |
-| **Braynr Integration** | Imports a `braynr-export.json` to personalise the roadmap to the student's real reading speed, retention rate, and average session length |
-| **3-tier AI fallback** | Gemini SDK → OpenRouter → deterministic local mocks; the demo always works, even offline |
+| **AI Roadmap Generation** | Gemini 2.0 Flash analyses subject + sources and produces a structured level graph via native JSON schema output — no regex, no fragile parsing |
+| **Knowledge Assessment** | 12-question quiz before onboarding completes; students with prior knowledge start at the right level |
+| **Spaced Repetition** | Full SM-2+ engine with Leitner boxes (1/3/7/14/30-day intervals), ease-factor decay, and a reinforcement mode that forces struggling cards into every session until 2 consecutive correct answers |
+| **Focus Mode** | Physically tilting the phone to landscape (detected via accelerometer) navigates to a distraction-free Pomodoro view — no chrome, no notifications |
+| **Multi-roadmap** | Full multi-subject support with a roadmap switcher — each subject has independent levels, objectives, quizzes, and spaced rep cards |
+| **Gamification** | Points, streaks, badges, streak multipliers (1.5×/2×/3× at 7/14/30 days), and a mock leaderboard showing your rank among friends |
+| **Braynr Integration** | Syncs with a Braynr profile (reading speed, retention rate, avg session length) to personalise time estimates per level objective |
+| **3-tier AI fallback** | Gemini SDK → OpenRouter → deterministic local mocks; the demo always works, even without API keys |
 
 ---
 
@@ -67,13 +68,14 @@ app/
   (onboarding)/          # 6-step modal flow
     subject.tsx          #   1. Subject title
     sources.tsx          #   2. PDFs / URLs / notes
-    deadline.tsx         #   3. Deadline + hours/week + Braynr import
+    deadline.tsx         #   3. Deadline + hours/week
     processing.tsx       #   4. AI analysis (animated)
     assessment.tsx       #   5. Knowledge quiz (12 Qs)
     roadmap-reveal.tsx   #   6. Animated roadmap reveal
   (tabs)/
-    index.tsx            # Home: today's objectives, streak, quick-review
+    index.tsx            # Home: today's objectives, streak, quick-review, roadmap switcher
     roadmap.tsx          # Full level map with status + deadlines
+    leaderboard.tsx      # Leaderboard: podium view + ranked list
     profile.tsx          # Stats, badges
   quiz/[id].tsx          # Level quiz gate (pass = 70%+)
   quiz/daily-challenge.tsx
@@ -83,22 +85,27 @@ app/
 services/
   gemini.ts              # All Gemini prompt/schema definitions
   api.ts                 # 3-tier fallback orchestration
-  spacedRepetition.ts    # SM-2+ Leitner box engine (local, no network)
-  braynrParser.ts        # Parses Braynr export → BraynrStudyProfile
-  roadmapEstimates.ts    # Per-objective time estimates from Braynr profile
+  spacedRepetition.ts    # SM-2+ Leitner box engine (5 boxes, ease factor, reinforcement mode)
+  braynrParser.ts        # Parses Braynr export → reading speed / retention / session length
+  roadmapEstimates.ts    # Per-objective time estimates using Braynr profile
   roadmapMerge.ts        # Roadmap adjustment after failed levels
+  leaderboard.ts         # Leaderboard service (mock, ready for real API)
   mockData.ts            # Deterministic mocks keyed by subject title
 
 hooks/
   useStudyStore.ts       # Central Zustand store (multi-roadmap, gamification, SR)
   useSpacedRepetition.ts
-  useGamePoints.ts
+  useGamePoints.ts       # Points + streak multipliers + badge triggers
+  useLeaderboard.ts      # Leaderboard data hook
+
+components/
+  RoadmapSelector.tsx    # Multi-roadmap switcher UI
 
 constants/
   theme.ts               # Design tokens
   gamification.ts        # Point values, badge definitions, Pomodoro defaults
 
-types/index.ts           # All shared TypeScript types
+types/index.ts           # All shared TypeScript types (includes Roadmap type)
 ```
 
 ### AI fallback chain
@@ -109,8 +116,7 @@ api.generateRoadmap()
   ├─ 1. Gemini SDK   responseSchema + responseMimeType: application/json
   │                  → type-safe structured output, no parsing
   │
-  ├─ 2. OpenRouter   REST, OpenAI-compatible interface
-  │                  → same model, different auth path
+  ├─ 2. OpenRouter   REST, OpenAI-compatible interface, same model
   │
   └─ 3. Mock data    deterministic generators keyed by subject title
                      → always works, even without API keys
@@ -162,22 +168,22 @@ npx expo start --android
 
 **Assessment-first, not onboarding-first.** Most apps dump you into a blank state and expect you to self-assess. We run a quiz *before* the roadmap is generated — a student who already knows half the material gets a shorter, more relevant roadmap immediately.
 
-**No leaderboard.** It was in the original spec. We removed it. Competitive rankings during exam prep add anxiety without improving outcomes. Streaks and badges reward *your own* consistency, not how you compare to others.
+**Tilt-to-focus as a physical affordance.** The accelerometer runs in the root layout at 500ms intervals. When `|x| > 0.75 && |y| < 0.5`, the app navigates to focus mode and passes the tilt direction so the Pomodoro screen rotates accordingly. Rotating the phone isn't a gesture you do by accident — the transition to a distraction-free session requires a deliberate physical act.
 
-**Tilt-to-focus as a physical affordance.** Rotating the phone isn't a gesture you do by accident. Making landscape mode the focus-mode trigger means the transition to a distraction-free session requires a deliberate physical act — which is the point.
+**Structured AI output from day one.** Every Gemini call uses `responseSchema`. This meant zero time debugging malformed AI responses during the hackathon.
 
-**Structured AI output from day one.** Every Gemini call uses `responseSchema`. No JSON.parse-and-hope. This meant we spent zero time debugging malformed AI responses and could iterate on the actual product.
+**SM-2+ with a reinforcement mode.** Standard SM-2 lets struggling cards drift. Our implementation tracks consecutive failures: after 3 misses, a card enters reinforcement mode and appears in every session until 2 consecutive correct answers. This is a real behaviour change, not just a cosmetic tweak to intervals.
 
 ---
 
 ## What We'd Do With More Time
 
-- **Real source ingestion** — the picker accepts PDFs/URLs but doesn't extract text yet; fix is piping through Gemini's multimodal `inlineData`
+- **Real source ingestion** — the picker accepts PDFs/URLs but Gemini currently only receives the subject title; fix is piping files through `inlineData`
 - **Streaming roadmap generation** — `streamGenerateContent` so the roadmap appears node-by-node instead of a 10-second wait
-- **Smarter rescheduling** — currently ±2 days of local logic; better to send the full context to Gemini and let it reason
-- **Multi-subject dashboard** — store and types already support `subjects: Subject[]`; the UI only creates one
-- **Push notifications** — `services/notifications.ts` exists and is wired to Expo Notifications, but is never called from the UI
-- **Backend proxy** — API keys live in the client bundle, fine for a demo, unacceptable for production
+- **Smarter rescheduling** — currently ±2 days of local logic after a failed level; better to send full context to Gemini and let it reason
+- **Real leaderboard backend** — `services/leaderboard.ts` returns hardcoded mock data; the hook and UI are ready for a real API
+- **Push notifications** — `services/notifications.ts` and `hooks/useNotifications.ts` are fully implemented but `initNotifications` is never called from the UI
+- **Real Braynr import** — currently reads a hardcoded `assets/braynr-export.json`; the parser is ready, the file picker just needs wiring
 
 ---
 
